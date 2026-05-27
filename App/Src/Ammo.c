@@ -4,9 +4,17 @@
 #include "stdio.h"
 #include "string.h"
 #include "stdarg.h"
+#include "math.h"
 #include "remote_control.h"
 #include "Data.h"
 #include "dma.h"
+
+#define BALLISTIC_ANGLE_DEG      26.6f
+#define BALLISTIC_HORIZ_DIST     16.05f
+#define BALLISTIC_HEIGHT_DIFF    1.5f
+#define BALLISTIC_GRAVITY        9.81f
+#define BALLISTIC_WHEEL_RADIUS   0.044f
+#define BALLISTIC_PAIR1_RPM      5000
 
 //ammo_step_e ammo_step =STEP_AMMO_CLOSE;
 ammo_step_e ammo_step =STEP_AMMO_STOP;
@@ -31,8 +39,28 @@ static int shoot_G_time = 0;
 int ammo_time = 0;
 int len=10;
 int vel_trans[6]={2500,-2500,3000,-3000,3000,-3000};
-int vel_before[6]={5000,-5000,3600,-3600,3374,-3374};//25米散布圆
-int vel_last[6]={3570,-3570,4070,-4070,4570,-4570};
+int vel_before[6]={0};
+int vel_last[6]={0};
+
+static int ballistic_calc_rpm(void)
+{
+    float angle_rad = BALLISTIC_ANGLE_DEG * 3.141592654f / 180.0f;
+    float cos_a = cosf(angle_rad);
+    float tan_a = tanf(angle_rad);
+    float v0 = BALLISTIC_HORIZ_DIST / cos_a
+               * sqrtf(BALLISTIC_GRAVITY / (2.0f * (BALLISTIC_HORIZ_DIST * tan_a - BALLISTIC_HEIGHT_DIFF)));
+    return (int)(v0 * 60.0f / (2.0f * 3.141592654f * BALLISTIC_WHEEL_RADIUS));
+}
+
+static void ballistic_set_vel_before(int rpm_base)
+{
+    int pair3 = rpm_base;
+    int pair2 = rpm_base + 300;
+
+    vel_before[0] =  BALLISTIC_PAIR1_RPM;  vel_before[1] = -BALLISTIC_PAIR1_RPM;
+    vel_before[2] =  pair2;               vel_before[3] = -pair2;
+    vel_before[4] =  pair3;               vel_before[5] = -pair3;
+}
 //int vel[6]={4365,-4365,4865,-4865,5365,-5365};//25米基地固定目标
 //int vel[6]={3601,-3601,4101,-4101,4601,-4601};//16米前哨站目标
 //int vel[6]={3601,-3601,3601,-3601,3601,-3601};
@@ -107,6 +135,8 @@ void Ammo_Task()
     PID_init(&PID_chassis_pos[1] , PID_chassis_pos_Kp , PID_chassis_pos_Ki , PID_chassis_pos_Kd , PID_chassis_pos_imax , PID_chassis_pos_outmax);
     PID_init(&PID_chassis_pos[2] , PID_chassis_pos_Kp , PID_chassis_pos_Ki , PID_chassis_pos_Kd , PID_chassis_pos_imax , PID_chassis_pos_outmax);
     PID_init(&PID_chassis_pos[3] , PID_chassis_pos_Kp , PID_chassis_pos_Ki , PID_chassis_pos_Kd , PID_chassis_pos_imax , PID_chassis_pos_outmax);
+
+    ballistic_set_vel_before(ballistic_calc_rpm());
 
 
     while(1)
