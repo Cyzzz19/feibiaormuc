@@ -1,0 +1,1922 @@
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"BMI088.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.BMI088_delay_us,"ax",%progbits
+  20              		.align	1
+  21              		.global	BMI088_delay_us
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	BMI088_delay_us:
+  27              	.LVL0:
+  28              	.LFB143:
+  29              		.file 1 "Library/Src/BMI088.c"
+   1:Library/Src/BMI088.c **** #include "BMI088.h"
+   2:Library/Src/BMI088.c **** 
+   3:Library/Src/BMI088.c **** 
+   4:Library/Src/BMI088.c **** float BMI088_ACCEL_SEN = BMI088_ACCEL_3G_SEN;
+   5:Library/Src/BMI088.c **** float BMI088_GYRO_SEN = BMI088_GYRO_2000_SEN;
+   6:Library/Src/BMI088.c **** 
+   7:Library/Src/BMI088.c **** 
+   8:Library/Src/BMI088.c **** #define BMI088_accel_write_single_reg(reg, data)   \
+   9:Library/Src/BMI088.c ****     {                                            \
+  10:Library/Src/BMI088.c ****         HAL_GPIO_WritePin(GPIOA , GPIO_PIN_4 , 0);                     \
+  11:Library/Src/BMI088.c ****         BMI088_write_single_reg((reg) , (data));  \
+  12:Library/Src/BMI088.c ****         HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, 1);                     \
+  13:Library/Src/BMI088.c ****     }
+  14:Library/Src/BMI088.c **** #define BMI088_accel_read_single_reg(reg, data) \
+  15:Library/Src/BMI088.c ****     {                                           \
+  16:Library/Src/BMI088.c ****         HAL_GPIO_WritePin(GPIOA , GPIO_PIN_4 , 0);                    \
+  17:Library/Src/BMI088.c ****         BMI088_read_write_byte((reg) | 0x80);   \
+  18:Library/Src/BMI088.c ****         BMI088_read_write_byte(0x55);           \
+  19:Library/Src/BMI088.c ****         (data) = BMI088_read_write_byte(0x55);  \
+  20:Library/Src/BMI088.c ****         HAL_GPIO_WritePin(GPIOA , GPIO_PIN_4 , 1);                    \
+  21:Library/Src/BMI088.c ****     }
+  22:Library/Src/BMI088.c **** 
+  23:Library/Src/BMI088.c **** #define BMI088_accel_read_muli_reg(reg, data, len) \
+  24:Library/Src/BMI088.c ****     {                                              \
+  25:Library/Src/BMI088.c ****         HAL_GPIO_WritePin(GPIOA , GPIO_PIN_4 , 0);                       \
+  26:Library/Src/BMI088.c ****         BMI088_read_write_byte((reg) | 0x80);      \
+  27:Library/Src/BMI088.c ****         BMI088_read_muli_reg(reg, data, len);      \
+  28:Library/Src/BMI088.c ****         HAL_GPIO_WritePin(GPIOA , GPIO_PIN_4 , 1);                       \
+  29:Library/Src/BMI088.c ****     }
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 2
+
+
+  30:Library/Src/BMI088.c **** 
+  31:Library/Src/BMI088.c **** #define BMI088_gyro_write_single_reg(reg, data) \
+  32:Library/Src/BMI088.c ****     {                                           \
+  33:Library/Src/BMI088.c ****         HAL_GPIO_WritePin(GPIOB , GPIO_PIN_0 , 0);                    \
+  34:Library/Src/BMI088.c ****         BMI088_write_single_reg((reg), (data)); \
+  35:Library/Src/BMI088.c ****         HAL_GPIO_WritePin(GPIOB , GPIO_PIN_0 , 1);                     \
+  36:Library/Src/BMI088.c ****     }
+  37:Library/Src/BMI088.c **** #define BMI088_gyro_read_single_reg(reg, data)  \
+  38:Library/Src/BMI088.c ****     {                                           \
+  39:Library/Src/BMI088.c ****         HAL_GPIO_WritePin(GPIOB , GPIO_PIN_0 , 0);                     \
+  40:Library/Src/BMI088.c ****         BMI088_read_single_reg((reg), &(data)); \
+  41:Library/Src/BMI088.c ****         HAL_GPIO_WritePin(GPIOB , GPIO_PIN_0 , 1);                     \
+  42:Library/Src/BMI088.c ****     }
+  43:Library/Src/BMI088.c **** 
+  44:Library/Src/BMI088.c **** #define BMI088_gyro_read_muli_reg(reg, data, len)   \
+  45:Library/Src/BMI088.c ****     {                                               \
+  46:Library/Src/BMI088.c ****         HAL_GPIO_WritePin(GPIOB , GPIO_PIN_0 , 0);                         \
+  47:Library/Src/BMI088.c ****         BMI088_read_muli_reg((reg), (data), (len)); \
+  48:Library/Src/BMI088.c ****         HAL_GPIO_WritePin(GPIOB , GPIO_PIN_0 , 1);                         \
+  49:Library/Src/BMI088.c ****     }
+  50:Library/Src/BMI088.c **** 
+  51:Library/Src/BMI088.c **** static void BMI088_write_single_reg(uint8_t reg, uint8_t data);
+  52:Library/Src/BMI088.c **** static void BMI088_read_single_reg(uint8_t reg, uint8_t *return_data);
+  53:Library/Src/BMI088.c **** //static void BMI088_write_muli_reg(uint8_t reg, uint8_t* buf, uint8_t len );
+  54:Library/Src/BMI088.c **** static void BMI088_read_muli_reg(uint8_t reg, uint8_t *buf, uint8_t len);
+  55:Library/Src/BMI088.c **** 
+  56:Library/Src/BMI088.c **** 
+  57:Library/Src/BMI088.c **** 
+  58:Library/Src/BMI088.c **** 
+  59:Library/Src/BMI088.c **** 
+  60:Library/Src/BMI088.c **** static uint8_t write_BMI088_accel_reg_data_error[BMI088_WRITE_ACCEL_REG_NUM][3] =
+  61:Library/Src/BMI088.c ****     {
+  62:Library/Src/BMI088.c ****         {BMI088_ACC_PWR_CTRL, BMI088_ACC_ENABLE_ACC_ON, BMI088_ACC_PWR_CTRL_ERROR},
+  63:Library/Src/BMI088.c ****         {BMI088_ACC_PWR_CONF, BMI088_ACC_PWR_ACTIVE_MODE, BMI088_ACC_PWR_CONF_ERROR},
+  64:Library/Src/BMI088.c ****         {BMI088_ACC_CONF,  BMI088_ACC_NORMAL| BMI088_ACC_800_HZ | BMI088_ACC_CONF_MUST_Set, BMI088_
+  65:Library/Src/BMI088.c ****         {BMI088_ACC_RANGE, BMI088_ACC_RANGE_3G, BMI088_ACC_RANGE_ERROR},
+  66:Library/Src/BMI088.c ****         {BMI088_INT1_IO_CTRL, BMI088_ACC_INT1_IO_ENABLE | BMI088_ACC_INT1_GPIO_PP | BMI088_ACC_INT1
+  67:Library/Src/BMI088.c ****         {BMI088_INT_MAP_DATA, BMI088_ACC_INT1_DRDY_INTERRUPT, BMI088_INT_MAP_DATA_ERROR}
+  68:Library/Src/BMI088.c **** 
+  69:Library/Src/BMI088.c **** };
+  70:Library/Src/BMI088.c **** 
+  71:Library/Src/BMI088.c **** static uint8_t write_BMI088_gyro_reg_data_error[BMI088_WRITE_GYRO_REG_NUM][3] =
+  72:Library/Src/BMI088.c ****     {
+  73:Library/Src/BMI088.c ****         {BMI088_GYRO_RANGE, BMI088_GYRO_2000, BMI088_GYRO_RANGE_ERROR},
+  74:Library/Src/BMI088.c ****         {BMI088_GYRO_BANDWIDTH, BMI088_GYRO_1000_116_HZ | BMI088_GYRO_BANDWIDTH_MUST_Set, BMI088_GY
+  75:Library/Src/BMI088.c ****         {BMI088_GYRO_LPM1, BMI088_GYRO_NORMAL_MODE, BMI088_GYRO_LPM1_ERROR},
+  76:Library/Src/BMI088.c ****         {BMI088_GYRO_CTRL, BMI088_DRDY_ON, BMI088_GYRO_CTRL_ERROR},
+  77:Library/Src/BMI088.c ****         {BMI088_GYRO_INT3_INT4_IO_CONF, BMI088_GYRO_INT3_GPIO_PP | BMI088_GYRO_INT3_GPIO_LOW, BMI08
+  78:Library/Src/BMI088.c ****         {BMI088_GYRO_INT3_INT4_IO_MAP, BMI088_GYRO_DRDY_IO_INT3, BMI088_GYRO_INT3_INT4_IO_MAP_ERROR
+  79:Library/Src/BMI088.c **** 
+  80:Library/Src/BMI088.c **** };
+  81:Library/Src/BMI088.c **** 
+  82:Library/Src/BMI088.c **** void BMI088_init(void)
+  83:Library/Src/BMI088.c **** {
+  84:Library/Src/BMI088.c ****     bmi088_accel_init();
+  85:Library/Src/BMI088.c ****     bmi088_gyro_init();
+  86:Library/Src/BMI088.c **** }
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 3
+
+
+  87:Library/Src/BMI088.c **** 
+  88:Library/Src/BMI088.c **** void bmi088_accel_init(void)
+  89:Library/Src/BMI088.c **** {
+  90:Library/Src/BMI088.c ****     uint8_t res = 0;
+  91:Library/Src/BMI088.c ****     uint8_t write_reg_num = 0;
+  92:Library/Src/BMI088.c ****     
+  93:Library/Src/BMI088.c ****     while(res != BMI088_ACC_CHIP_ID_VALUE)
+  94:Library/Src/BMI088.c ****     {
+  95:Library/Src/BMI088.c ****         BMI088_accel_read_single_reg(BMI088_ACC_CHIP_ID, res);
+  96:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+  97:Library/Src/BMI088.c ****         BMI088_accel_read_single_reg(BMI088_ACC_CHIP_ID, res);
+  98:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+  99:Library/Src/BMI088.c **** 
+ 100:Library/Src/BMI088.c ****         BMI088_accel_write_single_reg(BMI088_ACC_SOFTRESET, BMI088_ACC_SOFTRESET_VALUE);
+ 101:Library/Src/BMI088.c ****         BMI088_delay_ms(BMI088_LONG_DELAY_TIME);
+ 102:Library/Src/BMI088.c **** 
+ 103:Library/Src/BMI088.c ****         BMI088_accel_read_single_reg(BMI088_ACC_CHIP_ID, res);
+ 104:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 105:Library/Src/BMI088.c ****         BMI088_accel_read_single_reg(BMI088_ACC_CHIP_ID, res);
+ 106:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 107:Library/Src/BMI088.c ****     }
+ 108:Library/Src/BMI088.c **** 
+ 109:Library/Src/BMI088.c ****     for (write_reg_num = 0; write_reg_num < BMI088_WRITE_ACCEL_REG_NUM; write_reg_num++)
+ 110:Library/Src/BMI088.c ****     {
+ 111:Library/Src/BMI088.c ****         while(res != write_BMI088_accel_reg_data_error[write_reg_num][1])
+ 112:Library/Src/BMI088.c ****         {
+ 113:Library/Src/BMI088.c ****             BMI088_accel_write_single_reg(write_BMI088_accel_reg_data_error[write_reg_num][0], writ
+ 114:Library/Src/BMI088.c ****             BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 115:Library/Src/BMI088.c **** 
+ 116:Library/Src/BMI088.c ****             BMI088_accel_read_single_reg(write_BMI088_accel_reg_data_error[write_reg_num][0], res);
+ 117:Library/Src/BMI088.c ****             BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 118:Library/Src/BMI088.c ****         }
+ 119:Library/Src/BMI088.c ****     }
+ 120:Library/Src/BMI088.c **** }
+ 121:Library/Src/BMI088.c **** 
+ 122:Library/Src/BMI088.c **** void bmi088_gyro_init(void)
+ 123:Library/Src/BMI088.c **** {
+ 124:Library/Src/BMI088.c ****     uint8_t write_reg_num = 0;
+ 125:Library/Src/BMI088.c ****     uint8_t res = 0;
+ 126:Library/Src/BMI088.c **** 
+ 127:Library/Src/BMI088.c ****     while(res != BMI088_GYRO_CHIP_ID_VALUE)
+ 128:Library/Src/BMI088.c ****     {
+ 129:Library/Src/BMI088.c **** 
+ 130:Library/Src/BMI088.c ****         BMI088_gyro_read_single_reg(BMI088_GYRO_CHIP_ID, res);
+ 131:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 132:Library/Src/BMI088.c ****         BMI088_gyro_read_single_reg(BMI088_GYRO_CHIP_ID, res);
+ 133:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 134:Library/Src/BMI088.c **** 
+ 135:Library/Src/BMI088.c ****         BMI088_gyro_write_single_reg(BMI088_GYRO_SOFTRESET, BMI088_GYRO_SOFTRESET_VALUE);
+ 136:Library/Src/BMI088.c ****         BMI088_delay_ms(BMI088_LONG_DELAY_TIME);
+ 137:Library/Src/BMI088.c **** 
+ 138:Library/Src/BMI088.c ****         BMI088_gyro_read_single_reg(BMI088_GYRO_CHIP_ID, res);
+ 139:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 140:Library/Src/BMI088.c ****         BMI088_gyro_read_single_reg(BMI088_GYRO_CHIP_ID, res);
+ 141:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 142:Library/Src/BMI088.c ****     }
+ 143:Library/Src/BMI088.c ****     
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 4
+
+
+ 144:Library/Src/BMI088.c ****     for (write_reg_num = 0; write_reg_num < BMI088_WRITE_GYRO_REG_NUM; write_reg_num++)
+ 145:Library/Src/BMI088.c ****     {
+ 146:Library/Src/BMI088.c ****         while(res != write_BMI088_gyro_reg_data_error[write_reg_num][1])
+ 147:Library/Src/BMI088.c ****         {
+ 148:Library/Src/BMI088.c ****             BMI088_gyro_write_single_reg(write_BMI088_gyro_reg_data_error[write_reg_num][0], write_
+ 149:Library/Src/BMI088.c ****             BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 150:Library/Src/BMI088.c **** 
+ 151:Library/Src/BMI088.c ****             BMI088_gyro_read_single_reg(write_BMI088_gyro_reg_data_error[write_reg_num][0], res);
+ 152:Library/Src/BMI088.c ****             BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 153:Library/Src/BMI088.c ****         }
+ 154:Library/Src/BMI088.c ****     }
+ 155:Library/Src/BMI088.c **** }
+ 156:Library/Src/BMI088.c **** 
+ 157:Library/Src/BMI088.c **** 
+ 158:Library/Src/BMI088.c **** void BMI088_read(float gyro[3], float accel[3], float *temperate)
+ 159:Library/Src/BMI088.c **** {
+ 160:Library/Src/BMI088.c ****     uint8_t buf[8] = {0, 0, 0, 0, 0, 0};
+ 161:Library/Src/BMI088.c ****     int16_t bmi088_raw_temp;
+ 162:Library/Src/BMI088.c **** 
+ 163:Library/Src/BMI088.c ****     BMI088_accel_read_muli_reg(BMI088_ACCEL_XOUT_L, buf, 6);
+ 164:Library/Src/BMI088.c ****     
+ 165:Library/Src/BMI088.c ****     bmi088_raw_temp = (int16_t)((buf[1]) << 8) | buf[0];
+ 166:Library/Src/BMI088.c ****     accel[0] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 167:Library/Src/BMI088.c ****     bmi088_raw_temp = (int16_t)((buf[3]) << 8) | buf[2];
+ 168:Library/Src/BMI088.c ****     accel[1] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 169:Library/Src/BMI088.c ****     bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 170:Library/Src/BMI088.c ****     accel[2] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 171:Library/Src/BMI088.c ****     
+ 172:Library/Src/BMI088.c ****     BMI088_gyro_read_muli_reg(BMI088_GYRO_CHIP_ID, buf, 8);
+ 173:Library/Src/BMI088.c ****     if(buf[0] == BMI088_GYRO_CHIP_ID_VALUE)
+ 174:Library/Src/BMI088.c ****     {
+ 175:Library/Src/BMI088.c ****         bmi088_raw_temp = (int16_t)((buf[3]) << 8) | buf[2];
+ 176:Library/Src/BMI088.c ****         gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 177:Library/Src/BMI088.c ****         bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 178:Library/Src/BMI088.c ****         gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 179:Library/Src/BMI088.c ****         bmi088_raw_temp = (int16_t)((buf[7]) << 8) | buf[6];
+ 180:Library/Src/BMI088.c ****         gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 181:Library/Src/BMI088.c ****     }
+ 182:Library/Src/BMI088.c ****     BMI088_accel_read_muli_reg(BMI088_TEMP_M, buf, 2);
+ 183:Library/Src/BMI088.c ****     
+ 184:Library/Src/BMI088.c ****     bmi088_raw_temp = (int16_t)((buf[0] << 3) | (buf[1] >> 5));
+ 185:Library/Src/BMI088.c **** 
+ 186:Library/Src/BMI088.c ****     if (bmi088_raw_temp > 1023)
+ 187:Library/Src/BMI088.c ****     {
+ 188:Library/Src/BMI088.c ****         bmi088_raw_temp -= 2048;
+ 189:Library/Src/BMI088.c ****     }
+ 190:Library/Src/BMI088.c ****     
+ 191:Library/Src/BMI088.c ****     *temperate = bmi088_raw_temp * BMI088_TEMP_FACTOR + BMI088_TEMP_OFFSET;
+ 192:Library/Src/BMI088.c **** }
+ 193:Library/Src/BMI088.c **** 
+ 194:Library/Src/BMI088.c **** 
+ 195:Library/Src/BMI088.c **** static void BMI088_write_single_reg(uint8_t reg, uint8_t data)
+ 196:Library/Src/BMI088.c **** {
+ 197:Library/Src/BMI088.c ****     BMI088_read_write_byte(reg);
+ 198:Library/Src/BMI088.c ****     BMI088_read_write_byte(data);
+ 199:Library/Src/BMI088.c **** }
+ 200:Library/Src/BMI088.c **** 
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 5
+
+
+ 201:Library/Src/BMI088.c **** static void BMI088_read_single_reg(uint8_t reg, uint8_t *return_data)
+ 202:Library/Src/BMI088.c **** {
+ 203:Library/Src/BMI088.c ****     BMI088_read_write_byte(reg | 0x80);
+ 204:Library/Src/BMI088.c ****     *return_data = BMI088_read_write_byte(0x55);
+ 205:Library/Src/BMI088.c **** }
+ 206:Library/Src/BMI088.c **** 
+ 207:Library/Src/BMI088.c **** 
+ 208:Library/Src/BMI088.c **** static void BMI088_read_muli_reg(uint8_t reg, uint8_t *buf, uint8_t len)
+ 209:Library/Src/BMI088.c **** {
+ 210:Library/Src/BMI088.c ****     BMI088_read_write_byte(reg | 0x80);
+ 211:Library/Src/BMI088.c **** 
+ 212:Library/Src/BMI088.c ****     while (len != 0)
+ 213:Library/Src/BMI088.c ****     {
+ 214:Library/Src/BMI088.c **** 
+ 215:Library/Src/BMI088.c ****         *buf = BMI088_read_write_byte(0x55);
+ 216:Library/Src/BMI088.c ****         buf++;
+ 217:Library/Src/BMI088.c ****         len--;
+ 218:Library/Src/BMI088.c ****     }
+ 219:Library/Src/BMI088.c **** }
+ 220:Library/Src/BMI088.c **** 
+ 221:Library/Src/BMI088.c **** 
+ 222:Library/Src/BMI088.c **** 
+ 223:Library/Src/BMI088.c **** void BMI088_delay_ms(uint16_t ms)
+ 224:Library/Src/BMI088.c **** {
+ 225:Library/Src/BMI088.c ****     while(ms--)
+ 226:Library/Src/BMI088.c ****     {
+ 227:Library/Src/BMI088.c ****         BMI088_delay_us(1000);
+ 228:Library/Src/BMI088.c ****     }
+ 229:Library/Src/BMI088.c **** }
+ 230:Library/Src/BMI088.c **** 
+ 231:Library/Src/BMI088.c **** void BMI088_delay_us(uint16_t us)
+ 232:Library/Src/BMI088.c **** {
+  30              		.loc 1 232 1 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		@ link register save eliminated.
+  35              		.loc 1 232 1 is_stmt 0 view .LVU1
+  36 0000 10B4     		push	{r4}
+  37              	.LCFI0:
+  38              		.cfi_def_cfa_offset 4
+  39              		.cfi_offset 4, -4
+ 233:Library/Src/BMI088.c **** 
+ 234:Library/Src/BMI088.c ****     uint32_t ticks = 0;
+  40              		.loc 1 234 5 is_stmt 1 view .LVU2
+  41              	.LVL1:
+ 235:Library/Src/BMI088.c ****     uint32_t told = 0;
+  42              		.loc 1 235 5 view .LVU3
+ 236:Library/Src/BMI088.c ****     uint32_t tnow = 0;
+  43              		.loc 1 236 5 view .LVU4
+ 237:Library/Src/BMI088.c ****     uint32_t tcnt = 0;
+  44              		.loc 1 237 5 view .LVU5
+ 238:Library/Src/BMI088.c ****     uint32_t reload = 0;
+  45              		.loc 1 238 5 view .LVU6
+ 239:Library/Src/BMI088.c ****     reload = SysTick->LOAD;
+  46              		.loc 1 239 5 view .LVU7
+  47              		.loc 1 239 12 is_stmt 0 view .LVU8
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 6
+
+
+  48 0002 4FF0E023 		mov	r3, #-536813568
+  49 0006 5C69     		ldr	r4, [r3, #20]
+  50              	.LVL2:
+ 240:Library/Src/BMI088.c ****     ticks = us * 168;
+  51              		.loc 1 240 5 is_stmt 1 view .LVU9
+  52              		.loc 1 240 16 is_stmt 0 view .LVU10
+  53 0008 4FF0A80C 		mov	ip, #168
+  54 000c 0CFB00FC 		mul	ip, ip, r0
+  55              	.LVL3:
+ 241:Library/Src/BMI088.c ****     told = SysTick->VAL;
+  56              		.loc 1 241 5 is_stmt 1 view .LVU11
+  57              		.loc 1 241 10 is_stmt 0 view .LVU12
+  58 0010 9B69     		ldr	r3, [r3, #24]
+  59              	.LVL4:
+ 237:Library/Src/BMI088.c ****     uint32_t reload = 0;
+  60              		.loc 1 237 14 view .LVU13
+  61 0012 0021     		movs	r1, #0
+  62 0014 04E0     		b	.L5
+  63              	.LVL5:
+  64              	.L3:
+ 242:Library/Src/BMI088.c ****     while (1)
+ 243:Library/Src/BMI088.c ****     {
+ 244:Library/Src/BMI088.c ****         tnow = SysTick->VAL;
+ 245:Library/Src/BMI088.c ****         if (tnow != told)
+ 246:Library/Src/BMI088.c ****         {
+ 247:Library/Src/BMI088.c ****             if (tnow < told)
+ 248:Library/Src/BMI088.c ****             {
+ 249:Library/Src/BMI088.c ****                 tcnt += told - tnow;
+ 250:Library/Src/BMI088.c ****             }
+ 251:Library/Src/BMI088.c ****             else
+ 252:Library/Src/BMI088.c ****             {
+ 253:Library/Src/BMI088.c ****                 tcnt += reload - tnow + told;
+  65              		.loc 1 253 17 is_stmt 1 view .LVU14
+  66              		.loc 1 253 32 is_stmt 0 view .LVU15
+  67 0016 E01A     		subs	r0, r4, r3
+  68              		.loc 1 253 39 view .LVU16
+  69 0018 0244     		add	r2, r2, r0
+  70              	.LVL6:
+  71              		.loc 1 253 22 view .LVU17
+  72 001a 1144     		add	r1, r1, r2
+  73              	.LVL7:
+  74              	.L4:
+ 254:Library/Src/BMI088.c ****             }
+ 255:Library/Src/BMI088.c ****             told = tnow;
+  75              		.loc 1 255 13 is_stmt 1 view .LVU18
+ 256:Library/Src/BMI088.c ****             if (tcnt >= ticks)
+  76              		.loc 1 256 13 view .LVU19
+  77              		.loc 1 256 16 is_stmt 0 view .LVU20
+  78 001c 6145     		cmp	r1, ip
+  79 001e 09D2     		bcs	.L7
+  80              	.LVL8:
+  81              	.L5:
+ 237:Library/Src/BMI088.c ****     uint32_t reload = 0;
+  82              		.loc 1 237 14 view .LVU21
+  83 0020 1A46     		mov	r2, r3
+  84              	.LVL9:
+  85              	.L2:
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 7
+
+
+ 242:Library/Src/BMI088.c ****     {
+  86              		.loc 1 242 5 is_stmt 1 view .LVU22
+ 244:Library/Src/BMI088.c ****         if (tnow != told)
+  87              		.loc 1 244 9 view .LVU23
+ 244:Library/Src/BMI088.c ****         if (tnow != told)
+  88              		.loc 1 244 14 is_stmt 0 view .LVU24
+  89 0022 4FF0E023 		mov	r3, #-536813568
+  90 0026 9B69     		ldr	r3, [r3, #24]
+  91              	.LVL10:
+ 245:Library/Src/BMI088.c ****         {
+  92              		.loc 1 245 9 is_stmt 1 view .LVU25
+ 245:Library/Src/BMI088.c ****         {
+  93              		.loc 1 245 12 is_stmt 0 view .LVU26
+  94 0028 9A42     		cmp	r2, r3
+  95 002a FAD0     		beq	.L2
+ 247:Library/Src/BMI088.c ****             {
+  96              		.loc 1 247 13 is_stmt 1 view .LVU27
+ 247:Library/Src/BMI088.c ****             {
+  97              		.loc 1 247 16 is_stmt 0 view .LVU28
+  98 002c F3D9     		bls	.L3
+ 249:Library/Src/BMI088.c ****             }
+  99              		.loc 1 249 17 is_stmt 1 view .LVU29
+ 249:Library/Src/BMI088.c ****             }
+ 100              		.loc 1 249 30 is_stmt 0 view .LVU30
+ 101 002e D21A     		subs	r2, r2, r3
+ 102              	.LVL11:
+ 249:Library/Src/BMI088.c ****             }
+ 103              		.loc 1 249 22 view .LVU31
+ 104 0030 1144     		add	r1, r1, r2
+ 105              	.LVL12:
+ 249:Library/Src/BMI088.c ****             }
+ 106              		.loc 1 249 22 view .LVU32
+ 107 0032 F3E7     		b	.L4
+ 108              	.LVL13:
+ 109              	.L7:
+ 257:Library/Src/BMI088.c ****             {
+ 258:Library/Src/BMI088.c ****                 break;
+ 259:Library/Src/BMI088.c ****             }
+ 260:Library/Src/BMI088.c ****         }
+ 261:Library/Src/BMI088.c ****     }
+ 262:Library/Src/BMI088.c **** }
+ 110              		.loc 1 262 1 view .LVU33
+ 111 0034 5DF8044B 		ldr	r4, [sp], #4
+ 112              	.LCFI1:
+ 113              		.cfi_restore 4
+ 114              		.cfi_def_cfa_offset 0
+ 115              	.LVL14:
+ 116              		.loc 1 262 1 view .LVU34
+ 117 0038 7047     		bx	lr
+ 118              		.cfi_endproc
+ 119              	.LFE143:
+ 121              		.section	.text.BMI088_delay_ms,"ax",%progbits
+ 122              		.align	1
+ 123              		.global	BMI088_delay_ms
+ 124              		.syntax unified
+ 125              		.thumb
+ 126              		.thumb_func
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 8
+
+
+ 128              	BMI088_delay_ms:
+ 129              	.LVL15:
+ 130              	.LFB142:
+ 224:Library/Src/BMI088.c ****     while(ms--)
+ 131              		.loc 1 224 1 is_stmt 1 view -0
+ 132              		.cfi_startproc
+ 133              		@ args = 0, pretend = 0, frame = 0
+ 134              		@ frame_needed = 0, uses_anonymous_args = 0
+ 224:Library/Src/BMI088.c ****     while(ms--)
+ 135              		.loc 1 224 1 is_stmt 0 view .LVU36
+ 136 0000 10B5     		push	{r4, lr}
+ 137              	.LCFI2:
+ 138              		.cfi_def_cfa_offset 8
+ 139              		.cfi_offset 4, -8
+ 140              		.cfi_offset 14, -4
+ 225:Library/Src/BMI088.c ****     {
+ 141              		.loc 1 225 5 is_stmt 1 view .LVU37
+ 225:Library/Src/BMI088.c ****     {
+ 142              		.loc 1 225 10 is_stmt 0 view .LVU38
+ 143 0002 04E0     		b	.L9
+ 144              	.LVL16:
+ 145              	.L10:
+ 227:Library/Src/BMI088.c ****     }
+ 146              		.loc 1 227 9 is_stmt 1 view .LVU39
+ 147 0004 4FF47A70 		mov	r0, #1000
+ 148 0008 FFF7FEFF 		bl	BMI088_delay_us
+ 149              	.LVL17:
+ 225:Library/Src/BMI088.c ****     {
+ 150              		.loc 1 225 13 is_stmt 0 view .LVU40
+ 151 000c 2046     		mov	r0, r4
+ 152              	.LVL18:
+ 153              	.L9:
+ 225:Library/Src/BMI088.c ****     {
+ 154              		.loc 1 225 10 is_stmt 1 view .LVU41
+ 225:Library/Src/BMI088.c ****     {
+ 155              		.loc 1 225 13 is_stmt 0 view .LVU42
+ 156 000e 431E     		subs	r3, r0, #1
+ 157 0010 9CB2     		uxth	r4, r3
+ 158              	.LVL19:
+ 225:Library/Src/BMI088.c ****     {
+ 159              		.loc 1 225 10 view .LVU43
+ 160 0012 0028     		cmp	r0, #0
+ 161 0014 F6D1     		bne	.L10
+ 229:Library/Src/BMI088.c **** 
+ 162              		.loc 1 229 1 view .LVU44
+ 163 0016 10BD     		pop	{r4, pc}
+ 229:Library/Src/BMI088.c **** 
+ 164              		.loc 1 229 1 view .LVU45
+ 165              		.cfi_endproc
+ 166              	.LFE142:
+ 168              		.section	.text.BMI088_read_write_byte,"ax",%progbits
+ 169              		.align	1
+ 170              		.global	BMI088_read_write_byte
+ 171              		.syntax unified
+ 172              		.thumb
+ 173              		.thumb_func
+ 175              	BMI088_read_write_byte:
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 9
+
+
+ 176              	.LVL20:
+ 177              	.LFB144:
+ 263:Library/Src/BMI088.c **** 
+ 264:Library/Src/BMI088.c **** uint8_t BMI088_read_write_byte(uint8_t txdata)
+ 265:Library/Src/BMI088.c **** {
+ 178              		.loc 1 265 1 is_stmt 1 view -0
+ 179              		.cfi_startproc
+ 180              		@ args = 0, pretend = 0, frame = 16
+ 181              		@ frame_needed = 0, uses_anonymous_args = 0
+ 182              		.loc 1 265 1 is_stmt 0 view .LVU47
+ 183 0000 00B5     		push	{lr}
+ 184              	.LCFI3:
+ 185              		.cfi_def_cfa_offset 4
+ 186              		.cfi_offset 14, -4
+ 187 0002 87B0     		sub	sp, sp, #28
+ 188              	.LCFI4:
+ 189              		.cfi_def_cfa_offset 32
+ 190 0004 8DF80F00 		strb	r0, [sp, #15]
+ 266:Library/Src/BMI088.c ****     uint8_t rx_data;
+ 191              		.loc 1 266 5 is_stmt 1 view .LVU48
+ 267:Library/Src/BMI088.c ****     HAL_SPI_TransmitReceive(&hspi1, &txdata, &rx_data, 1, 1000);
+ 192              		.loc 1 267 5 view .LVU49
+ 193 0008 4FF47A73 		mov	r3, #1000
+ 194 000c 0093     		str	r3, [sp]
+ 195 000e 0123     		movs	r3, #1
+ 196 0010 0DF11702 		add	r2, sp, #23
+ 197 0014 0DF10F01 		add	r1, sp, #15
+ 198 0018 0348     		ldr	r0, .L14
+ 199              	.LVL21:
+ 200              		.loc 1 267 5 is_stmt 0 view .LVU50
+ 201 001a FFF7FEFF 		bl	HAL_SPI_TransmitReceive
+ 202              	.LVL22:
+ 268:Library/Src/BMI088.c ****     return rx_data;
+ 203              		.loc 1 268 5 is_stmt 1 view .LVU51
+ 269:Library/Src/BMI088.c **** }
+ 204              		.loc 1 269 1 is_stmt 0 view .LVU52
+ 205 001e 9DF81700 		ldrb	r0, [sp, #23]	@ zero_extendqisi2
+ 206 0022 07B0     		add	sp, sp, #28
+ 207              	.LCFI5:
+ 208              		.cfi_def_cfa_offset 4
+ 209              		@ sp needed
+ 210 0024 5DF804FB 		ldr	pc, [sp], #4
+ 211              	.L15:
+ 212              		.align	2
+ 213              	.L14:
+ 214 0028 00000000 		.word	hspi1
+ 215              		.cfi_endproc
+ 216              	.LFE144:
+ 218              		.section	.text.BMI088_write_single_reg,"ax",%progbits
+ 219              		.align	1
+ 220              		.syntax unified
+ 221              		.thumb
+ 222              		.thumb_func
+ 224              	BMI088_write_single_reg:
+ 225              	.LVL23:
+ 226              	.LFB139:
+ 196:Library/Src/BMI088.c ****     BMI088_read_write_byte(reg);
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 10
+
+
+ 227              		.loc 1 196 1 is_stmt 1 view -0
+ 228              		.cfi_startproc
+ 229              		@ args = 0, pretend = 0, frame = 0
+ 230              		@ frame_needed = 0, uses_anonymous_args = 0
+ 196:Library/Src/BMI088.c ****     BMI088_read_write_byte(reg);
+ 231              		.loc 1 196 1 is_stmt 0 view .LVU54
+ 232 0000 10B5     		push	{r4, lr}
+ 233              	.LCFI6:
+ 234              		.cfi_def_cfa_offset 8
+ 235              		.cfi_offset 4, -8
+ 236              		.cfi_offset 14, -4
+ 237 0002 0C46     		mov	r4, r1
+ 197:Library/Src/BMI088.c ****     BMI088_read_write_byte(data);
+ 238              		.loc 1 197 5 is_stmt 1 view .LVU55
+ 239 0004 FFF7FEFF 		bl	BMI088_read_write_byte
+ 240              	.LVL24:
+ 198:Library/Src/BMI088.c **** }
+ 241              		.loc 1 198 5 view .LVU56
+ 242 0008 2046     		mov	r0, r4
+ 243 000a FFF7FEFF 		bl	BMI088_read_write_byte
+ 244              	.LVL25:
+ 199:Library/Src/BMI088.c **** 
+ 245              		.loc 1 199 1 is_stmt 0 view .LVU57
+ 246 000e 10BD     		pop	{r4, pc}
+ 247              		.cfi_endproc
+ 248              	.LFE139:
+ 250              		.section	.text.bmi088_accel_init,"ax",%progbits
+ 251              		.align	1
+ 252              		.global	bmi088_accel_init
+ 253              		.syntax unified
+ 254              		.thumb
+ 255              		.thumb_func
+ 257              	bmi088_accel_init:
+ 258              	.LFB136:
+  89:Library/Src/BMI088.c ****     uint8_t res = 0;
+ 259              		.loc 1 89 1 is_stmt 1 view -0
+ 260              		.cfi_startproc
+ 261              		@ args = 0, pretend = 0, frame = 0
+ 262              		@ frame_needed = 0, uses_anonymous_args = 0
+ 263 0000 70B5     		push	{r4, r5, r6, lr}
+ 264              	.LCFI7:
+ 265              		.cfi_def_cfa_offset 16
+ 266              		.cfi_offset 4, -16
+ 267              		.cfi_offset 5, -12
+ 268              		.cfi_offset 6, -8
+ 269              		.cfi_offset 14, -4
+  90:Library/Src/BMI088.c ****     uint8_t write_reg_num = 0;
+ 270              		.loc 1 90 5 view .LVU59
+ 271              	.LVL26:
+  91:Library/Src/BMI088.c ****     
+ 272              		.loc 1 91 5 view .LVU60
+  93:Library/Src/BMI088.c ****     {
+ 273              		.loc 1 93 5 view .LVU61
+  90:Library/Src/BMI088.c ****     uint8_t write_reg_num = 0;
+ 274              		.loc 1 90 13 is_stmt 0 view .LVU62
+ 275 0002 0026     		movs	r6, #0
+  93:Library/Src/BMI088.c ****     {
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 11
+
+
+ 276              		.loc 1 93 10 view .LVU63
+ 277 0004 6AE0     		b	.L19
+ 278              	.LVL27:
+ 279              	.L20:
+  95:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 280              		.loc 1 95 9 is_stmt 1 view .LVU64
+ 281 0006 554C     		ldr	r4, .L25
+ 282 0008 0022     		movs	r2, #0
+ 283 000a 1021     		movs	r1, #16
+ 284 000c 2046     		mov	r0, r4
+ 285 000e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 286              	.LVL28:
+  95:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 287              		.loc 1 95 9 view .LVU65
+ 288 0012 8020     		movs	r0, #128
+ 289 0014 FFF7FEFF 		bl	BMI088_read_write_byte
+ 290              	.LVL29:
+  95:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 291              		.loc 1 95 9 view .LVU66
+ 292 0018 5520     		movs	r0, #85
+ 293 001a FFF7FEFF 		bl	BMI088_read_write_byte
+ 294              	.LVL30:
+  95:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 295              		.loc 1 95 9 view .LVU67
+ 296 001e 5520     		movs	r0, #85
+ 297 0020 FFF7FEFF 		bl	BMI088_read_write_byte
+ 298              	.LVL31:
+  95:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 299              		.loc 1 95 9 view .LVU68
+ 300 0024 0122     		movs	r2, #1
+ 301 0026 1021     		movs	r1, #16
+ 302 0028 2046     		mov	r0, r4
+ 303 002a FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 304              	.LVL32:
+  95:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 305              		.loc 1 95 62 view .LVU69
+  96:Library/Src/BMI088.c ****         BMI088_accel_read_single_reg(BMI088_ACC_CHIP_ID, res);
+ 306              		.loc 1 96 9 view .LVU70
+ 307 002e 9620     		movs	r0, #150
+ 308 0030 FFF7FEFF 		bl	BMI088_delay_us
+ 309              	.LVL33:
+  97:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 310              		.loc 1 97 9 view .LVU71
+ 311 0034 0022     		movs	r2, #0
+ 312 0036 1021     		movs	r1, #16
+ 313 0038 2046     		mov	r0, r4
+ 314 003a FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 315              	.LVL34:
+  97:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 316              		.loc 1 97 9 view .LVU72
+ 317 003e 8020     		movs	r0, #128
+ 318 0040 FFF7FEFF 		bl	BMI088_read_write_byte
+ 319              	.LVL35:
+  97:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 320              		.loc 1 97 9 view .LVU73
+ 321 0044 5520     		movs	r0, #85
+ 322 0046 FFF7FEFF 		bl	BMI088_read_write_byte
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 12
+
+
+ 323              	.LVL36:
+  97:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 324              		.loc 1 97 9 view .LVU74
+ 325 004a 5520     		movs	r0, #85
+ 326 004c FFF7FEFF 		bl	BMI088_read_write_byte
+ 327              	.LVL37:
+  97:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 328              		.loc 1 97 9 view .LVU75
+ 329 0050 0122     		movs	r2, #1
+ 330 0052 1021     		movs	r1, #16
+ 331 0054 2046     		mov	r0, r4
+ 332 0056 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 333              	.LVL38:
+  97:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 334              		.loc 1 97 62 view .LVU76
+  98:Library/Src/BMI088.c **** 
+ 335              		.loc 1 98 9 view .LVU77
+ 336 005a 9620     		movs	r0, #150
+ 337 005c FFF7FEFF 		bl	BMI088_delay_us
+ 338              	.LVL39:
+ 100:Library/Src/BMI088.c ****         BMI088_delay_ms(BMI088_LONG_DELAY_TIME);
+ 339              		.loc 1 100 9 view .LVU78
+ 340 0060 0022     		movs	r2, #0
+ 341 0062 1021     		movs	r1, #16
+ 342 0064 2046     		mov	r0, r4
+ 343 0066 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 344              	.LVL40:
+ 100:Library/Src/BMI088.c ****         BMI088_delay_ms(BMI088_LONG_DELAY_TIME);
+ 345              		.loc 1 100 9 view .LVU79
+ 346 006a B621     		movs	r1, #182
+ 347 006c 7E20     		movs	r0, #126
+ 348 006e FFF7FEFF 		bl	BMI088_write_single_reg
+ 349              	.LVL41:
+ 100:Library/Src/BMI088.c ****         BMI088_delay_ms(BMI088_LONG_DELAY_TIME);
+ 350              		.loc 1 100 9 view .LVU80
+ 351 0072 0122     		movs	r2, #1
+ 352 0074 1021     		movs	r1, #16
+ 353 0076 2046     		mov	r0, r4
+ 354 0078 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 355              	.LVL42:
+ 100:Library/Src/BMI088.c ****         BMI088_delay_ms(BMI088_LONG_DELAY_TIME);
+ 356              		.loc 1 100 88 view .LVU81
+ 101:Library/Src/BMI088.c **** 
+ 357              		.loc 1 101 9 view .LVU82
+ 358 007c 5020     		movs	r0, #80
+ 359 007e FFF7FEFF 		bl	BMI088_delay_ms
+ 360              	.LVL43:
+ 103:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 361              		.loc 1 103 9 view .LVU83
+ 362 0082 0022     		movs	r2, #0
+ 363 0084 1021     		movs	r1, #16
+ 364 0086 2046     		mov	r0, r4
+ 365 0088 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 366              	.LVL44:
+ 103:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 367              		.loc 1 103 9 view .LVU84
+ 368 008c 8020     		movs	r0, #128
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 13
+
+
+ 369 008e FFF7FEFF 		bl	BMI088_read_write_byte
+ 370              	.LVL45:
+ 103:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 371              		.loc 1 103 9 view .LVU85
+ 372 0092 5520     		movs	r0, #85
+ 373 0094 FFF7FEFF 		bl	BMI088_read_write_byte
+ 374              	.LVL46:
+ 103:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 375              		.loc 1 103 9 view .LVU86
+ 376 0098 5520     		movs	r0, #85
+ 377 009a FFF7FEFF 		bl	BMI088_read_write_byte
+ 378              	.LVL47:
+ 103:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 379              		.loc 1 103 9 view .LVU87
+ 380 009e 0122     		movs	r2, #1
+ 381 00a0 1021     		movs	r1, #16
+ 382 00a2 2046     		mov	r0, r4
+ 383 00a4 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 384              	.LVL48:
+ 103:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 385              		.loc 1 103 62 view .LVU88
+ 104:Library/Src/BMI088.c ****         BMI088_accel_read_single_reg(BMI088_ACC_CHIP_ID, res);
+ 386              		.loc 1 104 9 view .LVU89
+ 387 00a8 9620     		movs	r0, #150
+ 388 00aa FFF7FEFF 		bl	BMI088_delay_us
+ 389              	.LVL49:
+ 105:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 390              		.loc 1 105 9 view .LVU90
+ 391 00ae 0022     		movs	r2, #0
+ 392 00b0 1021     		movs	r1, #16
+ 393 00b2 2046     		mov	r0, r4
+ 394 00b4 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 395              	.LVL50:
+ 105:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 396              		.loc 1 105 9 view .LVU91
+ 397 00b8 8020     		movs	r0, #128
+ 398 00ba FFF7FEFF 		bl	BMI088_read_write_byte
+ 399              	.LVL51:
+ 105:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 400              		.loc 1 105 9 view .LVU92
+ 401 00be 5520     		movs	r0, #85
+ 402 00c0 FFF7FEFF 		bl	BMI088_read_write_byte
+ 403              	.LVL52:
+ 105:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 404              		.loc 1 105 9 view .LVU93
+ 405 00c4 5520     		movs	r0, #85
+ 406 00c6 FFF7FEFF 		bl	BMI088_read_write_byte
+ 407              	.LVL53:
+ 408 00ca 0646     		mov	r6, r0
+ 409              	.LVL54:
+ 105:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 410              		.loc 1 105 9 view .LVU94
+ 411 00cc 0122     		movs	r2, #1
+ 412 00ce 1021     		movs	r1, #16
+ 413 00d0 2046     		mov	r0, r4
+ 414 00d2 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 415              	.LVL55:
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 14
+
+
+ 105:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 416              		.loc 1 105 62 view .LVU95
+ 106:Library/Src/BMI088.c ****     }
+ 417              		.loc 1 106 9 view .LVU96
+ 418 00d6 9620     		movs	r0, #150
+ 419 00d8 FFF7FEFF 		bl	BMI088_delay_us
+ 420              	.LVL56:
+ 421              	.L19:
+  93:Library/Src/BMI088.c ****     {
+ 422              		.loc 1 93 10 view .LVU97
+ 423 00dc 1E2E     		cmp	r6, #30
+ 424 00de 92D1     		bne	.L20
+ 109:Library/Src/BMI088.c ****     {
+ 425              		.loc 1 109 24 is_stmt 0 view .LVU98
+ 426 00e0 0025     		movs	r5, #0
+ 427 00e2 37E0     		b	.L21
+ 428              	.LVL57:
+ 429              	.L22:
+ 113:Library/Src/BMI088.c ****             BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 430              		.loc 1 113 13 is_stmt 1 view .LVU99
+ 431 00e4 1D4C     		ldr	r4, .L25
+ 432 00e6 0022     		movs	r2, #0
+ 433 00e8 1021     		movs	r1, #16
+ 434 00ea 2046     		mov	r0, r4
+ 435 00ec FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 436              	.LVL58:
+ 113:Library/Src/BMI088.c ****             BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 437              		.loc 1 113 13 view .LVU100
+ 438 00f0 1B4A     		ldr	r2, .L25+4
+ 439 00f2 05EB4503 		add	r3, r5, r5, lsl #1
+ 440 00f6 D118     		adds	r1, r2, r3
+ 441 00f8 D65C     		ldrb	r6, [r2, r3]	@ zero_extendqisi2
+ 442              	.LVL59:
+ 113:Library/Src/BMI088.c ****             BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 443              		.loc 1 113 13 is_stmt 0 view .LVU101
+ 444 00fa 4978     		ldrb	r1, [r1, #1]	@ zero_extendqisi2
+ 445 00fc 3046     		mov	r0, r6
+ 446 00fe FFF7FEFF 		bl	BMI088_write_single_reg
+ 447              	.LVL60:
+ 113:Library/Src/BMI088.c ****             BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 448              		.loc 1 113 13 is_stmt 1 view .LVU102
+ 449 0102 0122     		movs	r2, #1
+ 450 0104 1021     		movs	r1, #16
+ 451 0106 2046     		mov	r0, r4
+ 452 0108 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 453              	.LVL61:
+ 113:Library/Src/BMI088.c ****             BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 454              		.loc 1 113 148 view .LVU103
+ 114:Library/Src/BMI088.c **** 
+ 455              		.loc 1 114 13 view .LVU104
+ 456 010c 9620     		movs	r0, #150
+ 457 010e FFF7FEFF 		bl	BMI088_delay_us
+ 458              	.LVL62:
+ 116:Library/Src/BMI088.c ****             BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 459              		.loc 1 116 13 view .LVU105
+ 460 0112 0022     		movs	r2, #0
+ 461 0114 1021     		movs	r1, #16
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 15
+
+
+ 462 0116 2046     		mov	r0, r4
+ 463 0118 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 464              	.LVL63:
+ 116:Library/Src/BMI088.c ****             BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 465              		.loc 1 116 13 view .LVU106
+ 466 011c 46F08000 		orr	r0, r6, #128
+ 467 0120 FFF7FEFF 		bl	BMI088_read_write_byte
+ 468              	.LVL64:
+ 116:Library/Src/BMI088.c ****             BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 469              		.loc 1 116 13 view .LVU107
+ 470 0124 5520     		movs	r0, #85
+ 471 0126 FFF7FEFF 		bl	BMI088_read_write_byte
+ 472              	.LVL65:
+ 116:Library/Src/BMI088.c ****             BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 473              		.loc 1 116 13 view .LVU108
+ 474 012a 5520     		movs	r0, #85
+ 475 012c FFF7FEFF 		bl	BMI088_read_write_byte
+ 476              	.LVL66:
+ 477 0130 0646     		mov	r6, r0
+ 478              	.LVL67:
+ 116:Library/Src/BMI088.c ****             BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 479              		.loc 1 116 13 view .LVU109
+ 480 0132 0122     		movs	r2, #1
+ 481 0134 1021     		movs	r1, #16
+ 482 0136 2046     		mov	r0, r4
+ 483 0138 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 484              	.LVL68:
+ 116:Library/Src/BMI088.c ****             BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 485              		.loc 1 116 99 view .LVU110
+ 117:Library/Src/BMI088.c ****         }
+ 486              		.loc 1 117 13 view .LVU111
+ 487 013c 9620     		movs	r0, #150
+ 488 013e FFF7FEFF 		bl	BMI088_delay_us
+ 489              	.LVL69:
+ 490              	.L23:
+ 111:Library/Src/BMI088.c ****         {
+ 491              		.loc 1 111 14 view .LVU112
+ 111:Library/Src/BMI088.c ****         {
+ 492              		.loc 1 111 70 is_stmt 0 view .LVU113
+ 493 0142 05EB4502 		add	r2, r5, r5, lsl #1
+ 494 0146 064B     		ldr	r3, .L25+4
+ 495 0148 1344     		add	r3, r3, r2
+ 496 014a 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+ 111:Library/Src/BMI088.c ****         {
+ 497              		.loc 1 111 14 view .LVU114
+ 498 014c B342     		cmp	r3, r6
+ 499 014e C9D1     		bne	.L22
+ 109:Library/Src/BMI088.c ****     {
+ 500              		.loc 1 109 73 is_stmt 1 discriminator 2 view .LVU115
+ 109:Library/Src/BMI088.c ****     {
+ 501              		.loc 1 109 86 is_stmt 0 discriminator 2 view .LVU116
+ 502 0150 0135     		adds	r5, r5, #1
+ 503              	.LVL70:
+ 109:Library/Src/BMI088.c ****     {
+ 504              		.loc 1 109 86 discriminator 2 view .LVU117
+ 505 0152 EDB2     		uxtb	r5, r5
+ 506              	.LVL71:
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 16
+
+
+ 507              	.L21:
+ 109:Library/Src/BMI088.c ****     {
+ 508              		.loc 1 109 29 is_stmt 1 discriminator 1 view .LVU118
+ 109:Library/Src/BMI088.c ****     {
+ 509              		.loc 1 109 5 is_stmt 0 discriminator 1 view .LVU119
+ 510 0154 052D     		cmp	r5, #5
+ 511 0156 F4D9     		bls	.L23
+ 120:Library/Src/BMI088.c **** 
+ 512              		.loc 1 120 1 view .LVU120
+ 513 0158 70BD     		pop	{r4, r5, r6, pc}
+ 514              	.LVL72:
+ 515              	.L26:
+ 120:Library/Src/BMI088.c **** 
+ 516              		.loc 1 120 1 view .LVU121
+ 517 015a 00BF     		.align	2
+ 518              	.L25:
+ 519 015c 00000240 		.word	1073872896
+ 520 0160 00000000 		.word	.LANCHOR0
+ 521              		.cfi_endproc
+ 522              	.LFE136:
+ 524              		.section	.text.BMI088_read_single_reg,"ax",%progbits
+ 525              		.align	1
+ 526              		.syntax unified
+ 527              		.thumb
+ 528              		.thumb_func
+ 530              	BMI088_read_single_reg:
+ 531              	.LVL73:
+ 532              	.LFB140:
+ 202:Library/Src/BMI088.c ****     BMI088_read_write_byte(reg | 0x80);
+ 533              		.loc 1 202 1 is_stmt 1 view -0
+ 534              		.cfi_startproc
+ 535              		@ args = 0, pretend = 0, frame = 0
+ 536              		@ frame_needed = 0, uses_anonymous_args = 0
+ 202:Library/Src/BMI088.c ****     BMI088_read_write_byte(reg | 0x80);
+ 537              		.loc 1 202 1 is_stmt 0 view .LVU123
+ 538 0000 10B5     		push	{r4, lr}
+ 539              	.LCFI8:
+ 540              		.cfi_def_cfa_offset 8
+ 541              		.cfi_offset 4, -8
+ 542              		.cfi_offset 14, -4
+ 543 0002 0C46     		mov	r4, r1
+ 203:Library/Src/BMI088.c ****     *return_data = BMI088_read_write_byte(0x55);
+ 544              		.loc 1 203 5 is_stmt 1 view .LVU124
+ 545 0004 40F08000 		orr	r0, r0, #128
+ 546              	.LVL74:
+ 203:Library/Src/BMI088.c ****     *return_data = BMI088_read_write_byte(0x55);
+ 547              		.loc 1 203 5 is_stmt 0 view .LVU125
+ 548 0008 FFF7FEFF 		bl	BMI088_read_write_byte
+ 549              	.LVL75:
+ 204:Library/Src/BMI088.c **** }
+ 550              		.loc 1 204 5 is_stmt 1 view .LVU126
+ 204:Library/Src/BMI088.c **** }
+ 551              		.loc 1 204 20 is_stmt 0 view .LVU127
+ 552 000c 5520     		movs	r0, #85
+ 553 000e FFF7FEFF 		bl	BMI088_read_write_byte
+ 554              	.LVL76:
+ 204:Library/Src/BMI088.c **** }
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 17
+
+
+ 555              		.loc 1 204 18 view .LVU128
+ 556 0012 2070     		strb	r0, [r4]
+ 205:Library/Src/BMI088.c **** 
+ 557              		.loc 1 205 1 view .LVU129
+ 558 0014 10BD     		pop	{r4, pc}
+ 205:Library/Src/BMI088.c **** 
+ 559              		.loc 1 205 1 view .LVU130
+ 560              		.cfi_endproc
+ 561              	.LFE140:
+ 563              		.section	.text.bmi088_gyro_init,"ax",%progbits
+ 564              		.align	1
+ 565              		.global	bmi088_gyro_init
+ 566              		.syntax unified
+ 567              		.thumb
+ 568              		.thumb_func
+ 570              	bmi088_gyro_init:
+ 571              	.LFB137:
+ 123:Library/Src/BMI088.c ****     uint8_t write_reg_num = 0;
+ 572              		.loc 1 123 1 is_stmt 1 view -0
+ 573              		.cfi_startproc
+ 574              		@ args = 0, pretend = 0, frame = 8
+ 575              		@ frame_needed = 0, uses_anonymous_args = 0
+ 576 0000 70B5     		push	{r4, r5, r6, lr}
+ 577              	.LCFI9:
+ 578              		.cfi_def_cfa_offset 16
+ 579              		.cfi_offset 4, -16
+ 580              		.cfi_offset 5, -12
+ 581              		.cfi_offset 6, -8
+ 582              		.cfi_offset 14, -4
+ 583 0002 82B0     		sub	sp, sp, #8
+ 584              	.LCFI10:
+ 585              		.cfi_def_cfa_offset 24
+ 124:Library/Src/BMI088.c ****     uint8_t res = 0;
+ 586              		.loc 1 124 5 view .LVU132
+ 587              	.LVL77:
+ 125:Library/Src/BMI088.c **** 
+ 588              		.loc 1 125 5 view .LVU133
+ 125:Library/Src/BMI088.c **** 
+ 589              		.loc 1 125 13 is_stmt 0 view .LVU134
+ 590 0004 0023     		movs	r3, #0
+ 591 0006 8DF80730 		strb	r3, [sp, #7]
+ 127:Library/Src/BMI088.c ****     {
+ 592              		.loc 1 127 5 is_stmt 1 view .LVU135
+ 127:Library/Src/BMI088.c ****     {
+ 593              		.loc 1 127 10 is_stmt 0 view .LVU136
+ 594 000a 59E0     		b	.L30
+ 595              	.L31:
+ 130:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 596              		.loc 1 130 9 is_stmt 1 view .LVU137
+ 597 000c 4B4C     		ldr	r4, .L36
+ 598 000e 0022     		movs	r2, #0
+ 599 0010 0121     		movs	r1, #1
+ 600 0012 2046     		mov	r0, r4
+ 601 0014 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 602              	.LVL78:
+ 130:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 603              		.loc 1 130 9 view .LVU138
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 18
+
+
+ 604 0018 0DF10701 		add	r1, sp, #7
+ 605 001c 0020     		movs	r0, #0
+ 606 001e FFF7FEFF 		bl	BMI088_read_single_reg
+ 607              	.LVL79:
+ 130:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 608              		.loc 1 130 9 view .LVU139
+ 609 0022 0122     		movs	r2, #1
+ 610 0024 1146     		mov	r1, r2
+ 611 0026 2046     		mov	r0, r4
+ 612 0028 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 613              	.LVL80:
+ 130:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 614              		.loc 1 130 62 view .LVU140
+ 131:Library/Src/BMI088.c ****         BMI088_gyro_read_single_reg(BMI088_GYRO_CHIP_ID, res);
+ 615              		.loc 1 131 9 view .LVU141
+ 616 002c 9620     		movs	r0, #150
+ 617 002e FFF7FEFF 		bl	BMI088_delay_us
+ 618              	.LVL81:
+ 132:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 619              		.loc 1 132 9 view .LVU142
+ 620 0032 0022     		movs	r2, #0
+ 621 0034 0121     		movs	r1, #1
+ 622 0036 2046     		mov	r0, r4
+ 623 0038 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 624              	.LVL82:
+ 132:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 625              		.loc 1 132 9 view .LVU143
+ 626 003c 0DF10701 		add	r1, sp, #7
+ 627 0040 0020     		movs	r0, #0
+ 628 0042 FFF7FEFF 		bl	BMI088_read_single_reg
+ 629              	.LVL83:
+ 132:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 630              		.loc 1 132 9 view .LVU144
+ 631 0046 0122     		movs	r2, #1
+ 632 0048 1146     		mov	r1, r2
+ 633 004a 2046     		mov	r0, r4
+ 634 004c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 635              	.LVL84:
+ 132:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 636              		.loc 1 132 62 view .LVU145
+ 133:Library/Src/BMI088.c **** 
+ 637              		.loc 1 133 9 view .LVU146
+ 638 0050 9620     		movs	r0, #150
+ 639 0052 FFF7FEFF 		bl	BMI088_delay_us
+ 640              	.LVL85:
+ 135:Library/Src/BMI088.c ****         BMI088_delay_ms(BMI088_LONG_DELAY_TIME);
+ 641              		.loc 1 135 9 view .LVU147
+ 642 0056 0022     		movs	r2, #0
+ 643 0058 0121     		movs	r1, #1
+ 644 005a 2046     		mov	r0, r4
+ 645 005c FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 646              	.LVL86:
+ 135:Library/Src/BMI088.c ****         BMI088_delay_ms(BMI088_LONG_DELAY_TIME);
+ 647              		.loc 1 135 9 view .LVU148
+ 648 0060 B621     		movs	r1, #182
+ 649 0062 1420     		movs	r0, #20
+ 650 0064 FFF7FEFF 		bl	BMI088_write_single_reg
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 19
+
+
+ 651              	.LVL87:
+ 135:Library/Src/BMI088.c ****         BMI088_delay_ms(BMI088_LONG_DELAY_TIME);
+ 652              		.loc 1 135 9 view .LVU149
+ 653 0068 0122     		movs	r2, #1
+ 654 006a 1146     		mov	r1, r2
+ 655 006c 2046     		mov	r0, r4
+ 656 006e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 657              	.LVL88:
+ 135:Library/Src/BMI088.c ****         BMI088_delay_ms(BMI088_LONG_DELAY_TIME);
+ 658              		.loc 1 135 89 view .LVU150
+ 136:Library/Src/BMI088.c **** 
+ 659              		.loc 1 136 9 view .LVU151
+ 660 0072 5020     		movs	r0, #80
+ 661 0074 FFF7FEFF 		bl	BMI088_delay_ms
+ 662              	.LVL89:
+ 138:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 663              		.loc 1 138 9 view .LVU152
+ 664 0078 0022     		movs	r2, #0
+ 665 007a 0121     		movs	r1, #1
+ 666 007c 2046     		mov	r0, r4
+ 667 007e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 668              	.LVL90:
+ 138:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 669              		.loc 1 138 9 view .LVU153
+ 670 0082 0DF10701 		add	r1, sp, #7
+ 671 0086 0020     		movs	r0, #0
+ 672 0088 FFF7FEFF 		bl	BMI088_read_single_reg
+ 673              	.LVL91:
+ 138:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 674              		.loc 1 138 9 view .LVU154
+ 675 008c 0122     		movs	r2, #1
+ 676 008e 1146     		mov	r1, r2
+ 677 0090 2046     		mov	r0, r4
+ 678 0092 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 679              	.LVL92:
+ 138:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 680              		.loc 1 138 62 view .LVU155
+ 139:Library/Src/BMI088.c ****         BMI088_gyro_read_single_reg(BMI088_GYRO_CHIP_ID, res);
+ 681              		.loc 1 139 9 view .LVU156
+ 682 0096 9620     		movs	r0, #150
+ 683 0098 FFF7FEFF 		bl	BMI088_delay_us
+ 684              	.LVL93:
+ 140:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 685              		.loc 1 140 9 view .LVU157
+ 686 009c 0022     		movs	r2, #0
+ 687 009e 0121     		movs	r1, #1
+ 688 00a0 2046     		mov	r0, r4
+ 689 00a2 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 690              	.LVL94:
+ 140:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 691              		.loc 1 140 9 view .LVU158
+ 692 00a6 0DF10701 		add	r1, sp, #7
+ 693 00aa 0020     		movs	r0, #0
+ 694 00ac FFF7FEFF 		bl	BMI088_read_single_reg
+ 695              	.LVL95:
+ 140:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 696              		.loc 1 140 9 view .LVU159
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 20
+
+
+ 697 00b0 0122     		movs	r2, #1
+ 698 00b2 1146     		mov	r1, r2
+ 699 00b4 2046     		mov	r0, r4
+ 700 00b6 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 701              	.LVL96:
+ 140:Library/Src/BMI088.c ****         BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 702              		.loc 1 140 62 view .LVU160
+ 141:Library/Src/BMI088.c ****     }
+ 703              		.loc 1 141 9 view .LVU161
+ 704 00ba 9620     		movs	r0, #150
+ 705 00bc FFF7FEFF 		bl	BMI088_delay_us
+ 706              	.LVL97:
+ 707              	.L30:
+ 127:Library/Src/BMI088.c ****     {
+ 708              		.loc 1 127 10 view .LVU162
+ 127:Library/Src/BMI088.c ****     {
+ 709              		.loc 1 127 15 is_stmt 0 view .LVU163
+ 710 00c0 9DF80730 		ldrb	r3, [sp, #7]	@ zero_extendqisi2
+ 127:Library/Src/BMI088.c ****     {
+ 711              		.loc 1 127 10 view .LVU164
+ 712 00c4 0F2B     		cmp	r3, #15
+ 713 00c6 A1D1     		bne	.L31
+ 144:Library/Src/BMI088.c ****     {
+ 714              		.loc 1 144 24 view .LVU165
+ 715 00c8 0025     		movs	r5, #0
+ 716 00ca 33E0     		b	.L32
+ 717              	.LVL98:
+ 718              	.L33:
+ 148:Library/Src/BMI088.c ****             BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 719              		.loc 1 148 13 is_stmt 1 view .LVU166
+ 720 00cc 1B4C     		ldr	r4, .L36
+ 721 00ce 0022     		movs	r2, #0
+ 722 00d0 0121     		movs	r1, #1
+ 723 00d2 2046     		mov	r0, r4
+ 724 00d4 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 725              	.LVL99:
+ 148:Library/Src/BMI088.c ****             BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 726              		.loc 1 148 13 view .LVU167
+ 727 00d8 194A     		ldr	r2, .L36+4
+ 728 00da 05EB4503 		add	r3, r5, r5, lsl #1
+ 729 00de D118     		adds	r1, r2, r3
+ 730 00e0 D65C     		ldrb	r6, [r2, r3]	@ zero_extendqisi2
+ 731 00e2 4978     		ldrb	r1, [r1, #1]	@ zero_extendqisi2
+ 732 00e4 3046     		mov	r0, r6
+ 733 00e6 FFF7FEFF 		bl	BMI088_write_single_reg
+ 734              	.LVL100:
+ 148:Library/Src/BMI088.c ****             BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 735              		.loc 1 148 13 view .LVU168
+ 736 00ea 0122     		movs	r2, #1
+ 737 00ec 1146     		mov	r1, r2
+ 738 00ee 2046     		mov	r0, r4
+ 739 00f0 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 740              	.LVL101:
+ 148:Library/Src/BMI088.c ****             BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 741              		.loc 1 148 145 view .LVU169
+ 149:Library/Src/BMI088.c **** 
+ 742              		.loc 1 149 13 view .LVU170
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 21
+
+
+ 743 00f4 9620     		movs	r0, #150
+ 744 00f6 FFF7FEFF 		bl	BMI088_delay_us
+ 745              	.LVL102:
+ 151:Library/Src/BMI088.c ****             BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 746              		.loc 1 151 13 view .LVU171
+ 747 00fa 0022     		movs	r2, #0
+ 748 00fc 0121     		movs	r1, #1
+ 749 00fe 2046     		mov	r0, r4
+ 750 0100 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 751              	.LVL103:
+ 151:Library/Src/BMI088.c ****             BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 752              		.loc 1 151 13 view .LVU172
+ 753 0104 0DF10701 		add	r1, sp, #7
+ 754 0108 3046     		mov	r0, r6
+ 755 010a FFF7FEFF 		bl	BMI088_read_single_reg
+ 756              	.LVL104:
+ 151:Library/Src/BMI088.c ****             BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 757              		.loc 1 151 13 view .LVU173
+ 758 010e 0122     		movs	r2, #1
+ 759 0110 1146     		mov	r1, r2
+ 760 0112 2046     		mov	r0, r4
+ 761 0114 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 762              	.LVL105:
+ 151:Library/Src/BMI088.c ****             BMI088_delay_us(BMI088_COM_WAIT_SENSOR_TIME);
+ 763              		.loc 1 151 97 view .LVU174
+ 152:Library/Src/BMI088.c ****         }
+ 764              		.loc 1 152 13 view .LVU175
+ 765 0118 9620     		movs	r0, #150
+ 766 011a FFF7FEFF 		bl	BMI088_delay_us
+ 767              	.LVL106:
+ 768              	.L34:
+ 146:Library/Src/BMI088.c ****         {
+ 769              		.loc 1 146 14 view .LVU176
+ 146:Library/Src/BMI088.c ****         {
+ 770              		.loc 1 146 69 is_stmt 0 view .LVU177
+ 771 011e 05EB4502 		add	r2, r5, r5, lsl #1
+ 772 0122 074B     		ldr	r3, .L36+4
+ 773 0124 1344     		add	r3, r3, r2
+ 774 0126 5A78     		ldrb	r2, [r3, #1]	@ zero_extendqisi2
+ 146:Library/Src/BMI088.c ****         {
+ 775              		.loc 1 146 19 view .LVU178
+ 776 0128 9DF80730 		ldrb	r3, [sp, #7]	@ zero_extendqisi2
+ 146:Library/Src/BMI088.c ****         {
+ 777              		.loc 1 146 14 view .LVU179
+ 778 012c 9A42     		cmp	r2, r3
+ 779 012e CDD1     		bne	.L33
+ 144:Library/Src/BMI088.c ****     {
+ 780              		.loc 1 144 72 is_stmt 1 discriminator 2 view .LVU180
+ 144:Library/Src/BMI088.c ****     {
+ 781              		.loc 1 144 85 is_stmt 0 discriminator 2 view .LVU181
+ 782 0130 0135     		adds	r5, r5, #1
+ 783              	.LVL107:
+ 144:Library/Src/BMI088.c ****     {
+ 784              		.loc 1 144 85 discriminator 2 view .LVU182
+ 785 0132 EDB2     		uxtb	r5, r5
+ 786              	.LVL108:
+ 787              	.L32:
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 22
+
+
+ 144:Library/Src/BMI088.c ****     {
+ 788              		.loc 1 144 29 is_stmt 1 discriminator 1 view .LVU183
+ 144:Library/Src/BMI088.c ****     {
+ 789              		.loc 1 144 5 is_stmt 0 discriminator 1 view .LVU184
+ 790 0134 052D     		cmp	r5, #5
+ 791 0136 F2D9     		bls	.L34
+ 155:Library/Src/BMI088.c **** 
+ 792              		.loc 1 155 1 view .LVU185
+ 793 0138 02B0     		add	sp, sp, #8
+ 794              	.LCFI11:
+ 795              		.cfi_def_cfa_offset 16
+ 796              		@ sp needed
+ 797 013a 70BD     		pop	{r4, r5, r6, pc}
+ 798              	.LVL109:
+ 799              	.L37:
+ 155:Library/Src/BMI088.c **** 
+ 800              		.loc 1 155 1 view .LVU186
+ 801              		.align	2
+ 802              	.L36:
+ 803 013c 00040240 		.word	1073873920
+ 804 0140 00000000 		.word	.LANCHOR1
+ 805              		.cfi_endproc
+ 806              	.LFE137:
+ 808              		.section	.text.BMI088_init,"ax",%progbits
+ 809              		.align	1
+ 810              		.global	BMI088_init
+ 811              		.syntax unified
+ 812              		.thumb
+ 813              		.thumb_func
+ 815              	BMI088_init:
+ 816              	.LFB135:
+  83:Library/Src/BMI088.c ****     bmi088_accel_init();
+ 817              		.loc 1 83 1 is_stmt 1 view -0
+ 818              		.cfi_startproc
+ 819              		@ args = 0, pretend = 0, frame = 0
+ 820              		@ frame_needed = 0, uses_anonymous_args = 0
+ 821 0000 08B5     		push	{r3, lr}
+ 822              	.LCFI12:
+ 823              		.cfi_def_cfa_offset 8
+ 824              		.cfi_offset 3, -8
+ 825              		.cfi_offset 14, -4
+  84:Library/Src/BMI088.c ****     bmi088_gyro_init();
+ 826              		.loc 1 84 5 view .LVU188
+ 827 0002 FFF7FEFF 		bl	bmi088_accel_init
+ 828              	.LVL110:
+  85:Library/Src/BMI088.c **** }
+ 829              		.loc 1 85 5 view .LVU189
+ 830 0006 FFF7FEFF 		bl	bmi088_gyro_init
+ 831              	.LVL111:
+  86:Library/Src/BMI088.c **** 
+ 832              		.loc 1 86 1 is_stmt 0 view .LVU190
+ 833 000a 08BD     		pop	{r3, pc}
+ 834              		.cfi_endproc
+ 835              	.LFE135:
+ 837              		.section	.text.BMI088_read_muli_reg,"ax",%progbits
+ 838              		.align	1
+ 839              		.syntax unified
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 23
+
+
+ 840              		.thumb
+ 841              		.thumb_func
+ 843              	BMI088_read_muli_reg:
+ 844              	.LVL112:
+ 845              	.LFB141:
+ 209:Library/Src/BMI088.c ****     BMI088_read_write_byte(reg | 0x80);
+ 846              		.loc 1 209 1 is_stmt 1 view -0
+ 847              		.cfi_startproc
+ 848              		@ args = 0, pretend = 0, frame = 0
+ 849              		@ frame_needed = 0, uses_anonymous_args = 0
+ 209:Library/Src/BMI088.c ****     BMI088_read_write_byte(reg | 0x80);
+ 850              		.loc 1 209 1 is_stmt 0 view .LVU192
+ 851 0000 38B5     		push	{r3, r4, r5, lr}
+ 852              	.LCFI13:
+ 853              		.cfi_def_cfa_offset 16
+ 854              		.cfi_offset 3, -16
+ 855              		.cfi_offset 4, -12
+ 856              		.cfi_offset 5, -8
+ 857              		.cfi_offset 14, -4
+ 858 0002 0D46     		mov	r5, r1
+ 859 0004 1446     		mov	r4, r2
+ 210:Library/Src/BMI088.c **** 
+ 860              		.loc 1 210 5 is_stmt 1 view .LVU193
+ 861 0006 40F08000 		orr	r0, r0, #128
+ 862              	.LVL113:
+ 210:Library/Src/BMI088.c **** 
+ 863              		.loc 1 210 5 is_stmt 0 view .LVU194
+ 864 000a FFF7FEFF 		bl	BMI088_read_write_byte
+ 865              	.LVL114:
+ 212:Library/Src/BMI088.c ****     {
+ 866              		.loc 1 212 5 is_stmt 1 view .LVU195
+ 212:Library/Src/BMI088.c ****     {
+ 867              		.loc 1 212 11 is_stmt 0 view .LVU196
+ 868 000e 06E0     		b	.L41
+ 869              	.LVL115:
+ 870              	.L42:
+ 215:Library/Src/BMI088.c ****         buf++;
+ 871              		.loc 1 215 9 is_stmt 1 view .LVU197
+ 215:Library/Src/BMI088.c ****         buf++;
+ 872              		.loc 1 215 16 is_stmt 0 view .LVU198
+ 873 0010 5520     		movs	r0, #85
+ 874 0012 FFF7FEFF 		bl	BMI088_read_write_byte
+ 875              	.LVL116:
+ 215:Library/Src/BMI088.c ****         buf++;
+ 876              		.loc 1 215 14 view .LVU199
+ 877 0016 05F8010B 		strb	r0, [r5], #1
+ 878              	.LVL117:
+ 216:Library/Src/BMI088.c ****         len--;
+ 879              		.loc 1 216 9 is_stmt 1 view .LVU200
+ 217:Library/Src/BMI088.c ****     }
+ 880              		.loc 1 217 9 view .LVU201
+ 217:Library/Src/BMI088.c ****     }
+ 881              		.loc 1 217 12 is_stmt 0 view .LVU202
+ 882 001a 013C     		subs	r4, r4, #1
+ 883              	.LVL118:
+ 217:Library/Src/BMI088.c ****     }
+ 884              		.loc 1 217 12 view .LVU203
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 24
+
+
+ 885 001c E4B2     		uxtb	r4, r4
+ 886              	.LVL119:
+ 887              	.L41:
+ 212:Library/Src/BMI088.c ****     {
+ 888              		.loc 1 212 11 is_stmt 1 view .LVU204
+ 889 001e 002C     		cmp	r4, #0
+ 890 0020 F6D1     		bne	.L42
+ 219:Library/Src/BMI088.c **** 
+ 891              		.loc 1 219 1 is_stmt 0 view .LVU205
+ 892 0022 38BD     		pop	{r3, r4, r5, pc}
+ 219:Library/Src/BMI088.c **** 
+ 893              		.loc 1 219 1 view .LVU206
+ 894              		.cfi_endproc
+ 895              	.LFE141:
+ 897              		.section	.text.BMI088_read,"ax",%progbits
+ 898              		.align	1
+ 899              		.global	BMI088_read
+ 900              		.syntax unified
+ 901              		.thumb
+ 902              		.thumb_func
+ 904              	BMI088_read:
+ 905              	.LVL120:
+ 906              	.LFB138:
+ 159:Library/Src/BMI088.c ****     uint8_t buf[8] = {0, 0, 0, 0, 0, 0};
+ 907              		.loc 1 159 1 is_stmt 1 view -0
+ 908              		.cfi_startproc
+ 909              		@ args = 0, pretend = 0, frame = 8
+ 910              		@ frame_needed = 0, uses_anonymous_args = 0
+ 159:Library/Src/BMI088.c ****     uint8_t buf[8] = {0, 0, 0, 0, 0, 0};
+ 911              		.loc 1 159 1 is_stmt 0 view .LVU208
+ 912 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 913              	.LCFI14:
+ 914              		.cfi_def_cfa_offset 24
+ 915              		.cfi_offset 4, -24
+ 916              		.cfi_offset 5, -20
+ 917              		.cfi_offset 6, -16
+ 918              		.cfi_offset 7, -12
+ 919              		.cfi_offset 8, -8
+ 920              		.cfi_offset 14, -4
+ 921 0004 82B0     		sub	sp, sp, #8
+ 922              	.LCFI15:
+ 923              		.cfi_def_cfa_offset 32
+ 924 0006 0746     		mov	r7, r0
+ 925 0008 0D46     		mov	r5, r1
+ 926 000a 1446     		mov	r4, r2
+ 160:Library/Src/BMI088.c ****     int16_t bmi088_raw_temp;
+ 927              		.loc 1 160 5 is_stmt 1 view .LVU209
+ 160:Library/Src/BMI088.c ****     int16_t bmi088_raw_temp;
+ 928              		.loc 1 160 13 is_stmt 0 view .LVU210
+ 929 000c 644B     		ldr	r3, .L49
+ 930 000e 93E80300 		ldm	r3, {r0, r1}
+ 931              	.LVL121:
+ 160:Library/Src/BMI088.c ****     int16_t bmi088_raw_temp;
+ 932              		.loc 1 160 13 view .LVU211
+ 933 0012 0090     		str	r0, [sp]
+ 934 0014 ADF80410 		strh	r1, [sp, #4]	@ movhi
+ 935 0018 090C     		lsrs	r1, r1, #16
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 25
+
+
+ 936 001a 8DF80610 		strb	r1, [sp, #6]
+ 937 001e 0026     		movs	r6, #0
+ 938 0020 8DF80760 		strb	r6, [sp, #7]
+ 161:Library/Src/BMI088.c **** 
+ 939              		.loc 1 161 5 is_stmt 1 view .LVU212
+ 163:Library/Src/BMI088.c ****     
+ 940              		.loc 1 163 5 view .LVU213
+ 941 0024 DFF88481 		ldr	r8, .L49+12
+ 942 0028 3246     		mov	r2, r6
+ 943              	.LVL122:
+ 163:Library/Src/BMI088.c ****     
+ 944              		.loc 1 163 5 is_stmt 0 view .LVU214
+ 945 002a 1021     		movs	r1, #16
+ 946 002c 4046     		mov	r0, r8
+ 947 002e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 948              	.LVL123:
+ 163:Library/Src/BMI088.c ****     
+ 949              		.loc 1 163 5 is_stmt 1 view .LVU215
+ 950 0032 9220     		movs	r0, #146
+ 951 0034 FFF7FEFF 		bl	BMI088_read_write_byte
+ 952              	.LVL124:
+ 163:Library/Src/BMI088.c ****     
+ 953              		.loc 1 163 5 view .LVU216
+ 954 0038 0622     		movs	r2, #6
+ 955 003a 6946     		mov	r1, sp
+ 956 003c 1220     		movs	r0, #18
+ 957 003e FFF7FEFF 		bl	BMI088_read_muli_reg
+ 958              	.LVL125:
+ 163:Library/Src/BMI088.c ****     
+ 959              		.loc 1 163 5 view .LVU217
+ 960 0042 0122     		movs	r2, #1
+ 961 0044 1021     		movs	r1, #16
+ 962 0046 4046     		mov	r0, r8
+ 963 0048 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 964              	.LVL126:
+ 163:Library/Src/BMI088.c ****     
+ 965              		.loc 1 163 60 view .LVU218
+ 165:Library/Src/BMI088.c ****     accel[0] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 966              		.loc 1 165 5 view .LVU219
+ 165:Library/Src/BMI088.c ****     accel[0] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 967              		.loc 1 165 37 is_stmt 0 view .LVU220
+ 968 004c 9DF80130 		ldrb	r3, [sp, #1]	@ zero_extendqisi2
+ 165:Library/Src/BMI088.c ****     accel[0] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 969              		.loc 1 165 42 view .LVU221
+ 970 0050 1B02     		lsls	r3, r3, #8
+ 165:Library/Src/BMI088.c ****     accel[0] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 971              		.loc 1 165 23 view .LVU222
+ 972 0052 1BB2     		sxth	r3, r3
+ 165:Library/Src/BMI088.c ****     accel[0] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 973              		.loc 1 165 53 view .LVU223
+ 974 0054 9DF80020 		ldrb	r2, [sp]	@ zero_extendqisi2
+ 165:Library/Src/BMI088.c ****     accel[0] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 975              		.loc 1 165 21 view .LVU224
+ 976 0058 1343     		orrs	r3, r3, r2
+ 977 005a 07EE903A 		vmov	s15, r3	@ int
+ 978              	.LVL127:
+ 166:Library/Src/BMI088.c ****     bmi088_raw_temp = (int16_t)((buf[3]) << 8) | buf[2];
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 26
+
+
+ 979              		.loc 1 166 5 is_stmt 1 view .LVU225
+ 166:Library/Src/BMI088.c ****     bmi088_raw_temp = (int16_t)((buf[3]) << 8) | buf[2];
+ 980              		.loc 1 166 32 is_stmt 0 view .LVU226
+ 981 005e F8EEE77A 		vcvt.f32.s32	s15, s15
+ 982              	.LVL128:
+ 166:Library/Src/BMI088.c ****     bmi088_raw_temp = (int16_t)((buf[3]) << 8) | buf[2];
+ 983              		.loc 1 166 32 view .LVU227
+ 984 0062 504A     		ldr	r2, .L49+4
+ 985 0064 92ED007A 		vldr.32	s14, [r2]
+ 986 0068 67EE877A 		vmul.f32	s15, s15, s14
+ 166:Library/Src/BMI088.c ****     bmi088_raw_temp = (int16_t)((buf[3]) << 8) | buf[2];
+ 987              		.loc 1 166 14 view .LVU228
+ 988 006c C5ED007A 		vstr.32	s15, [r5]
+ 167:Library/Src/BMI088.c ****     accel[1] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 989              		.loc 1 167 5 is_stmt 1 view .LVU229
+ 167:Library/Src/BMI088.c ****     accel[1] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 990              		.loc 1 167 37 is_stmt 0 view .LVU230
+ 991 0070 9DF80330 		ldrb	r3, [sp, #3]	@ zero_extendqisi2
+ 992              	.LVL129:
+ 167:Library/Src/BMI088.c ****     accel[1] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 993              		.loc 1 167 42 view .LVU231
+ 994 0074 1B02     		lsls	r3, r3, #8
+ 167:Library/Src/BMI088.c ****     accel[1] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 995              		.loc 1 167 23 view .LVU232
+ 996 0076 1BB2     		sxth	r3, r3
+ 167:Library/Src/BMI088.c ****     accel[1] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 997              		.loc 1 167 53 view .LVU233
+ 998 0078 9DF80210 		ldrb	r1, [sp, #2]	@ zero_extendqisi2
+ 167:Library/Src/BMI088.c ****     accel[1] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 999              		.loc 1 167 21 view .LVU234
+ 1000 007c 0B43     		orrs	r3, r3, r1
+ 1001 007e 07EE103A 		vmov	s14, r3	@ int
+ 1002              	.LVL130:
+ 168:Library/Src/BMI088.c ****     bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 1003              		.loc 1 168 5 is_stmt 1 view .LVU235
+ 168:Library/Src/BMI088.c ****     bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 1004              		.loc 1 168 32 is_stmt 0 view .LVU236
+ 1005 0082 D2ED006A 		vldr.32	s13, [r2]
+ 1006 0086 B8EEC77A 		vcvt.f32.s32	s14, s14
+ 1007              	.LVL131:
+ 168:Library/Src/BMI088.c ****     bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 1008              		.loc 1 168 32 view .LVU237
+ 1009 008a 27EE267A 		vmul.f32	s14, s14, s13
+ 168:Library/Src/BMI088.c ****     bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 1010              		.loc 1 168 14 view .LVU238
+ 1011 008e 85ED017A 		vstr.32	s14, [r5, #4]
+ 169:Library/Src/BMI088.c ****     accel[2] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 1012              		.loc 1 169 5 is_stmt 1 view .LVU239
+ 169:Library/Src/BMI088.c ****     accel[2] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 1013              		.loc 1 169 37 is_stmt 0 view .LVU240
+ 1014 0092 9DF80530 		ldrb	r3, [sp, #5]	@ zero_extendqisi2
+ 1015              	.LVL132:
+ 169:Library/Src/BMI088.c ****     accel[2] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 1016              		.loc 1 169 42 view .LVU241
+ 1017 0096 1B02     		lsls	r3, r3, #8
+ 169:Library/Src/BMI088.c ****     accel[2] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 1018              		.loc 1 169 23 view .LVU242
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 27
+
+
+ 1019 0098 1BB2     		sxth	r3, r3
+ 169:Library/Src/BMI088.c ****     accel[2] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 1020              		.loc 1 169 53 view .LVU243
+ 1021 009a 9DF80420 		ldrb	r2, [sp, #4]	@ zero_extendqisi2
+ 169:Library/Src/BMI088.c ****     accel[2] = bmi088_raw_temp * BMI088_ACCEL_SEN;
+ 1022              		.loc 1 169 21 view .LVU244
+ 1023 009e 1343     		orrs	r3, r3, r2
+ 1024 00a0 07EE903A 		vmov	s15, r3	@ int
+ 1025              	.LVL133:
+ 170:Library/Src/BMI088.c ****     
+ 1026              		.loc 1 170 5 is_stmt 1 view .LVU245
+ 170:Library/Src/BMI088.c ****     
+ 1027              		.loc 1 170 32 is_stmt 0 view .LVU246
+ 1028 00a4 F8EEE77A 		vcvt.f32.s32	s15, s15
+ 1029              	.LVL134:
+ 170:Library/Src/BMI088.c ****     
+ 1030              		.loc 1 170 32 view .LVU247
+ 1031 00a8 67EEA67A 		vmul.f32	s15, s15, s13
+ 170:Library/Src/BMI088.c ****     
+ 1032              		.loc 1 170 14 view .LVU248
+ 1033 00ac C5ED027A 		vstr.32	s15, [r5, #8]
+ 172:Library/Src/BMI088.c ****     if(buf[0] == BMI088_GYRO_CHIP_ID_VALUE)
+ 1034              		.loc 1 172 5 is_stmt 1 view .LVU249
+ 1035 00b0 3D4D     		ldr	r5, .L49+8
+ 1036              	.LVL135:
+ 172:Library/Src/BMI088.c ****     if(buf[0] == BMI088_GYRO_CHIP_ID_VALUE)
+ 1037              		.loc 1 172 5 is_stmt 0 view .LVU250
+ 1038 00b2 3246     		mov	r2, r6
+ 1039 00b4 0121     		movs	r1, #1
+ 1040 00b6 2846     		mov	r0, r5
+ 1041 00b8 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 1042              	.LVL136:
+ 172:Library/Src/BMI088.c ****     if(buf[0] == BMI088_GYRO_CHIP_ID_VALUE)
+ 1043              		.loc 1 172 5 is_stmt 1 view .LVU251
+ 1044 00bc 0822     		movs	r2, #8
+ 1045 00be 6946     		mov	r1, sp
+ 1046 00c0 3046     		mov	r0, r6
+ 1047 00c2 FFF7FEFF 		bl	BMI088_read_muli_reg
+ 1048              	.LVL137:
+ 172:Library/Src/BMI088.c ****     if(buf[0] == BMI088_GYRO_CHIP_ID_VALUE)
+ 1049              		.loc 1 172 5 view .LVU252
+ 1050 00c6 0122     		movs	r2, #1
+ 1051 00c8 1146     		mov	r1, r2
+ 1052 00ca 2846     		mov	r0, r5
+ 1053 00cc FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 1054              	.LVL138:
+ 172:Library/Src/BMI088.c ****     if(buf[0] == BMI088_GYRO_CHIP_ID_VALUE)
+ 1055              		.loc 1 172 59 view .LVU253
+ 173:Library/Src/BMI088.c ****     {
+ 1056              		.loc 1 173 5 view .LVU254
+ 173:Library/Src/BMI088.c ****     {
+ 1057              		.loc 1 173 11 is_stmt 0 view .LVU255
+ 1058 00d0 9DF80030 		ldrb	r3, [sp]	@ zero_extendqisi2
+ 173:Library/Src/BMI088.c ****     {
+ 1059              		.loc 1 173 7 view .LVU256
+ 1060 00d4 0F2B     		cmp	r3, #15
+ 1061 00d6 2FD0     		beq	.L48
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 28
+
+
+ 1062              	.L45:
+ 182:Library/Src/BMI088.c ****     
+ 1063              		.loc 1 182 5 is_stmt 1 view .LVU257
+ 1064 00d8 344D     		ldr	r5, .L49+12
+ 1065 00da 0022     		movs	r2, #0
+ 1066 00dc 1021     		movs	r1, #16
+ 1067 00de 2846     		mov	r0, r5
+ 1068 00e0 FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 1069              	.LVL139:
+ 182:Library/Src/BMI088.c ****     
+ 1070              		.loc 1 182 5 view .LVU258
+ 1071 00e4 A220     		movs	r0, #162
+ 1072 00e6 FFF7FEFF 		bl	BMI088_read_write_byte
+ 1073              	.LVL140:
+ 182:Library/Src/BMI088.c ****     
+ 1074              		.loc 1 182 5 view .LVU259
+ 1075 00ea 0222     		movs	r2, #2
+ 1076 00ec 6946     		mov	r1, sp
+ 1077 00ee 2220     		movs	r0, #34
+ 1078 00f0 FFF7FEFF 		bl	BMI088_read_muli_reg
+ 1079              	.LVL141:
+ 182:Library/Src/BMI088.c ****     
+ 1080              		.loc 1 182 5 view .LVU260
+ 1081 00f4 0122     		movs	r2, #1
+ 1082 00f6 1021     		movs	r1, #16
+ 1083 00f8 2846     		mov	r0, r5
+ 1084 00fa FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 1085              	.LVL142:
+ 182:Library/Src/BMI088.c ****     
+ 1086              		.loc 1 182 54 view .LVU261
+ 184:Library/Src/BMI088.c **** 
+ 1087              		.loc 1 184 5 view .LVU262
+ 184:Library/Src/BMI088.c **** 
+ 1088              		.loc 1 184 37 is_stmt 0 view .LVU263
+ 1089 00fe 9DF80020 		ldrb	r2, [sp]	@ zero_extendqisi2
+ 184:Library/Src/BMI088.c **** 
+ 1090              		.loc 1 184 53 view .LVU264
+ 1091 0102 9DF80130 		ldrb	r3, [sp, #1]	@ zero_extendqisi2
+ 184:Library/Src/BMI088.c **** 
+ 1092              		.loc 1 184 23 view .LVU265
+ 1093 0106 5B09     		lsrs	r3, r3, #5
+ 184:Library/Src/BMI088.c **** 
+ 1094              		.loc 1 184 21 view .LVU266
+ 1095 0108 43EAC203 		orr	r3, r3, r2, lsl #3
+ 1096              	.LVL143:
+ 186:Library/Src/BMI088.c ****     {
+ 1097              		.loc 1 186 5 is_stmt 1 view .LVU267
+ 186:Library/Src/BMI088.c ****     {
+ 1098              		.loc 1 186 8 is_stmt 0 view .LVU268
+ 1099 010c B3F5806F 		cmp	r3, #1024
+ 1100 0110 01DB     		blt	.L46
+ 188:Library/Src/BMI088.c ****     }
+ 1101              		.loc 1 188 9 is_stmt 1 view .LVU269
+ 188:Library/Src/BMI088.c ****     }
+ 1102              		.loc 1 188 25 is_stmt 0 view .LVU270
+ 1103 0112 A3F50063 		sub	r3, r3, #2048
+ 1104              	.LVL144:
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 29
+
+
+ 1105              	.L46:
+ 191:Library/Src/BMI088.c **** }
+ 1106              		.loc 1 191 5 is_stmt 1 view .LVU271
+ 191:Library/Src/BMI088.c **** }
+ 1107              		.loc 1 191 34 is_stmt 0 view .LVU272
+ 1108 0116 07EE903A 		vmov	s15, r3	@ int
+ 1109 011a F8EEE77A 		vcvt.f32.s32	s15, s15
+ 1110 011e B4EE007A 		vmov.f32	s14, #1.25e-1
+ 1111 0122 67EE877A 		vmul.f32	s15, s15, s14
+ 191:Library/Src/BMI088.c **** }
+ 1112              		.loc 1 191 55 view .LVU273
+ 1113 0126 B3EE077A 		vmov.f32	s14, #2.3e+1
+ 1114 012a 77EE877A 		vadd.f32	s15, s15, s14
+ 191:Library/Src/BMI088.c **** }
+ 1115              		.loc 1 191 16 view .LVU274
+ 1116 012e C4ED007A 		vstr.32	s15, [r4]
+ 192:Library/Src/BMI088.c **** 
+ 1117              		.loc 1 192 1 view .LVU275
+ 1118 0132 02B0     		add	sp, sp, #8
+ 1119              	.LCFI16:
+ 1120              		.cfi_remember_state
+ 1121              		.cfi_def_cfa_offset 24
+ 1122              		@ sp needed
+ 1123 0134 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 1124              	.LVL145:
+ 1125              	.L48:
+ 1126              	.LCFI17:
+ 1127              		.cfi_restore_state
+ 175:Library/Src/BMI088.c ****         gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1128              		.loc 1 175 9 is_stmt 1 view .LVU276
+ 175:Library/Src/BMI088.c ****         gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1129              		.loc 1 175 41 is_stmt 0 view .LVU277
+ 1130 0138 9DF80330 		ldrb	r3, [sp, #3]	@ zero_extendqisi2
+ 175:Library/Src/BMI088.c ****         gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1131              		.loc 1 175 46 view .LVU278
+ 1132 013c 1B02     		lsls	r3, r3, #8
+ 175:Library/Src/BMI088.c ****         gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1133              		.loc 1 175 27 view .LVU279
+ 1134 013e 1BB2     		sxth	r3, r3
+ 175:Library/Src/BMI088.c ****         gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1135              		.loc 1 175 57 view .LVU280
+ 1136 0140 9DF80220 		ldrb	r2, [sp, #2]	@ zero_extendqisi2
+ 175:Library/Src/BMI088.c ****         gyro[0] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1137              		.loc 1 175 25 view .LVU281
+ 1138 0144 1343     		orrs	r3, r3, r2
+ 1139 0146 07EE903A 		vmov	s15, r3	@ int
+ 1140              	.LVL146:
+ 176:Library/Src/BMI088.c ****         bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 1141              		.loc 1 176 9 is_stmt 1 view .LVU282
+ 176:Library/Src/BMI088.c ****         bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 1142              		.loc 1 176 35 is_stmt 0 view .LVU283
+ 1143 014a F8EEE77A 		vcvt.f32.s32	s15, s15
+ 1144              	.LVL147:
+ 176:Library/Src/BMI088.c ****         bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 1145              		.loc 1 176 35 view .LVU284
+ 1146 014e 184A     		ldr	r2, .L49+16
+ 1147 0150 92ED007A 		vldr.32	s14, [r2]
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 30
+
+
+ 1148 0154 67EE877A 		vmul.f32	s15, s15, s14
+ 176:Library/Src/BMI088.c ****         bmi088_raw_temp = (int16_t)((buf[5]) << 8) | buf[4];
+ 1149              		.loc 1 176 17 view .LVU285
+ 1150 0158 C7ED007A 		vstr.32	s15, [r7]
+ 177:Library/Src/BMI088.c ****         gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1151              		.loc 1 177 9 is_stmt 1 view .LVU286
+ 177:Library/Src/BMI088.c ****         gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1152              		.loc 1 177 41 is_stmt 0 view .LVU287
+ 1153 015c 9DF80530 		ldrb	r3, [sp, #5]	@ zero_extendqisi2
+ 1154              	.LVL148:
+ 177:Library/Src/BMI088.c ****         gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1155              		.loc 1 177 46 view .LVU288
+ 1156 0160 1B02     		lsls	r3, r3, #8
+ 177:Library/Src/BMI088.c ****         gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1157              		.loc 1 177 27 view .LVU289
+ 1158 0162 1BB2     		sxth	r3, r3
+ 177:Library/Src/BMI088.c ****         gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1159              		.loc 1 177 57 view .LVU290
+ 1160 0164 9DF80410 		ldrb	r1, [sp, #4]	@ zero_extendqisi2
+ 177:Library/Src/BMI088.c ****         gyro[1] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1161              		.loc 1 177 25 view .LVU291
+ 1162 0168 0B43     		orrs	r3, r3, r1
+ 1163 016a 07EE103A 		vmov	s14, r3	@ int
+ 1164              	.LVL149:
+ 178:Library/Src/BMI088.c ****         bmi088_raw_temp = (int16_t)((buf[7]) << 8) | buf[6];
+ 1165              		.loc 1 178 9 is_stmt 1 view .LVU292
+ 178:Library/Src/BMI088.c ****         bmi088_raw_temp = (int16_t)((buf[7]) << 8) | buf[6];
+ 1166              		.loc 1 178 35 is_stmt 0 view .LVU293
+ 1167 016e D2ED006A 		vldr.32	s13, [r2]
+ 1168 0172 B8EEC77A 		vcvt.f32.s32	s14, s14
+ 1169              	.LVL150:
+ 178:Library/Src/BMI088.c ****         bmi088_raw_temp = (int16_t)((buf[7]) << 8) | buf[6];
+ 1170              		.loc 1 178 35 view .LVU294
+ 1171 0176 27EE267A 		vmul.f32	s14, s14, s13
+ 178:Library/Src/BMI088.c ****         bmi088_raw_temp = (int16_t)((buf[7]) << 8) | buf[6];
+ 1172              		.loc 1 178 17 view .LVU295
+ 1173 017a 87ED017A 		vstr.32	s14, [r7, #4]
+ 179:Library/Src/BMI088.c ****         gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1174              		.loc 1 179 9 is_stmt 1 view .LVU296
+ 179:Library/Src/BMI088.c ****         gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1175              		.loc 1 179 41 is_stmt 0 view .LVU297
+ 1176 017e 9DF80730 		ldrb	r3, [sp, #7]	@ zero_extendqisi2
+ 1177              	.LVL151:
+ 179:Library/Src/BMI088.c ****         gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1178              		.loc 1 179 46 view .LVU298
+ 1179 0182 1B02     		lsls	r3, r3, #8
+ 179:Library/Src/BMI088.c ****         gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1180              		.loc 1 179 27 view .LVU299
+ 1181 0184 1BB2     		sxth	r3, r3
+ 179:Library/Src/BMI088.c ****         gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1182              		.loc 1 179 57 view .LVU300
+ 1183 0186 9DF80620 		ldrb	r2, [sp, #6]	@ zero_extendqisi2
+ 179:Library/Src/BMI088.c ****         gyro[2] = bmi088_raw_temp * BMI088_GYRO_SEN;
+ 1184              		.loc 1 179 25 view .LVU301
+ 1185 018a 1343     		orrs	r3, r3, r2
+ 1186 018c 07EE903A 		vmov	s15, r3	@ int
+ 1187              	.LVL152:
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 31
+
+
+ 180:Library/Src/BMI088.c ****     }
+ 1188              		.loc 1 180 9 is_stmt 1 view .LVU302
+ 180:Library/Src/BMI088.c ****     }
+ 1189              		.loc 1 180 35 is_stmt 0 view .LVU303
+ 1190 0190 F8EEE77A 		vcvt.f32.s32	s15, s15
+ 1191              	.LVL153:
+ 180:Library/Src/BMI088.c ****     }
+ 1192              		.loc 1 180 35 view .LVU304
+ 1193 0194 67EEA67A 		vmul.f32	s15, s15, s13
+ 180:Library/Src/BMI088.c ****     }
+ 1194              		.loc 1 180 17 view .LVU305
+ 1195 0198 C7ED027A 		vstr.32	s15, [r7, #8]
+ 1196 019c 9CE7     		b	.L45
+ 1197              	.L50:
+ 1198 019e 00BF     		.align	2
+ 1199              	.L49:
+ 1200 01a0 00000000 		.word	.LANCHOR2
+ 1201 01a4 00000000 		.word	.LANCHOR3
+ 1202 01a8 00040240 		.word	1073873920
+ 1203 01ac 00000240 		.word	1073872896
+ 1204 01b0 00000000 		.word	.LANCHOR4
+ 1205              		.cfi_endproc
+ 1206              	.LFE138:
+ 1208              		.global	BMI088_GYRO_SEN
+ 1209              		.global	BMI088_ACCEL_SEN
+ 1210              		.section	.rodata
+ 1211              		.align	2
+ 1212              		.set	.LANCHOR2,. + 0
+ 1213              	.LC0:
+ 1214 0000 00000000 		.ascii	"\000\000\000\000\000\000\000"
+ 1214      000000
+ 1215 0007 00       		.space	1
+ 1216              		.section	.data.BMI088_ACCEL_SEN,"aw"
+ 1217              		.align	2
+ 1218              		.set	.LANCHOR3,. + 0
+ 1221              	BMI088_ACCEL_SEN:
+ 1222 0000 E7416B3A 		.word	980107751
+ 1223              		.section	.data.BMI088_GYRO_SEN,"aw"
+ 1224              		.align	2
+ 1225              		.set	.LANCHOR4,. + 0
+ 1228              	BMI088_GYRO_SEN:
+ 1229 0000 58A08B3A 		.word	982229080
+ 1230              		.section	.rodata.write_BMI088_accel_reg_data_error,"a"
+ 1231              		.align	2
+ 1232              		.set	.LANCHOR0,. + 0
+ 1235              	write_BMI088_accel_reg_data_error:
+ 1236 0000 7D0401   		.ascii	"}\004\001"
+ 1237 0003 7C0002   		.ascii	"|\000\002"
+ 1238 0006 40AB03   		.ascii	"@\253\003"
+ 1239 0009 410005   		.ascii	"A\000\005"
+ 1240 000c 530806   		.ascii	"S\010\006"
+ 1241 000f 580407   		.ascii	"X\004\007"
+ 1242              		.section	.rodata.write_BMI088_gyro_reg_data_error,"a"
+ 1243              		.align	2
+ 1244              		.set	.LANCHOR1,. + 0
+ 1247              	write_BMI088_gyro_reg_data_error:
+ 1248 0000 0F0008   		.ascii	"\017\000\010"
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 32
+
+
+ 1249 0003 108209   		.ascii	"\020\202\011"
+ 1250 0006 11000A   		.ascii	"\021\000\012"
+ 1251 0009 15800B   		.ascii	"\025\200\013"
+ 1252 000c 16000C   		.ascii	"\026\000\014"
+ 1253 000f 18010D   		.ascii	"\030\001\015"
+ 1254              		.text
+ 1255              	.Letext0:
+ 1256              		.file 2 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 1257              		.file 3 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 1258              		.file 4 "Drivers/CMSIS/Include/core_cm4.h"
+ 1259              		.file 5 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
+ 1260              		.file 6 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 1261              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 1262              		.file 8 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_spi.h"
+ 1263              		.file 9 "Library/Inc/BMI088.h"
+ 1264              		.file 10 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h"
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s 			page 33
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 BMI088.c
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:20     .text.BMI088_delay_us:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:26     .text.BMI088_delay_us:00000000 BMI088_delay_us
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:122    .text.BMI088_delay_ms:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:128    .text.BMI088_delay_ms:00000000 BMI088_delay_ms
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:169    .text.BMI088_read_write_byte:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:175    .text.BMI088_read_write_byte:00000000 BMI088_read_write_byte
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:214    .text.BMI088_read_write_byte:00000028 $d
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:219    .text.BMI088_write_single_reg:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:224    .text.BMI088_write_single_reg:00000000 BMI088_write_single_reg
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:251    .text.bmi088_accel_init:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:257    .text.bmi088_accel_init:00000000 bmi088_accel_init
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:519    .text.bmi088_accel_init:0000015c $d
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:525    .text.BMI088_read_single_reg:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:530    .text.BMI088_read_single_reg:00000000 BMI088_read_single_reg
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:564    .text.bmi088_gyro_init:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:570    .text.bmi088_gyro_init:00000000 bmi088_gyro_init
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:803    .text.bmi088_gyro_init:0000013c $d
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:809    .text.BMI088_init:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:815    .text.BMI088_init:00000000 BMI088_init
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:838    .text.BMI088_read_muli_reg:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:843    .text.BMI088_read_muli_reg:00000000 BMI088_read_muli_reg
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:898    .text.BMI088_read:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:904    .text.BMI088_read:00000000 BMI088_read
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:1200   .text.BMI088_read:000001a0 $d
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:1228   .data.BMI088_GYRO_SEN:00000000 BMI088_GYRO_SEN
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:1221   .data.BMI088_ACCEL_SEN:00000000 BMI088_ACCEL_SEN
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:1211   .rodata:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:1217   .data.BMI088_ACCEL_SEN:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:1224   .data.BMI088_GYRO_SEN:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:1231   .rodata.write_BMI088_accel_reg_data_error:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:1235   .rodata.write_BMI088_accel_reg_data_error:00000000 write_BMI088_accel_reg_data_error
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:1243   .rodata.write_BMI088_gyro_reg_data_error:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\cceV6nJ4.s:1247   .rodata.write_BMI088_gyro_reg_data_error:00000000 write_BMI088_gyro_reg_data_error
+
+UNDEFINED SYMBOLS
+HAL_SPI_TransmitReceive
+hspi1
+HAL_GPIO_WritePin

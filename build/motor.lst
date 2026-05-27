@@ -1,0 +1,1581 @@
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"motor.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.float_to_uint,"ax",%progbits
+  20              		.align	1
+  21              		.global	float_to_uint
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	float_to_uint:
+  27              	.LVL0:
+  28              	.LFB135:
+  29              		.file 1 "Library/Src/motor.c"
+   1:Library/Src/motor.c **** #include "motor.h"
+   2:Library/Src/motor.c **** 
+   3:Library/Src/motor.c **** data_motor_t data_motor;
+   4:Library/Src/motor.c **** 
+   5:Library/Src/motor.c **** /*float转换至uint*/
+   6:Library/Src/motor.c **** int float_to_uint(float x , float x_min , float x_max , int bits)
+   7:Library/Src/motor.c **** {
+  30              		.loc 1 7 1 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		@ link register save eliminated.
+   8:Library/Src/motor.c **** 	/* Converts a float to an unsigned int, given range and number of bits */
+   9:Library/Src/motor.c **** 	float span = x_max - x_min;
+  35              		.loc 1 9 2 view .LVU1
+  36              		.loc 1 9 8 is_stmt 0 view .LVU2
+  37 0000 31EE601A 		vsub.f32	s2, s2, s1
+  38              	.LVL1:
+  10:Library/Src/motor.c **** 	float offset = x_min;
+  39              		.loc 1 10 2 is_stmt 1 view .LVU3
+  11:Library/Src/motor.c **** 	return (int) ((x-offset)*((float)((1<<bits)-1))/span);
+  40              		.loc 1 11 2 view .LVU4
+  41              		.loc 1 11 18 is_stmt 0 view .LVU5
+  42 0004 30EE600A 		vsub.f32	s0, s0, s1
+  43              	.LVL2:
+  44              		.loc 1 11 38 view .LVU6
+  45 0008 0123     		movs	r3, #1
+  46 000a 8340     		lsls	r3, r3, r0
+  47              		.loc 1 11 45 view .LVU7
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 2
+
+
+  48 000c 013B     		subs	r3, r3, #1
+  49              		.loc 1 11 28 view .LVU8
+  50 000e 07EE903A 		vmov	s15, r3	@ int
+  51 0012 F8EEE77A 		vcvt.f32.s32	s15, s15
+  52              		.loc 1 11 26 view .LVU9
+  53 0016 60EE277A 		vmul.f32	s15, s0, s15
+  54              		.loc 1 11 49 view .LVU10
+  55 001a 87EE817A 		vdiv.f32	s14, s15, s2
+  12:Library/Src/motor.c **** }
+  56              		.loc 1 12 1 view .LVU11
+  57 001e FDEEC77A 		vcvt.s32.f32	s15, s14
+  58 0022 17EE900A 		vmov	r0, s15	@ int
+  59              	.LVL3:
+  60              		.loc 1 12 1 view .LVU12
+  61 0026 7047     		bx	lr
+  62              		.cfi_endproc
+  63              	.LFE135:
+  65              		.section	.text.uint_to_float,"ax",%progbits
+  66              		.align	1
+  67              		.global	uint_to_float
+  68              		.syntax unified
+  69              		.thumb
+  70              		.thumb_func
+  72              	uint_to_float:
+  73              	.LVL4:
+  74              	.LFB136:
+  13:Library/Src/motor.c **** /*float转换至uint*/
+  14:Library/Src/motor.c **** 
+  15:Library/Src/motor.c **** 
+  16:Library/Src/motor.c **** /*uint转换至float*/
+  17:Library/Src/motor.c **** float uint_to_float(int x_int , float x_min , float x_max , int bits)
+  18:Library/Src/motor.c **** {
+  75              		.loc 1 18 1 is_stmt 1 view -0
+  76              		.cfi_startproc
+  77              		@ args = 0, pretend = 0, frame = 0
+  78              		@ frame_needed = 0, uses_anonymous_args = 0
+  79              		@ link register save eliminated.
+  80              		.loc 1 18 1 is_stmt 0 view .LVU14
+  81 0000 07EE900A 		vmov	s15, r0	@ int
+  19:Library/Src/motor.c **** 	/* converts unsigned int to float, given range and number of bits */
+  20:Library/Src/motor.c **** 	float span = x_max - x_min;
+  82              		.loc 1 20 2 is_stmt 1 view .LVU15
+  83              		.loc 1 20 8 is_stmt 0 view .LVU16
+  84 0004 70EEC00A 		vsub.f32	s1, s1, s0
+  85              	.LVL5:
+  21:Library/Src/motor.c **** 	float offset = x_min;
+  86              		.loc 1 21 2 is_stmt 1 view .LVU17
+  22:Library/Src/motor.c **** 	return ((float)x_int)*span/((float)((1<<bits)-1)) + offset;
+  87              		.loc 1 22 2 view .LVU18
+  88              		.loc 1 22 10 is_stmt 0 view .LVU19
+  89 0008 F8EEE77A 		vcvt.f32.s32	s15, s15
+  90              		.loc 1 22 23 view .LVU20
+  91 000c 67EEA00A 		vmul.f32	s1, s15, s1
+  92              	.LVL6:
+  93              		.loc 1 22 40 view .LVU21
+  94 0010 0123     		movs	r3, #1
+  95 0012 8B40     		lsls	r3, r3, r1
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 3
+
+
+  96              		.loc 1 22 47 view .LVU22
+  97 0014 013B     		subs	r3, r3, #1
+  98              		.loc 1 22 30 view .LVU23
+  99 0016 07EE903A 		vmov	s15, r3	@ int
+ 100 001a F8EEE77A 		vcvt.f32.s32	s15, s15
+ 101              		.loc 1 22 28 view .LVU24
+ 102 001e 80EEA77A 		vdiv.f32	s14, s1, s15
+  23:Library/Src/motor.c **** }
+ 103              		.loc 1 23 1 view .LVU25
+ 104 0022 37EE000A 		vadd.f32	s0, s14, s0
+ 105              	.LVL7:
+ 106              		.loc 1 23 1 view .LVU26
+ 107 0026 7047     		bx	lr
+ 108              		.cfi_endproc
+ 109              	.LFE136:
+ 111              		.section	.text.canx_send_data,"ax",%progbits
+ 112              		.align	1
+ 113              		.global	canx_send_data
+ 114              		.syntax unified
+ 115              		.thumb
+ 116              		.thumb_func
+ 118              	canx_send_data:
+ 119              	.LVL8:
+ 120              	.LFB137:
+  24:Library/Src/motor.c **** /*uint转换至float*/
+  25:Library/Src/motor.c **** 
+  26:Library/Src/motor.c **** 
+  27:Library/Src/motor.c **** 
+  28:Library/Src/motor.c **** /**
+  29:Library/Src/motor.c ****   * @brief          can发数据
+  30:Library/Src/motor.c ****   * @param hcan     can位（&hcan1/&hcan2）
+  31:Library/Src/motor.c ****   * @param id       can id
+  32:Library/Src/motor.c ****   * @param data     发送数据
+  33:Library/Src/motor.c ****   * @param len      数据长度
+  34:Library/Src/motor.c ****   * @return         none 
+  35:Library/Src/motor.c ****   */
+  36:Library/Src/motor.c **** uint8_t canx_send_data(CAN_HandleTypeDef *hcan, uint16_t id, uint8_t *data, uint32_t len)
+  37:Library/Src/motor.c **** {	
+ 121              		.loc 1 37 1 is_stmt 1 view -0
+ 122              		.cfi_startproc
+ 123              		@ args = 0, pretend = 0, frame = 24
+ 124              		@ frame_needed = 0, uses_anonymous_args = 0
+ 125              		.loc 1 37 1 is_stmt 0 view .LVU28
+ 126 0000 30B5     		push	{r4, r5, lr}
+ 127              	.LCFI0:
+ 128              		.cfi_def_cfa_offset 12
+ 129              		.cfi_offset 4, -12
+ 130              		.cfi_offset 5, -8
+ 131              		.cfi_offset 14, -4
+ 132 0002 87B0     		sub	sp, sp, #28
+ 133              	.LCFI1:
+ 134              		.cfi_def_cfa_offset 40
+ 135 0004 0446     		mov	r4, r0
+ 136 0006 1546     		mov	r5, r2
+  38:Library/Src/motor.c **** 	CAN_TxHeaderTypeDef	tx_header;
+ 137              		.loc 1 38 2 is_stmt 1 view .LVU29
+  39:Library/Src/motor.c **** 	
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 4
+
+
+  40:Library/Src/motor.c **** 	tx_header.StdId = id;
+ 138              		.loc 1 40 2 view .LVU30
+ 139              		.loc 1 40 18 is_stmt 0 view .LVU31
+ 140 0008 0091     		str	r1, [sp]
+  41:Library/Src/motor.c **** 	tx_header.ExtId = 0;
+ 141              		.loc 1 41 2 is_stmt 1 view .LVU32
+ 142              		.loc 1 41 18 is_stmt 0 view .LVU33
+ 143 000a 0021     		movs	r1, #0
+ 144              	.LVL9:
+ 145              		.loc 1 41 18 view .LVU34
+ 146 000c 0191     		str	r1, [sp, #4]
+  42:Library/Src/motor.c **** 	tx_header.IDE   = 0;
+ 147              		.loc 1 42 2 is_stmt 1 view .LVU35
+ 148              		.loc 1 42 18 is_stmt 0 view .LVU36
+ 149 000e 0291     		str	r1, [sp, #8]
+  43:Library/Src/motor.c **** 	tx_header.RTR   = 0;
+ 150              		.loc 1 43 2 is_stmt 1 view .LVU37
+ 151              		.loc 1 43 18 is_stmt 0 view .LVU38
+ 152 0010 0391     		str	r1, [sp, #12]
+  44:Library/Src/motor.c **** 	tx_header.DLC   = len;
+ 153              		.loc 1 44 2 is_stmt 1 view .LVU39
+ 154              		.loc 1 44 18 is_stmt 0 view .LVU40
+ 155 0012 0493     		str	r3, [sp, #16]
+  45:Library/Src/motor.c **** 	if(HAL_CAN_AddTxMessage(hcan, &tx_header, data, (uint32_t*)CAN_TX_MAILBOX0) != HAL_OK) 
+ 156              		.loc 1 45 2 is_stmt 1 view .LVU41
+ 157              		.loc 1 45 5 is_stmt 0 view .LVU42
+ 158 0014 0123     		movs	r3, #1
+ 159              	.LVL10:
+ 160              		.loc 1 45 5 view .LVU43
+ 161 0016 6946     		mov	r1, sp
+ 162 0018 FFF7FEFF 		bl	HAL_CAN_AddTxMessage
+ 163              	.LVL11:
+ 164              		.loc 1 45 4 view .LVU44
+ 165 001c 10B9     		cbnz	r0, .L6
+ 166              	.L4:
+  46:Library/Src/motor.c ****     {
+  47:Library/Src/motor.c **** 		if(HAL_CAN_AddTxMessage(hcan, &tx_header, data, (uint32_t*)CAN_TX_MAILBOX1) != HAL_OK) 
+  48:Library/Src/motor.c ****         {
+  49:Library/Src/motor.c **** 			HAL_CAN_AddTxMessage(hcan, &tx_header, data, (uint32_t*)CAN_TX_MAILBOX2);
+  50:Library/Src/motor.c ****         }
+  51:Library/Src/motor.c ****     }
+  52:Library/Src/motor.c ****     return 0;
+ 167              		.loc 1 52 5 is_stmt 1 view .LVU45
+  53:Library/Src/motor.c **** }
+ 168              		.loc 1 53 1 is_stmt 0 view .LVU46
+ 169 001e 0020     		movs	r0, #0
+ 170 0020 07B0     		add	sp, sp, #28
+ 171              	.LCFI2:
+ 172              		.cfi_remember_state
+ 173              		.cfi_def_cfa_offset 12
+ 174              		@ sp needed
+ 175 0022 30BD     		pop	{r4, r5, pc}
+ 176              	.LVL12:
+ 177              	.L6:
+ 178              	.LCFI3:
+ 179              		.cfi_restore_state
+  47:Library/Src/motor.c ****         {
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 5
+
+
+ 180              		.loc 1 47 3 is_stmt 1 view .LVU47
+  47:Library/Src/motor.c ****         {
+ 181              		.loc 1 47 6 is_stmt 0 view .LVU48
+ 182 0024 0223     		movs	r3, #2
+ 183 0026 2A46     		mov	r2, r5
+ 184 0028 6946     		mov	r1, sp
+ 185 002a 2046     		mov	r0, r4
+ 186 002c FFF7FEFF 		bl	HAL_CAN_AddTxMessage
+ 187              	.LVL13:
+  47:Library/Src/motor.c ****         {
+ 188              		.loc 1 47 5 view .LVU49
+ 189 0030 0028     		cmp	r0, #0
+ 190 0032 F4D0     		beq	.L4
+  49:Library/Src/motor.c ****         }
+ 191              		.loc 1 49 4 is_stmt 1 view .LVU50
+ 192 0034 0423     		movs	r3, #4
+ 193 0036 2A46     		mov	r2, r5
+ 194 0038 6946     		mov	r1, sp
+ 195 003a 2046     		mov	r0, r4
+ 196 003c FFF7FEFF 		bl	HAL_CAN_AddTxMessage
+ 197              	.LVL14:
+ 198 0040 EDE7     		b	.L4
+ 199              		.cfi_endproc
+ 200              	.LFE137:
+ 202              		.section	.text.DJ_motor_fbdata,"ax",%progbits
+ 203              		.align	1
+ 204              		.global	DJ_motor_fbdata
+ 205              		.syntax unified
+ 206              		.thumb
+ 207              		.thumb_func
+ 209              	DJ_motor_fbdata:
+ 210              	.LVL15:
+ 211              	.LFB138:
+  54:Library/Src/motor.c **** 
+  55:Library/Src/motor.c **** /**
+  56:Library/Src/motor.c ****   * @brief          DJ电机数据解包
+  57:Library/Src/motor.c ****   * @param motor    单位电机地址
+  58:Library/Src/motor.c ****   * @param rx_data  接收数据
+  59:Library/Src/motor.c ****   * @return         none 
+  60:Library/Src/motor.c ****   */
+  61:Library/Src/motor.c **** void DJ_motor_fbdata(motor_measure_DJ_t *motor , uint8_t *rx_data)
+  62:Library/Src/motor.c **** {
+ 212              		.loc 1 62 1 view -0
+ 213              		.cfi_startproc
+ 214              		@ args = 0, pretend = 0, frame = 0
+ 215              		@ frame_needed = 0, uses_anonymous_args = 0
+ 216              		@ link register save eliminated.
+  63:Library/Src/motor.c ****     motor->last_ecd = motor->ecd;
+ 217              		.loc 1 63 5 view .LVU52
+ 218              		.loc 1 63 28 is_stmt 0 view .LVU53
+ 219 0000 B0F90030 		ldrsh	r3, [r0]
+ 220              		.loc 1 63 21 view .LVU54
+ 221 0004 0381     		strh	r3, [r0, #8]	@ movhi
+  64:Library/Src/motor.c ****     motor->last_speed = motor->speed_rpm;
+ 222              		.loc 1 64 5 is_stmt 1 view .LVU55
+ 223              		.loc 1 64 30 is_stmt 0 view .LVU56
+ 224 0006 B0F90230 		ldrsh	r3, [r0, #2]
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 6
+
+
+ 225              		.loc 1 64 23 view .LVU57
+ 226 000a 4381     		strh	r3, [r0, #10]	@ movhi
+  65:Library/Src/motor.c ****     motor->ecd = (uint16_t)((rx_data)[0] << 8 | (rx_data)[1]);
+ 227              		.loc 1 65 5 is_stmt 1 view .LVU58
+ 228              		.loc 1 65 38 is_stmt 0 view .LVU59
+ 229 000c 0A78     		ldrb	r2, [r1]	@ zero_extendqisi2
+ 230              		.loc 1 65 58 view .LVU60
+ 231 000e 4B78     		ldrb	r3, [r1, #1]	@ zero_extendqisi2
+ 232              		.loc 1 65 18 view .LVU61
+ 233 0010 43EA0223 		orr	r3, r3, r2, lsl #8
+ 234              		.loc 1 65 16 view .LVU62
+ 235 0014 0380     		strh	r3, [r0]	@ movhi
+  66:Library/Src/motor.c ****     motor->speed_rpm = (uint16_t)((rx_data)[2] << 8 | (rx_data)[3]);
+ 236              		.loc 1 66 5 is_stmt 1 view .LVU63
+ 237              		.loc 1 66 44 is_stmt 0 view .LVU64
+ 238 0016 8B78     		ldrb	r3, [r1, #2]	@ zero_extendqisi2
+ 239              		.loc 1 66 48 view .LVU65
+ 240 0018 1B02     		lsls	r3, r3, #8
+ 241              		.loc 1 66 24 view .LVU66
+ 242 001a 1BB2     		sxth	r3, r3
+ 243              		.loc 1 66 64 view .LVU67
+ 244 001c CA78     		ldrb	r2, [r1, #3]	@ zero_extendqisi2
+ 245              		.loc 1 66 53 view .LVU68
+ 246 001e 1343     		orrs	r3, r3, r2
+ 247              		.loc 1 66 22 view .LVU69
+ 248 0020 4380     		strh	r3, [r0, #2]	@ movhi
+  67:Library/Src/motor.c ****     motor->given_current = (uint16_t)((rx_data)[4] << 8 | (rx_data)[5]);
+ 249              		.loc 1 67 5 is_stmt 1 view .LVU70
+ 250              		.loc 1 67 48 is_stmt 0 view .LVU71
+ 251 0022 0B79     		ldrb	r3, [r1, #4]	@ zero_extendqisi2
+ 252              		.loc 1 67 52 view .LVU72
+ 253 0024 1B02     		lsls	r3, r3, #8
+ 254              		.loc 1 67 28 view .LVU73
+ 255 0026 1BB2     		sxth	r3, r3
+ 256              		.loc 1 67 68 view .LVU74
+ 257 0028 4A79     		ldrb	r2, [r1, #5]	@ zero_extendqisi2
+ 258              		.loc 1 67 57 view .LVU75
+ 259 002a 1343     		orrs	r3, r3, r2
+ 260              		.loc 1 67 26 view .LVU76
+ 261 002c 8380     		strh	r3, [r0, #4]	@ movhi
+  68:Library/Src/motor.c ****     motor->temperate = (rx_data)[6];
+ 262              		.loc 1 68 5 is_stmt 1 view .LVU77
+ 263              		.loc 1 68 22 is_stmt 0 view .LVU78
+ 264 002e 8B79     		ldrb	r3, [r1, #6]	@ zero_extendqisi2
+ 265 0030 8371     		strb	r3, [r0, #6]
+  69:Library/Src/motor.c **** }
+ 266              		.loc 1 69 1 view .LVU79
+ 267 0032 7047     		bx	lr
+ 268              		.cfi_endproc
+ 269              	.LFE138:
+ 271              		.section	.text.DJ_124_ctrl,"ax",%progbits
+ 272              		.align	1
+ 273              		.global	DJ_124_ctrl
+ 274              		.syntax unified
+ 275              		.thumb
+ 276              		.thumb_func
+ 278              	DJ_124_ctrl:
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 7
+
+
+ 279              	.LVL16:
+ 280              	.LFB139:
+  70:Library/Src/motor.c **** 
+  71:Library/Src/motor.c **** 
+  72:Library/Src/motor.c **** /**
+  73:Library/Src/motor.c ****   * @brief          3508/2006/6020电流开环
+  74:Library/Src/motor.c ****   * @param hcan     &hcan1 / &hcan2
+  75:Library/Src/motor.c ****   * @param motor_id 发送id
+  76:Library/Src/motor.c ****   * @param motor1   电机1电流
+  77:Library/Src/motor.c ****   * @param motor2   电机2电流
+  78:Library/Src/motor.c ****   * @param motor3   电机3电流
+  79:Library/Src/motor.c ****   * @param motor4   电机4电流
+  80:Library/Src/motor.c ****   * @return         none 
+  81:Library/Src/motor.c ****   */
+  82:Library/Src/motor.c **** void DJ_124_ctrl(CAN_HandleTypeDef* hcan , uint16_t motor_id , uint16_t motor1 , uint16_t motor2 , 
+  83:Library/Src/motor.c **** {
+ 281              		.loc 1 83 1 is_stmt 1 view -0
+ 282              		.cfi_startproc
+ 283              		@ args = 8, pretend = 0, frame = 0
+ 284              		@ frame_needed = 0, uses_anonymous_args = 0
+ 285              		.loc 1 83 1 is_stmt 0 view .LVU81
+ 286 0000 38B5     		push	{r3, r4, r5, lr}
+ 287              	.LCFI4:
+ 288              		.cfi_def_cfa_offset 16
+ 289              		.cfi_offset 3, -16
+ 290              		.cfi_offset 4, -12
+ 291              		.cfi_offset 5, -8
+ 292              		.cfi_offset 14, -4
+ 293 0002 9446     		mov	ip, r2
+ 294 0004 BDF81040 		ldrh	r4, [sp, #16]
+ 295 0008 BDF814E0 		ldrh	lr, [sp, #20]
+  84:Library/Src/motor.c ****     static uint8_t tx_data[8];
+ 296              		.loc 1 84 5 is_stmt 1 view .LVU82
+  85:Library/Src/motor.c **** 
+  86:Library/Src/motor.c ****     tx_data[0] = motor1 >> 8;
+ 297              		.loc 1 86 5 view .LVU83
+ 298              		.loc 1 86 16 is_stmt 0 view .LVU84
+ 299 000c 0B4A     		ldr	r2, .L10
+ 300              	.LVL17:
+ 301              		.loc 1 86 16 view .LVU85
+ 302 000e 4FEA1C25 		lsr	r5, ip, #8
+ 303 0012 1570     		strb	r5, [r2]
+  87:Library/Src/motor.c ****     tx_data[1] = motor1;
+ 304              		.loc 1 87 5 is_stmt 1 view .LVU86
+ 305              		.loc 1 87 16 is_stmt 0 view .LVU87
+ 306 0014 82F801C0 		strb	ip, [r2, #1]
+  88:Library/Src/motor.c ****     tx_data[2] = motor2 >> 8;
+ 307              		.loc 1 88 5 is_stmt 1 view .LVU88
+ 308              		.loc 1 88 16 is_stmt 0 view .LVU89
+ 309 0018 4FEA132C 		lsr	ip, r3, #8
+ 310 001c 82F802C0 		strb	ip, [r2, #2]
+  89:Library/Src/motor.c ****     tx_data[3] = motor2;
+ 311              		.loc 1 89 5 is_stmt 1 view .LVU90
+ 312              		.loc 1 89 16 is_stmt 0 view .LVU91
+ 313 0020 D370     		strb	r3, [r2, #3]
+  90:Library/Src/motor.c ****     tx_data[4] = motor3 >> 8;
+ 314              		.loc 1 90 5 is_stmt 1 view .LVU92
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 8
+
+
+ 315              		.loc 1 90 16 is_stmt 0 view .LVU93
+ 316 0022 230A     		lsrs	r3, r4, #8
+ 317              	.LVL18:
+ 318              		.loc 1 90 16 view .LVU94
+ 319 0024 1371     		strb	r3, [r2, #4]
+  91:Library/Src/motor.c ****     tx_data[5] = motor3;
+ 320              		.loc 1 91 5 is_stmt 1 view .LVU95
+ 321              		.loc 1 91 16 is_stmt 0 view .LVU96
+ 322 0026 5471     		strb	r4, [r2, #5]
+  92:Library/Src/motor.c ****     tx_data[6] = motor4 >> 8;
+ 323              		.loc 1 92 5 is_stmt 1 view .LVU97
+ 324              		.loc 1 92 16 is_stmt 0 view .LVU98
+ 325 0028 4FEA1E23 		lsr	r3, lr, #8
+ 326 002c 9371     		strb	r3, [r2, #6]
+  93:Library/Src/motor.c ****     tx_data[7] = motor4;
+ 327              		.loc 1 93 5 is_stmt 1 view .LVU99
+ 328              		.loc 1 93 16 is_stmt 0 view .LVU100
+ 329 002e 82F807E0 		strb	lr, [r2, #7]
+  94:Library/Src/motor.c **** 
+  95:Library/Src/motor.c ****     canx_send_data(hcan, motor_id, tx_data, 0x08);
+ 330              		.loc 1 95 5 is_stmt 1 view .LVU101
+ 331 0032 0823     		movs	r3, #8
+ 332 0034 FFF7FEFF 		bl	canx_send_data
+ 333              	.LVL19:
+  96:Library/Src/motor.c **** }
+ 334              		.loc 1 96 1 is_stmt 0 view .LVU102
+ 335 0038 38BD     		pop	{r3, r4, r5, pc}
+ 336              	.LVL20:
+ 337              	.L11:
+ 338              		.loc 1 96 1 view .LVU103
+ 339 003a 00BF     		.align	2
+ 340              	.L10:
+ 341 003c 00000000 		.word	.LANCHOR0
+ 342              		.cfi_endproc
+ 343              	.LFE139:
+ 345              		.section	.text.DJ_124_ctrl_vel,"ax",%progbits
+ 346              		.align	1
+ 347              		.global	DJ_124_ctrl_vel
+ 348              		.syntax unified
+ 349              		.thumb
+ 350              		.thumb_func
+ 352              	DJ_124_ctrl_vel:
+ 353              	.LVL21:
+ 354              	.LFB140:
+  97:Library/Src/motor.c **** 
+  98:Library/Src/motor.c **** 
+  99:Library/Src/motor.c **** /**
+ 100:Library/Src/motor.c ****   * @brief 3508/2006/6020速度环
+ 101:Library/Src/motor.c ****   * @param hcan &hcan1 / &hcan2
+ 102:Library/Src/motor.c ****   * @param motor_id 发送ID
+ 103:Library/Src/motor.c ****   * @param pid_vel pid参数结构体
+ 104:Library/Src/motor.c ****   * @param motor_measure 电机反馈数据
+ 105:Library/Src/motor.c ****   * @param vel1 电机1转速
+ 106:Library/Src/motor.c ****   * @param vel2 电机2转速
+ 107:Library/Src/motor.c ****   * @param vel3 电机3转速
+ 108:Library/Src/motor.c ****   * @param vel4 电机4转速
+ 109:Library/Src/motor.c ****   * @return none 
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 9
+
+
+ 110:Library/Src/motor.c ****   */
+ 111:Library/Src/motor.c ****  void DJ_124_ctrl_vel(CAN_HandleTypeDef* hcan , uint16_t motor_id , pid_type_def pid_vel[4] , motor
+ 112:Library/Src/motor.c ****  {
+ 355              		.loc 1 112 2 is_stmt 1 view -0
+ 356              		.cfi_startproc
+ 357              		@ args = 16, pretend = 0, frame = 8
+ 358              		@ frame_needed = 0, uses_anonymous_args = 0
+ 359              		.loc 1 112 2 is_stmt 0 view .LVU105
+ 360 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 361              	.LCFI5:
+ 362              		.cfi_def_cfa_offset 20
+ 363              		.cfi_offset 4, -20
+ 364              		.cfi_offset 5, -16
+ 365              		.cfi_offset 6, -12
+ 366              		.cfi_offset 7, -8
+ 367              		.cfi_offset 14, -4
+ 368 0002 85B0     		sub	sp, sp, #20
+ 369              	.LCFI6:
+ 370              		.cfi_def_cfa_offset 40
+ 371 0004 0646     		mov	r6, r0
+ 372 0006 0F46     		mov	r7, r1
+ 373 0008 1546     		mov	r5, r2
+ 374 000a 1C46     		mov	r4, r3
+ 113:Library/Src/motor.c ****    int16_t motor_ctrl_vel[4] = {0};
+ 375              		.loc 1 113 4 is_stmt 1 view .LVU106
+ 376              		.loc 1 113 12 is_stmt 0 view .LVU107
+ 377 000c 0023     		movs	r3, #0
+ 378              	.LVL22:
+ 379              		.loc 1 113 12 view .LVU108
+ 380 000e 0293     		str	r3, [sp, #8]
+ 381 0010 0393     		str	r3, [sp, #12]
+ 114:Library/Src/motor.c ****    motor_ctrl_vel[0] = vel1;
+ 382              		.loc 1 114 4 is_stmt 1 view .LVU109
+ 383              		.loc 1 114 22 is_stmt 0 view .LVU110
+ 384 0012 BDF92820 		ldrsh	r2, [sp, #40]
+ 385              	.LVL23:
+ 386              		.loc 1 114 22 view .LVU111
+ 387 0016 ADF80820 		strh	r2, [sp, #8]	@ movhi
+ 115:Library/Src/motor.c ****    motor_ctrl_vel[1] = vel2;
+ 388              		.loc 1 115 4 is_stmt 1 view .LVU112
+ 389              		.loc 1 115 22 is_stmt 0 view .LVU113
+ 390 001a BDF92C20 		ldrsh	r2, [sp, #44]
+ 391 001e ADF80A20 		strh	r2, [sp, #10]	@ movhi
+ 116:Library/Src/motor.c ****    motor_ctrl_vel[2] = vel3;
+ 392              		.loc 1 116 4 is_stmt 1 view .LVU114
+ 393              		.loc 1 116 22 is_stmt 0 view .LVU115
+ 394 0022 BDF93020 		ldrsh	r2, [sp, #48]
+ 395 0026 ADF80C20 		strh	r2, [sp, #12]	@ movhi
+ 117:Library/Src/motor.c ****    motor_ctrl_vel[3] = vel4;
+ 396              		.loc 1 117 4 is_stmt 1 view .LVU116
+ 397              		.loc 1 117 22 is_stmt 0 view .LVU117
+ 398 002a BDF93420 		ldrsh	r2, [sp, #52]
+ 399 002e ADF80E20 		strh	r2, [sp, #14]	@ movhi
+ 118:Library/Src/motor.c ****    static int16_t motor_I[4] = {0};
+ 400              		.loc 1 118 4 is_stmt 1 view .LVU118
+ 119:Library/Src/motor.c ****  
+ 120:Library/Src/motor.c ****    static uint8_t i = 0;
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 10
+
+
+ 401              		.loc 1 120 4 view .LVU119
+ 121:Library/Src/motor.c ****    for(i = 0 ; i < 4 ; i += 1)
+ 402              		.loc 1 121 4 view .LVU120
+ 403              		.loc 1 121 10 is_stmt 0 view .LVU121
+ 404 0032 284A     		ldr	r2, .L18
+ 405 0034 1370     		strb	r3, [r2]
+ 406              		.loc 1 121 4 view .LVU122
+ 407 0036 04E0     		b	.L13
+ 408              	.LVL24:
+ 409              	.L14:
+ 410              		.loc 1 121 24 is_stmt 1 discriminator 2 view .LVU123
+ 411              		.loc 1 121 26 is_stmt 0 discriminator 2 view .LVU124
+ 412 0038 0EF1010E 		add	lr, lr, #1
+ 413 003c 254B     		ldr	r3, .L18
+ 414 003e 83F800E0 		strb	lr, [r3]
+ 415              	.L13:
+ 416              		.loc 1 121 16 is_stmt 1 discriminator 1 view .LVU125
+ 417              		.loc 1 121 18 is_stmt 0 discriminator 1 view .LVU126
+ 418 0042 244B     		ldr	r3, .L18
+ 419 0044 93F800C0 		ldrb	ip, [r3]	@ zero_extendqisi2
+ 420              		.loc 1 121 4 discriminator 1 view .LVU127
+ 421 0048 BCF1030F 		cmp	ip, #3
+ 422 004c 2DD8     		bhi	.L17
+ 122:Library/Src/motor.c ****    {
+ 123:Library/Src/motor.c ****      motor_I[i] = PID_Calc(&pid_vel[i] , motor_measure[i].speed_rpm , motor_ctrl_vel[i]);
+ 423              		.loc 1 123 6 is_stmt 1 view .LVU128
+ 424              		.loc 1 123 55 is_stmt 0 view .LVU129
+ 425 004e 0CEB4C03 		add	r3, ip, ip, lsl #1
+ 426 0052 04EB8303 		add	r3, r4, r3, lsl #2
+ 427              		.loc 1 123 58 view .LVU130
+ 428 0056 B3F90230 		ldrsh	r3, [r3, #2]
+ 429 005a 00EE103A 		vmov	s0, r3	@ int
+ 430              		.loc 1 123 85 view .LVU131
+ 431 005e 04AB     		add	r3, sp, #16
+ 432 0060 03EB4C03 		add	r3, r3, ip, lsl #1
+ 433 0064 33F9083C 		ldrsh	r3, [r3, #-8]
+ 434 0068 00EE903A 		vmov	s1, r3	@ int
+ 435              		.loc 1 123 19 view .LVU132
+ 436 006c F8EEE00A 		vcvt.f32.s32	s1, s1
+ 437 0070 B8EEC00A 		vcvt.f32.s32	s0, s0
+ 438 0074 3420     		movs	r0, #52
+ 439 0076 00FB0C50 		mla	r0, r0, ip, r5
+ 440 007a FFF7FEFF 		bl	PID_Calc
+ 441              	.LVL25:
+ 442              		.loc 1 123 13 view .LVU133
+ 443 007e 154B     		ldr	r3, .L18
+ 444 0080 93F800E0 		ldrb	lr, [r3]	@ zero_extendqisi2
+ 445              		.loc 1 123 17 view .LVU134
+ 446 0084 BDEEC00A 		vcvt.s32.f32	s0, s0
+ 447 0088 10EE103A 		vmov	r3, s0	@ int
+ 448 008c 0FFA83FC 		sxth	ip, r3
+ 449 0090 114B     		ldr	r3, .L18+4
+ 450 0092 23F81EC0 		strh	ip, [r3, lr, lsl #1]	@ movhi
+ 124:Library/Src/motor.c **** 
+ 125:Library/Src/motor.c ****      if(motor_I[i] > 5000)
+ 451              		.loc 1 125 6 is_stmt 1 view .LVU135
+ 452              		.loc 1 125 8 is_stmt 0 view .LVU136
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 11
+
+
+ 453 0096 41F28833 		movw	r3, #5000
+ 454 009a 9C45     		cmp	ip, r3
+ 455 009c CCDD     		ble	.L14
+ 126:Library/Src/motor.c ****      {
+ 127:Library/Src/motor.c ****       motor_I[i] = 5000;
+ 456              		.loc 1 127 7 is_stmt 1 view .LVU137
+ 457              		.loc 1 127 18 is_stmt 0 view .LVU138
+ 458 009e 0E4B     		ldr	r3, .L18+4
+ 459 00a0 41F28832 		movw	r2, #5000
+ 460 00a4 23F81E20 		strh	r2, [r3, lr, lsl #1]	@ movhi
+ 461 00a8 C6E7     		b	.L14
+ 462              	.L17:
+ 128:Library/Src/motor.c ****      }
+ 129:Library/Src/motor.c ****    }
+ 130:Library/Src/motor.c ****  
+ 131:Library/Src/motor.c ****    DJ_124_ctrl(hcan , motor_id , motor_I[0] , motor_I[1] , motor_I[2] , motor_I[3]);
+ 463              		.loc 1 131 4 is_stmt 1 view .LVU139
+ 464              		.loc 1 131 41 is_stmt 0 view .LVU140
+ 465 00aa 0B49     		ldr	r1, .L18+4
+ 466 00ac B1F90020 		ldrsh	r2, [r1]
+ 467              		.loc 1 131 54 view .LVU141
+ 468 00b0 B1F90230 		ldrsh	r3, [r1, #2]
+ 469              		.loc 1 131 67 view .LVU142
+ 470 00b4 B1F90400 		ldrsh	r0, [r1, #4]
+ 471              		.loc 1 131 80 view .LVU143
+ 472 00b8 B1F90610 		ldrsh	r1, [r1, #6]
+ 473              		.loc 1 131 4 view .LVU144
+ 474 00bc 89B2     		uxth	r1, r1
+ 475 00be 0191     		str	r1, [sp, #4]
+ 476 00c0 80B2     		uxth	r0, r0
+ 477 00c2 0090     		str	r0, [sp]
+ 478 00c4 9BB2     		uxth	r3, r3
+ 479 00c6 92B2     		uxth	r2, r2
+ 480 00c8 3946     		mov	r1, r7
+ 481 00ca 3046     		mov	r0, r6
+ 482 00cc FFF7FEFF 		bl	DJ_124_ctrl
+ 483              	.LVL26:
+ 132:Library/Src/motor.c ****  }
+ 484              		.loc 1 132 2 view .LVU145
+ 485 00d0 05B0     		add	sp, sp, #20
+ 486              	.LCFI7:
+ 487              		.cfi_def_cfa_offset 20
+ 488              		@ sp needed
+ 489 00d2 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 490              	.LVL27:
+ 491              	.L19:
+ 492              		.loc 1 132 2 view .LVU146
+ 493              		.align	2
+ 494              	.L18:
+ 495 00d4 00000000 		.word	.LANCHOR1
+ 496 00d8 00000000 		.word	.LANCHOR2
+ 497              		.cfi_endproc
+ 498              	.LFE140:
+ 500              		.section	.text.DJ_124_ctrl_pos,"ax",%progbits
+ 501              		.align	1
+ 502              		.global	DJ_124_ctrl_pos
+ 503              		.syntax unified
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 12
+
+
+ 504              		.thumb
+ 505              		.thumb_func
+ 507              	DJ_124_ctrl_pos:
+ 508              	.LVL28:
+ 509              	.LFB141:
+ 133:Library/Src/motor.c **** 
+ 134:Library/Src/motor.c **** 
+ 135:Library/Src/motor.c ****   /**
+ 136:Library/Src/motor.c ****   * @brief 3508/2006/6020位置环
+ 137:Library/Src/motor.c ****   * @param hcan &hcan1 / &hcan2
+ 138:Library/Src/motor.c ****   * @param motor_id 发送ID
+ 139:Library/Src/motor.c ****   * @param pid_vel pid参数结构体
+ 140:Library/Src/motor.c ****   * @param motor_measure 电机反馈数据
+ 141:Library/Src/motor.c ****   * @param pos1 电机1位置
+ 142:Library/Src/motor.c ****   * @param pos2 电机2位置
+ 143:Library/Src/motor.c ****   * @param pos3 电机3位置
+ 144:Library/Src/motor.c ****   * @param pos4 电机4位置
+ 145:Library/Src/motor.c ****   * @return none 
+ 146:Library/Src/motor.c ****   */
+ 147:Library/Src/motor.c **** void DJ_124_ctrl_pos(CAN_HandleTypeDef* hcan , uint16_t motor_id , pid_type_def pid_pos[4] , pid_ty
+ 148:Library/Src/motor.c **** {
+ 510              		.loc 1 148 1 is_stmt 1 view -0
+ 511              		.cfi_startproc
+ 512              		@ args = 20, pretend = 0, frame = 8
+ 513              		@ frame_needed = 0, uses_anonymous_args = 0
+ 514              		.loc 1 148 1 is_stmt 0 view .LVU148
+ 515 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 516              	.LCFI8:
+ 517              		.cfi_def_cfa_offset 24
+ 518              		.cfi_offset 4, -24
+ 519              		.cfi_offset 5, -20
+ 520              		.cfi_offset 6, -16
+ 521              		.cfi_offset 7, -12
+ 522              		.cfi_offset 8, -8
+ 523              		.cfi_offset 14, -4
+ 524 0004 86B0     		sub	sp, sp, #24
+ 525              	.LCFI9:
+ 526              		.cfi_def_cfa_offset 48
+ 527 0006 0646     		mov	r6, r0
+ 528 0008 0F46     		mov	r7, r1
+ 529 000a 1446     		mov	r4, r2
+ 530 000c 9846     		mov	r8, r3
+ 531 000e 0C9D     		ldr	r5, [sp, #48]
+ 149:Library/Src/motor.c ****   int16_t motor_ctrl_pos[4] = {0};
+ 532              		.loc 1 149 3 is_stmt 1 view .LVU149
+ 533              		.loc 1 149 11 is_stmt 0 view .LVU150
+ 534 0010 0023     		movs	r3, #0
+ 535              	.LVL29:
+ 536              		.loc 1 149 11 view .LVU151
+ 537 0012 0493     		str	r3, [sp, #16]
+ 538 0014 0593     		str	r3, [sp, #20]
+ 150:Library/Src/motor.c ****   motor_ctrl_pos[0] = pos1;
+ 539              		.loc 1 150 3 is_stmt 1 view .LVU152
+ 540              		.loc 1 150 21 is_stmt 0 view .LVU153
+ 541 0016 BDF93420 		ldrsh	r2, [sp, #52]
+ 542              	.LVL30:
+ 543              		.loc 1 150 21 view .LVU154
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 13
+
+
+ 544 001a ADF81020 		strh	r2, [sp, #16]	@ movhi
+ 151:Library/Src/motor.c ****   motor_ctrl_pos[1] = pos2;
+ 545              		.loc 1 151 3 is_stmt 1 view .LVU155
+ 546              		.loc 1 151 21 is_stmt 0 view .LVU156
+ 547 001e BDF93820 		ldrsh	r2, [sp, #56]
+ 548 0022 ADF81220 		strh	r2, [sp, #18]	@ movhi
+ 152:Library/Src/motor.c ****   motor_ctrl_pos[2] = pos3;
+ 549              		.loc 1 152 3 is_stmt 1 view .LVU157
+ 550              		.loc 1 152 21 is_stmt 0 view .LVU158
+ 551 0026 BDF93C20 		ldrsh	r2, [sp, #60]
+ 552 002a ADF81420 		strh	r2, [sp, #20]	@ movhi
+ 153:Library/Src/motor.c ****   motor_ctrl_pos[3] = pos4;
+ 553              		.loc 1 153 3 is_stmt 1 view .LVU159
+ 554              		.loc 1 153 21 is_stmt 0 view .LVU160
+ 555 002e BDF94020 		ldrsh	r2, [sp, #64]
+ 556 0032 ADF81620 		strh	r2, [sp, #22]	@ movhi
+ 154:Library/Src/motor.c ****   static int16_t motor_I[4] = {0};
+ 557              		.loc 1 154 3 is_stmt 1 view .LVU161
+ 155:Library/Src/motor.c **** 
+ 156:Library/Src/motor.c ****   static uint8_t i = 0;
+ 558              		.loc 1 156 3 view .LVU162
+ 157:Library/Src/motor.c ****   for(i = 0 ; i < 4 ; i += 1)
+ 559              		.loc 1 157 3 view .LVU163
+ 560              		.loc 1 157 9 is_stmt 0 view .LVU164
+ 561 0036 214A     		ldr	r2, .L24
+ 562 0038 1370     		strb	r3, [r2]
+ 563              		.loc 1 157 3 view .LVU165
+ 564 003a 23E0     		b	.L21
+ 565              	.LVL31:
+ 566              	.L22:
+ 158:Library/Src/motor.c ****   {
+ 159:Library/Src/motor.c ****     motor_I[i] = PID_Calc_motorpos(&pid_pos[i] , motor_measure[i].ecd , motor_ctrl_pos[i]);
+ 567              		.loc 1 159 5 is_stmt 1 discriminator 3 view .LVU166
+ 568              		.loc 1 159 63 is_stmt 0 discriminator 3 view .LVU167
+ 569 003c 0CEB4C03 		add	r3, ip, ip, lsl #1
+ 570              		.loc 1 159 66 discriminator 3 view .LVU168
+ 571 0040 35F82330 		ldrh	r3, [r5, r3, lsl #2]
+ 572 0044 00EE103A 		vmov	s0, r3	@ int
+ 573              		.loc 1 159 87 discriminator 3 view .LVU169
+ 574 0048 06AB     		add	r3, sp, #24
+ 575 004a 03EB4C03 		add	r3, r3, ip, lsl #1
+ 576 004e 33F9083C 		ldrsh	r3, [r3, #-8]
+ 577 0052 00EE903A 		vmov	s1, r3	@ int
+ 578              		.loc 1 159 18 discriminator 3 view .LVU170
+ 579 0056 F8EEE00A 		vcvt.f32.s32	s1, s1
+ 580 005a B8EE400A 		vcvt.f32.u32	s0, s0
+ 581 005e 3420     		movs	r0, #52
+ 582 0060 00FB0C40 		mla	r0, r0, ip, r4
+ 583 0064 FFF7FEFF 		bl	PID_Calc_motorpos
+ 584              	.LVL32:
+ 585              		.loc 1 159 12 discriminator 3 view .LVU171
+ 586 0068 144B     		ldr	r3, .L24
+ 587 006a 93F800C0 		ldrb	ip, [r3]	@ zero_extendqisi2
+ 588              		.loc 1 159 16 discriminator 3 view .LVU172
+ 589 006e BDEEC00A 		vcvt.s32.f32	s0, s0
+ 590 0072 134A     		ldr	r2, .L24+4
+ 591 0074 10EE101A 		vmov	r1, s0	@ int
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 14
+
+
+ 592 0078 22F81C10 		strh	r1, [r2, ip, lsl #1]	@ movhi
+ 157:Library/Src/motor.c ****   for(i = 0 ; i < 4 ; i += 1)
+ 593              		.loc 1 157 23 is_stmt 1 discriminator 3 view .LVU173
+ 157:Library/Src/motor.c ****   for(i = 0 ; i < 4 ; i += 1)
+ 594              		.loc 1 157 25 is_stmt 0 discriminator 3 view .LVU174
+ 595 007c 0CF1010C 		add	ip, ip, #1
+ 596 0080 83F800C0 		strb	ip, [r3]
+ 597              	.L21:
+ 157:Library/Src/motor.c ****   for(i = 0 ; i < 4 ; i += 1)
+ 598              		.loc 1 157 15 is_stmt 1 discriminator 1 view .LVU175
+ 157:Library/Src/motor.c ****   for(i = 0 ; i < 4 ; i += 1)
+ 599              		.loc 1 157 17 is_stmt 0 discriminator 1 view .LVU176
+ 600 0084 0D4B     		ldr	r3, .L24
+ 601 0086 93F800C0 		ldrb	ip, [r3]	@ zero_extendqisi2
+ 157:Library/Src/motor.c ****   for(i = 0 ; i < 4 ; i += 1)
+ 602              		.loc 1 157 3 discriminator 1 view .LVU177
+ 603 008a BCF1030F 		cmp	ip, #3
+ 604 008e D5D9     		bls	.L22
+ 160:Library/Src/motor.c ****   }
+ 161:Library/Src/motor.c **** 
+ 162:Library/Src/motor.c ****   DJ_124_ctrl_vel(hcan , motor_id , pid_vel , motor_measure , motor_I[0] , motor_I[1] , motor_I[2] 
+ 605              		.loc 1 162 3 is_stmt 1 view .LVU178
+ 606 0090 0B4B     		ldr	r3, .L24+4
+ 607 0092 B3F90620 		ldrsh	r2, [r3, #6]
+ 608 0096 0392     		str	r2, [sp, #12]
+ 609 0098 B3F90420 		ldrsh	r2, [r3, #4]
+ 610 009c 0292     		str	r2, [sp, #8]
+ 611 009e B3F90220 		ldrsh	r2, [r3, #2]
+ 612 00a2 0192     		str	r2, [sp, #4]
+ 613 00a4 B3F90030 		ldrsh	r3, [r3]
+ 614 00a8 0093     		str	r3, [sp]
+ 615 00aa 2B46     		mov	r3, r5
+ 616 00ac 4246     		mov	r2, r8
+ 617 00ae 3946     		mov	r1, r7
+ 618 00b0 3046     		mov	r0, r6
+ 619 00b2 FFF7FEFF 		bl	DJ_124_ctrl_vel
+ 620              	.LVL33:
+ 163:Library/Src/motor.c **** }
+ 621              		.loc 1 163 1 is_stmt 0 view .LVU179
+ 622 00b6 06B0     		add	sp, sp, #24
+ 623              	.LCFI10:
+ 624              		.cfi_def_cfa_offset 24
+ 625              		@ sp needed
+ 626 00b8 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+ 627              	.LVL34:
+ 628              	.L25:
+ 629              		.loc 1 163 1 view .LVU180
+ 630              		.align	2
+ 631              	.L24:
+ 632 00bc 00000000 		.word	.LANCHOR3
+ 633 00c0 00000000 		.word	.LANCHOR4
+ 634              		.cfi_endproc
+ 635              	.LFE141:
+ 637              		.global	__aeabi_f2d
+ 638              		.global	__aeabi_dmul
+ 639              		.global	__aeabi_d2f
+ 640              		.section	.text.DM_motor_fbdata,"ax",%progbits
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 15
+
+
+ 641              		.align	1
+ 642              		.global	DM_motor_fbdata
+ 643              		.syntax unified
+ 644              		.thumb
+ 645              		.thumb_func
+ 647              	DM_motor_fbdata:
+ 648              	.LVL35:
+ 649              	.LFB142:
+ 164:Library/Src/motor.c **** 
+ 165:Library/Src/motor.c **** 
+ 166:Library/Src/motor.c **** /**
+ 167:Library/Src/motor.c ****   * @brief          DM电机数据解包
+ 168:Library/Src/motor.c ****   * @param motor    单位电机地址
+ 169:Library/Src/motor.c ****   * @param rx_data  接收数据
+ 170:Library/Src/motor.c ****   * @return         none 
+ 171:Library/Src/motor.c ****   */
+ 172:Library/Src/motor.c **** void DM_motor_fbdata(motor_measure_DM_t *motor , uint8_t *rx_data)
+ 173:Library/Src/motor.c **** {
+ 650              		.loc 1 173 1 is_stmt 1 view -0
+ 651              		.cfi_startproc
+ 652              		@ args = 0, pretend = 0, frame = 0
+ 653              		@ frame_needed = 0, uses_anonymous_args = 0
+ 654              		.loc 1 173 1 is_stmt 0 view .LVU182
+ 655 0000 F8B5     		push	{r3, r4, r5, r6, r7, lr}
+ 656              	.LCFI11:
+ 657              		.cfi_def_cfa_offset 24
+ 658              		.cfi_offset 3, -24
+ 659              		.cfi_offset 4, -20
+ 660              		.cfi_offset 5, -16
+ 661              		.cfi_offset 6, -12
+ 662              		.cfi_offset 7, -8
+ 663              		.cfi_offset 14, -4
+ 664 0002 0446     		mov	r4, r0
+ 665 0004 0D46     		mov	r5, r1
+ 174:Library/Src/motor.c **** 	motor->id = (rx_data[0])&0x0F;
+ 666              		.loc 1 174 2 is_stmt 1 view .LVU183
+ 667              		.loc 1 174 22 is_stmt 0 view .LVU184
+ 668 0006 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 669              		.loc 1 174 26 view .LVU185
+ 670 0008 03F00F03 		and	r3, r3, #15
+ 671              		.loc 1 174 12 view .LVU186
+ 672 000c 0360     		str	r3, [r0]
+ 175:Library/Src/motor.c **** 	motor->err = (rx_data[0])>>4;
+ 673              		.loc 1 175 2 is_stmt 1 view .LVU187
+ 674              		.loc 1 175 23 is_stmt 0 view .LVU188
+ 675 000e 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 676              		.loc 1 175 27 view .LVU189
+ 677 0010 1B09     		lsrs	r3, r3, #4
+ 678              		.loc 1 175 13 view .LVU190
+ 679 0012 4360     		str	r3, [r0, #4]
+ 176:Library/Src/motor.c **** 	motor->p_int=(rx_data[1]<<8)|rx_data[2];
+ 680              		.loc 1 176 2 is_stmt 1 view .LVU191
+ 681              		.loc 1 176 23 is_stmt 0 view .LVU192
+ 682 0014 4B78     		ldrb	r3, [r1, #1]	@ zero_extendqisi2
+ 683              		.loc 1 176 38 view .LVU193
+ 684 0016 8878     		ldrb	r0, [r1, #2]	@ zero_extendqisi2
+ 685              	.LVL36:
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 16
+
+
+ 686              		.loc 1 176 30 view .LVU194
+ 687 0018 40EA0320 		orr	r0, r0, r3, lsl #8
+ 688              		.loc 1 176 14 view .LVU195
+ 689 001c E061     		str	r0, [r4, #28]
+ 177:Library/Src/motor.c **** 	motor->v_int=(rx_data[3]<<4)|(rx_data[4]>>4);
+ 690              		.loc 1 177 2 is_stmt 1 view .LVU196
+ 691              		.loc 1 177 23 is_stmt 0 view .LVU197
+ 692 001e CB78     		ldrb	r3, [r1, #3]	@ zero_extendqisi2
+ 693              		.loc 1 177 39 view .LVU198
+ 694 0020 0F79     		ldrb	r7, [r1, #4]	@ zero_extendqisi2
+ 695              		.loc 1 177 42 view .LVU199
+ 696 0022 3F09     		lsrs	r7, r7, #4
+ 697              		.loc 1 177 30 view .LVU200
+ 698 0024 47EA0317 		orr	r7, r7, r3, lsl #4
+ 699              		.loc 1 177 14 view .LVU201
+ 700 0028 2762     		str	r7, [r4, #32]
+ 178:Library/Src/motor.c **** 	motor->t_int=((rx_data[4]&0xF)<<8)|rx_data[5];
+ 701              		.loc 1 178 2 is_stmt 1 view .LVU202
+ 702              		.loc 1 178 24 is_stmt 0 view .LVU203
+ 703 002a 0E79     		ldrb	r6, [r1, #4]	@ zero_extendqisi2
+ 704              		.loc 1 178 32 view .LVU204
+ 705 002c 3602     		lsls	r6, r6, #8
+ 706 002e 06F47066 		and	r6, r6, #3840
+ 707              		.loc 1 178 44 view .LVU205
+ 708 0032 4B79     		ldrb	r3, [r1, #5]	@ zero_extendqisi2
+ 709              		.loc 1 178 36 view .LVU206
+ 710 0034 1E43     		orrs	r6, r6, r3
+ 711              		.loc 1 178 14 view .LVU207
+ 712 0036 6662     		str	r6, [r4, #36]
+ 179:Library/Src/motor.c **** 	motor->pos = uint_to_float(motor->p_int , DM_P_MIN , DM_P_MAX, 16) * 57.6; // (-12.5,12.5)->(-720,
+ 713              		.loc 1 179 2 is_stmt 1 view .LVU208
+ 714              		.loc 1 179 15 is_stmt 0 view .LVU209
+ 715 0038 1021     		movs	r1, #16
+ 716              	.LVL37:
+ 717              		.loc 1 179 15 view .LVU210
+ 718 003a F2EE090A 		vmov.f32	s1, #1.25e+1
+ 719 003e BAEE090A 		vmov.f32	s0, #-1.25e+1
+ 720 0042 FFF7FEFF 		bl	uint_to_float
+ 721              	.LVL38:
+ 722 0046 10EE100A 		vmov	r0, s0
+ 723 004a FFF7FEFF 		bl	__aeabi_f2d
+ 724              	.LVL39:
+ 725              		.loc 1 179 69 view .LVU211
+ 726 004e 16A3     		adr	r3, .L28
+ 727 0050 D3E90023 		ldrd	r2, [r3]
+ 728 0054 FFF7FEFF 		bl	__aeabi_dmul
+ 729              	.LVL40:
+ 730 0058 FFF7FEFF 		bl	__aeabi_d2f
+ 731              	.LVL41:
+ 732              		.loc 1 179 13 view .LVU212
+ 733 005c A060     		str	r0, [r4, #8]	@ float
+ 180:Library/Src/motor.c **** 	motor->vel = uint_to_float(motor->v_int , DM_V_MIN , DM_V_MAX, 12); // (-45.0,45.0)
+ 734              		.loc 1 180 2 is_stmt 1 view .LVU213
+ 735              		.loc 1 180 15 is_stmt 0 view .LVU214
+ 736 005e 0C21     		movs	r1, #12
+ 737 0060 F3EE0E0A 		vmov.f32	s1, #3.0e+1
+ 738 0064 BBEE0E0A 		vmov.f32	s0, #-3.0e+1
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 17
+
+
+ 739 0068 3846     		mov	r0, r7
+ 740 006a FFF7FEFF 		bl	uint_to_float
+ 741              	.LVL42:
+ 742              		.loc 1 180 13 view .LVU215
+ 743 006e 84ED030A 		vstr.32	s0, [r4, #12]
+ 181:Library/Src/motor.c **** 	motor->tor = uint_to_float(motor->t_int , DM_T_MIN , DM_T_MAX, 12);  // (-18.0,18.0)
+ 744              		.loc 1 181 2 is_stmt 1 view .LVU216
+ 745              		.loc 1 181 15 is_stmt 0 view .LVU217
+ 746 0072 0C21     		movs	r1, #12
+ 747 0074 F2EE040A 		vmov.f32	s1, #1.0e+1
+ 748 0078 BAEE040A 		vmov.f32	s0, #-1.0e+1
+ 749 007c 3046     		mov	r0, r6
+ 750 007e FFF7FEFF 		bl	uint_to_float
+ 751              	.LVL43:
+ 752              		.loc 1 181 13 view .LVU218
+ 753 0082 84ED040A 		vstr.32	s0, [r4, #16]
+ 182:Library/Src/motor.c **** 	motor->T_mos = (float)(rx_data[6]);
+ 754              		.loc 1 182 2 is_stmt 1 view .LVU219
+ 755              		.loc 1 182 32 is_stmt 0 view .LVU220
+ 756 0086 AB79     		ldrb	r3, [r5, #6]	@ zero_extendqisi2
+ 757 0088 07EE903A 		vmov	s15, r3	@ int
+ 758              		.loc 1 182 17 view .LVU221
+ 759 008c F8EE677A 		vcvt.f32.u32	s15, s15
+ 760              		.loc 1 182 15 view .LVU222
+ 761 0090 C4ED057A 		vstr.32	s15, [r4, #20]
+ 183:Library/Src/motor.c **** 	motor->T_Rotor = (float)(rx_data[7]);
+ 762              		.loc 1 183 2 is_stmt 1 view .LVU223
+ 763              		.loc 1 183 34 is_stmt 0 view .LVU224
+ 764 0094 EB79     		ldrb	r3, [r5, #7]	@ zero_extendqisi2
+ 765 0096 07EE903A 		vmov	s15, r3	@ int
+ 766              		.loc 1 183 19 view .LVU225
+ 767 009a F8EE677A 		vcvt.f32.u32	s15, s15
+ 768              		.loc 1 183 17 view .LVU226
+ 769 009e C4ED067A 		vstr.32	s15, [r4, #24]
+ 184:Library/Src/motor.c **** }
+ 770              		.loc 1 184 1 view .LVU227
+ 771 00a2 F8BD     		pop	{r3, r4, r5, r6, r7, pc}
+ 772              	.LVL44:
+ 773              	.L29:
+ 774              		.loc 1 184 1 view .LVU228
+ 775 00a4 AFF30080 		.align	3
+ 776              	.L28:
+ 777 00a8 CDCCCCCC 		.word	-858993459
+ 778 00ac CCCC4C40 		.word	1078774988
+ 779              		.cfi_endproc
+ 780              	.LFE142:
+ 782              		.section	.text.DM_motor_MIT_ctrl,"ax",%progbits
+ 783              		.align	1
+ 784              		.global	DM_motor_MIT_ctrl
+ 785              		.syntax unified
+ 786              		.thumb
+ 787              		.thumb_func
+ 789              	DM_motor_MIT_ctrl:
+ 790              	.LVL45:
+ 791              	.LFB143:
+ 185:Library/Src/motor.c **** 
+ 186:Library/Src/motor.c **** /**
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 18
+
+
+ 187:Library/Src/motor.c ****   * @brief MIT模式控制
+ 188:Library/Src/motor.c ****   * @param hcan 所在can接口
+ 189:Library/Src/motor.c ****   * @param motor_id 电机id
+ 190:Library/Src/motor.c ****   * @param pos 电机角度
+ 191:Library/Src/motor.c ****   * @param vel 电机速度
+ 192:Library/Src/motor.c ****   * @param kp 电机p
+ 193:Library/Src/motor.c ****   * @param kd 电机d
+ 194:Library/Src/motor.c ****   * @param torq 电机扭矩
+ 195:Library/Src/motor.c ****   * @return none 
+ 196:Library/Src/motor.c ****   */
+ 197:Library/Src/motor.c ****  void DM_motor_MIT_ctrl(CAN_HandleTypeDef* hcan, uint16_t motor_id, float pos, float vel,float kp, 
+ 198:Library/Src/motor.c ****  {
+ 792              		.loc 1 198 2 is_stmt 1 view -0
+ 793              		.cfi_startproc
+ 794              		@ args = 0, pretend = 0, frame = 8
+ 795              		@ frame_needed = 0, uses_anonymous_args = 0
+ 796              		.loc 1 198 2 is_stmt 0 view .LVU230
+ 797 0000 2DE9F04F 		push	{r4, r5, r6, r7, r8, r9, r10, fp, lr}
+ 798              	.LCFI12:
+ 799              		.cfi_def_cfa_offset 36
+ 800              		.cfi_offset 4, -36
+ 801              		.cfi_offset 5, -32
+ 802              		.cfi_offset 6, -28
+ 803              		.cfi_offset 7, -24
+ 804              		.cfi_offset 8, -20
+ 805              		.cfi_offset 9, -16
+ 806              		.cfi_offset 10, -12
+ 807              		.cfi_offset 11, -8
+ 808              		.cfi_offset 14, -4
+ 809 0004 2DED048B 		vpush.64	{d8, d9}
+ 810              	.LCFI13:
+ 811              		.cfi_def_cfa_offset 52
+ 812              		.cfi_offset 80, -52
+ 813              		.cfi_offset 81, -48
+ 814              		.cfi_offset 82, -44
+ 815              		.cfi_offset 83, -40
+ 816 0008 83B0     		sub	sp, sp, #12
+ 817              	.LCFI14:
+ 818              		.cfi_def_cfa_offset 64
+ 819 000a 8046     		mov	r8, r0
+ 820 000c 8946     		mov	r9, r1
+ 821 000e F0EE609A 		vmov.f32	s19, s1
+ 822 0012 B0EE419A 		vmov.f32	s18, s2
+ 823 0016 F0EE618A 		vmov.f32	s17, s3
+ 824 001a B0EE428A 		vmov.f32	s16, s4
+ 199:Library/Src/motor.c ****    uint8_t data[8] = {0};
+ 825              		.loc 1 199 4 is_stmt 1 view .LVU231
+ 826              		.loc 1 199 12 is_stmt 0 view .LVU232
+ 827 001e 0023     		movs	r3, #0
+ 828 0020 0093     		str	r3, [sp]
+ 829 0022 0193     		str	r3, [sp, #4]
+ 200:Library/Src/motor.c ****    uint16_t pos_tmp , vel_tmp , kp_tmp , kd_tmp , tor_tmp;
+ 830              		.loc 1 200 4 is_stmt 1 view .LVU233
+ 201:Library/Src/motor.c ****    uint16_t id = motor_id;
+ 831              		.loc 1 201 4 view .LVU234
+ 832              	.LVL46:
+ 202:Library/Src/motor.c ****  
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 19
+
+
+ 203:Library/Src/motor.c ****    pos_tmp = float_to_uint(pos,  DM_P_MIN,  DM_P_MAX,  16);
+ 833              		.loc 1 203 4 view .LVU235
+ 834              		.loc 1 203 14 is_stmt 0 view .LVU236
+ 835 0024 1020     		movs	r0, #16
+ 836              	.LVL47:
+ 837              		.loc 1 203 14 view .LVU237
+ 838 0026 B2EE091A 		vmov.f32	s2, #1.25e+1
+ 839              	.LVL48:
+ 840              		.loc 1 203 14 view .LVU238
+ 841 002a FAEE090A 		vmov.f32	s1, #-1.25e+1
+ 842              	.LVL49:
+ 843              		.loc 1 203 14 view .LVU239
+ 844 002e FFF7FEFF 		bl	float_to_uint
+ 845              	.LVL50:
+ 846              		.loc 1 203 14 view .LVU240
+ 847 0032 8246     		mov	r10, r0
+ 848              		.loc 1 203 12 view .LVU241
+ 849 0034 1FFA80FB 		uxth	fp, r0
+ 850              	.LVL51:
+ 204:Library/Src/motor.c ****    vel_tmp = float_to_uint(vel,  DM_V_MIN,  DM_V_MAX,  12);
+ 851              		.loc 1 204 4 is_stmt 1 view .LVU242
+ 852              		.loc 1 204 14 is_stmt 0 view .LVU243
+ 853 0038 0C20     		movs	r0, #12
+ 854 003a B3EE0E1A 		vmov.f32	s2, #3.0e+1
+ 855 003e FBEE0E0A 		vmov.f32	s1, #-3.0e+1
+ 856 0042 B0EE690A 		vmov.f32	s0, s19
+ 857 0046 FFF7FEFF 		bl	float_to_uint
+ 858              	.LVL52:
+ 859              		.loc 1 204 12 view .LVU244
+ 860 004a 87B2     		uxth	r7, r0
+ 861              	.LVL53:
+ 205:Library/Src/motor.c ****    kp_tmp  = float_to_uint(kp,   DM_KP_MIN, DM_KP_MAX, 12);
+ 862              		.loc 1 205 4 is_stmt 1 view .LVU245
+ 863              		.loc 1 205 14 is_stmt 0 view .LVU246
+ 864 004c DFED229A 		vldr.32	s19, .L32
+ 865              	.LVL54:
+ 866              		.loc 1 205 14 view .LVU247
+ 867 0050 0C20     		movs	r0, #12
+ 868 0052 9FED221A 		vldr.32	s2, .L32+4
+ 869 0056 F0EE690A 		vmov.f32	s1, s19
+ 870 005a B0EE490A 		vmov.f32	s0, s18
+ 871 005e FFF7FEFF 		bl	float_to_uint
+ 872              	.LVL55:
+ 873 0062 0646     		mov	r6, r0
+ 874              		.loc 1 205 12 view .LVU248
+ 875 0064 84B2     		uxth	r4, r0
+ 876              	.LVL56:
+ 206:Library/Src/motor.c ****    kd_tmp  = float_to_uint(kd,   DM_KD_MIN, DM_KD_MAX, 12);
+ 877              		.loc 1 206 4 is_stmt 1 view .LVU249
+ 878              		.loc 1 206 14 is_stmt 0 view .LVU250
+ 879 0066 0C20     		movs	r0, #12
+ 880 0068 B1EE041A 		vmov.f32	s2, #5.0e+0
+ 881 006c F0EE690A 		vmov.f32	s1, s19
+ 882 0070 B0EE680A 		vmov.f32	s0, s17
+ 883 0074 FFF7FEFF 		bl	float_to_uint
+ 884              	.LVL57:
+ 885              		.loc 1 206 12 view .LVU251
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 20
+
+
+ 886 0078 85B2     		uxth	r5, r0
+ 887              	.LVL58:
+ 207:Library/Src/motor.c ****    tor_tmp = float_to_uint(torq, DM_T_MIN,  DM_T_MAX,  12);
+ 888              		.loc 1 207 4 is_stmt 1 view .LVU252
+ 889              		.loc 1 207 14 is_stmt 0 view .LVU253
+ 890 007a 0C20     		movs	r0, #12
+ 891 007c B2EE041A 		vmov.f32	s2, #1.0e+1
+ 892 0080 FAEE040A 		vmov.f32	s1, #-1.0e+1
+ 893 0084 B0EE480A 		vmov.f32	s0, s16
+ 894 0088 FFF7FEFF 		bl	float_to_uint
+ 895              	.LVL59:
+ 208:Library/Src/motor.c ****  
+ 209:Library/Src/motor.c ****    data[0] = (pos_tmp >> 8);
+ 896              		.loc 1 209 4 is_stmt 1 view .LVU254
+ 897              		.loc 1 209 12 is_stmt 0 view .LVU255
+ 898 008c 4FEA1B2B 		lsr	fp, fp, #8
+ 899              	.LVL60:
+ 900              		.loc 1 209 12 view .LVU256
+ 901 0090 8DF800B0 		strb	fp, [sp]
+ 210:Library/Src/motor.c ****    data[1] = pos_tmp;
+ 902              		.loc 1 210 4 is_stmt 1 view .LVU257
+ 903              		.loc 1 210 12 is_stmt 0 view .LVU258
+ 904 0094 8DF801A0 		strb	r10, [sp, #1]
+ 211:Library/Src/motor.c ****    data[2] = (vel_tmp >> 4);
+ 905              		.loc 1 211 4 is_stmt 1 view .LVU259
+ 906              		.loc 1 211 12 is_stmt 0 view .LVU260
+ 907 0098 3B09     		lsrs	r3, r7, #4
+ 908 009a 8DF80230 		strb	r3, [sp, #2]
+ 212:Library/Src/motor.c ****    data[3] = ((vel_tmp&0xF)<<4)|(kp_tmp>>8);
+ 909              		.loc 1 212 4 is_stmt 1 view .LVU261
+ 910              		.loc 1 212 32 is_stmt 0 view .LVU262
+ 911 009e 240A     		lsrs	r4, r4, #8
+ 912              	.LVL61:
+ 913              		.loc 1 212 32 view .LVU263
+ 914 00a0 44EA0714 		orr	r4, r4, r7, lsl #4
+ 915              		.loc 1 212 12 view .LVU264
+ 916 00a4 8DF80340 		strb	r4, [sp, #3]
+ 213:Library/Src/motor.c ****    data[4] = kp_tmp;
+ 917              		.loc 1 213 4 is_stmt 1 view .LVU265
+ 918              		.loc 1 213 12 is_stmt 0 view .LVU266
+ 919 00a8 8DF80460 		strb	r6, [sp, #4]
+ 214:Library/Src/motor.c ****    data[5] = (kd_tmp >> 4);
+ 920              		.loc 1 214 4 is_stmt 1 view .LVU267
+ 921              		.loc 1 214 12 is_stmt 0 view .LVU268
+ 922 00ac 2B09     		lsrs	r3, r5, #4
+ 923 00ae 8DF80530 		strb	r3, [sp, #5]
+ 215:Library/Src/motor.c ****    data[6] = ((kd_tmp&0xF)<<4)|(tor_tmp>>8);
+ 924              		.loc 1 215 4 is_stmt 1 view .LVU269
+ 925              		.loc 1 215 31 is_stmt 0 view .LVU270
+ 926 00b2 C0F30723 		ubfx	r3, r0, #8, #8
+ 927 00b6 43EA0515 		orr	r5, r3, r5, lsl #4
+ 928              	.LVL62:
+ 929              		.loc 1 215 12 view .LVU271
+ 930 00ba 8DF80650 		strb	r5, [sp, #6]
+ 216:Library/Src/motor.c ****    data[7] = tor_tmp;
+ 931              		.loc 1 216 4 is_stmt 1 view .LVU272
+ 932              		.loc 1 216 12 is_stmt 0 view .LVU273
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 21
+
+
+ 933 00be 8DF80700 		strb	r0, [sp, #7]
+ 217:Library/Src/motor.c ****    
+ 218:Library/Src/motor.c ****    canx_send_data(hcan, id, data, 8);
+ 934              		.loc 1 218 4 is_stmt 1 view .LVU274
+ 935 00c2 0823     		movs	r3, #8
+ 936 00c4 6A46     		mov	r2, sp
+ 937 00c6 4946     		mov	r1, r9
+ 938 00c8 4046     		mov	r0, r8
+ 939              	.LVL63:
+ 940              		.loc 1 218 4 is_stmt 0 view .LVU275
+ 941 00ca FFF7FEFF 		bl	canx_send_data
+ 942              	.LVL64:
+ 219:Library/Src/motor.c ****  }
+ 943              		.loc 1 219 2 view .LVU276
+ 944 00ce 03B0     		add	sp, sp, #12
+ 945              	.LCFI15:
+ 946              		.cfi_def_cfa_offset 52
+ 947              		@ sp needed
+ 948 00d0 BDEC048B 		vldm	sp!, {d8-d9}
+ 949              	.LCFI16:
+ 950              		.cfi_restore 82
+ 951              		.cfi_restore 83
+ 952              		.cfi_restore 80
+ 953              		.cfi_restore 81
+ 954              		.cfi_def_cfa_offset 36
+ 955              	.LVL65:
+ 956              		.loc 1 219 2 view .LVU277
+ 957 00d4 BDE8F08F 		pop	{r4, r5, r6, r7, r8, r9, r10, fp, pc}
+ 958              	.LVL66:
+ 959              	.L33:
+ 960              		.loc 1 219 2 view .LVU278
+ 961              		.align	2
+ 962              	.L32:
+ 963 00d8 00000000 		.word	0
+ 964 00dc 0000FA43 		.word	1140457472
+ 965              		.cfi_endproc
+ 966              	.LFE143:
+ 968              		.section	.text.DM_motor_enable,"ax",%progbits
+ 969              		.align	1
+ 970              		.global	DM_motor_enable
+ 971              		.syntax unified
+ 972              		.thumb
+ 973              		.thumb_func
+ 975              	DM_motor_enable:
+ 976              	.LVL67:
+ 977              	.LFB144:
+ 220:Library/Src/motor.c **** 
+ 221:Library/Src/motor.c **** void DM_motor_enable(CAN_HandleTypeDef* hcan , uint16_t motor_id)
+ 222:Library/Src/motor.c **** {
+ 978              		.loc 1 222 1 is_stmt 1 view -0
+ 979              		.cfi_startproc
+ 980              		@ args = 0, pretend = 0, frame = 8
+ 981              		@ frame_needed = 0, uses_anonymous_args = 0
+ 982              		.loc 1 222 1 is_stmt 0 view .LVU280
+ 983 0000 00B5     		push	{lr}
+ 984              	.LCFI17:
+ 985              		.cfi_def_cfa_offset 4
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 22
+
+
+ 986              		.cfi_offset 14, -4
+ 987 0002 83B0     		sub	sp, sp, #12
+ 988              	.LCFI18:
+ 989              		.cfi_def_cfa_offset 16
+ 223:Library/Src/motor.c ****   uint8_t data[8];
+ 990              		.loc 1 223 3 is_stmt 1 view .LVU281
+ 224:Library/Src/motor.c ****   data[0] = 0xFF;
+ 991              		.loc 1 224 3 view .LVU282
+ 992              		.loc 1 224 11 is_stmt 0 view .LVU283
+ 993 0004 FF23     		movs	r3, #255
+ 994 0006 8DF80030 		strb	r3, [sp]
+ 225:Library/Src/motor.c **** 	data[1] = 0xFF;
+ 995              		.loc 1 225 2 is_stmt 1 view .LVU284
+ 996              		.loc 1 225 10 is_stmt 0 view .LVU285
+ 997 000a 8DF80130 		strb	r3, [sp, #1]
+ 226:Library/Src/motor.c **** 	data[2] = 0xFF;
+ 998              		.loc 1 226 2 is_stmt 1 view .LVU286
+ 999              		.loc 1 226 10 is_stmt 0 view .LVU287
+ 1000 000e 8DF80230 		strb	r3, [sp, #2]
+ 227:Library/Src/motor.c **** 	data[3] = 0xFF;
+ 1001              		.loc 1 227 2 is_stmt 1 view .LVU288
+ 1002              		.loc 1 227 10 is_stmt 0 view .LVU289
+ 1003 0012 8DF80330 		strb	r3, [sp, #3]
+ 228:Library/Src/motor.c **** 	data[4] = 0xFF;
+ 1004              		.loc 1 228 2 is_stmt 1 view .LVU290
+ 1005              		.loc 1 228 10 is_stmt 0 view .LVU291
+ 1006 0016 8DF80430 		strb	r3, [sp, #4]
+ 229:Library/Src/motor.c **** 	data[5] = 0xFF;
+ 1007              		.loc 1 229 2 is_stmt 1 view .LVU292
+ 1008              		.loc 1 229 10 is_stmt 0 view .LVU293
+ 1009 001a 8DF80530 		strb	r3, [sp, #5]
+ 230:Library/Src/motor.c **** 	data[6] = 0xFF;
+ 1010              		.loc 1 230 2 is_stmt 1 view .LVU294
+ 1011              		.loc 1 230 10 is_stmt 0 view .LVU295
+ 1012 001e 8DF80630 		strb	r3, [sp, #6]
+ 231:Library/Src/motor.c **** 	data[7] = 0xFC;
+ 1013              		.loc 1 231 2 is_stmt 1 view .LVU296
+ 1014              		.loc 1 231 10 is_stmt 0 view .LVU297
+ 1015 0022 FC23     		movs	r3, #252
+ 1016 0024 8DF80730 		strb	r3, [sp, #7]
+ 232:Library/Src/motor.c **** 	canx_send_data(hcan , motor_id , data, 8);
+ 1017              		.loc 1 232 2 is_stmt 1 view .LVU298
+ 1018 0028 0823     		movs	r3, #8
+ 1019 002a 6A46     		mov	r2, sp
+ 1020 002c FFF7FEFF 		bl	canx_send_data
+ 1021              	.LVL68:
+ 233:Library/Src/motor.c **** }
+ 1022              		.loc 1 233 1 is_stmt 0 view .LVU299
+ 1023 0030 03B0     		add	sp, sp, #12
+ 1024              	.LCFI19:
+ 1025              		.cfi_def_cfa_offset 4
+ 1026              		@ sp needed
+ 1027 0032 5DF804FB 		ldr	pc, [sp], #4
+ 1028              		.cfi_endproc
+ 1029              	.LFE144:
+ 1031              		.section	.text.DM_motor_disable,"ax",%progbits
+ 1032              		.align	1
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 23
+
+
+ 1033              		.global	DM_motor_disable
+ 1034              		.syntax unified
+ 1035              		.thumb
+ 1036              		.thumb_func
+ 1038              	DM_motor_disable:
+ 1039              	.LVL69:
+ 1040              	.LFB145:
+ 234:Library/Src/motor.c **** 
+ 235:Library/Src/motor.c **** 
+ 236:Library/Src/motor.c **** void DM_motor_disable(CAN_HandleTypeDef* hcan , uint16_t motor_id)
+ 237:Library/Src/motor.c **** {
+ 1041              		.loc 1 237 1 is_stmt 1 view -0
+ 1042              		.cfi_startproc
+ 1043              		@ args = 0, pretend = 0, frame = 8
+ 1044              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1045              		.loc 1 237 1 is_stmt 0 view .LVU301
+ 1046 0000 00B5     		push	{lr}
+ 1047              	.LCFI20:
+ 1048              		.cfi_def_cfa_offset 4
+ 1049              		.cfi_offset 14, -4
+ 1050 0002 83B0     		sub	sp, sp, #12
+ 1051              	.LCFI21:
+ 1052              		.cfi_def_cfa_offset 16
+ 238:Library/Src/motor.c ****   uint8_t data[8];
+ 1053              		.loc 1 238 3 is_stmt 1 view .LVU302
+ 239:Library/Src/motor.c ****   data[0] = 0xFF;
+ 1054              		.loc 1 239 3 view .LVU303
+ 1055              		.loc 1 239 11 is_stmt 0 view .LVU304
+ 1056 0004 FF23     		movs	r3, #255
+ 1057 0006 8DF80030 		strb	r3, [sp]
+ 240:Library/Src/motor.c **** 	data[1] = 0xFF;
+ 1058              		.loc 1 240 2 is_stmt 1 view .LVU305
+ 1059              		.loc 1 240 10 is_stmt 0 view .LVU306
+ 1060 000a 8DF80130 		strb	r3, [sp, #1]
+ 241:Library/Src/motor.c **** 	data[2] = 0xFF;
+ 1061              		.loc 1 241 2 is_stmt 1 view .LVU307
+ 1062              		.loc 1 241 10 is_stmt 0 view .LVU308
+ 1063 000e 8DF80230 		strb	r3, [sp, #2]
+ 242:Library/Src/motor.c **** 	data[3] = 0xFF;
+ 1064              		.loc 1 242 2 is_stmt 1 view .LVU309
+ 1065              		.loc 1 242 10 is_stmt 0 view .LVU310
+ 1066 0012 8DF80330 		strb	r3, [sp, #3]
+ 243:Library/Src/motor.c **** 	data[4] = 0xFF;
+ 1067              		.loc 1 243 2 is_stmt 1 view .LVU311
+ 1068              		.loc 1 243 10 is_stmt 0 view .LVU312
+ 1069 0016 8DF80430 		strb	r3, [sp, #4]
+ 244:Library/Src/motor.c **** 	data[5] = 0xFF;
+ 1070              		.loc 1 244 2 is_stmt 1 view .LVU313
+ 1071              		.loc 1 244 10 is_stmt 0 view .LVU314
+ 1072 001a 8DF80530 		strb	r3, [sp, #5]
+ 245:Library/Src/motor.c **** 	data[6] = 0xFF;
+ 1073              		.loc 1 245 2 is_stmt 1 view .LVU315
+ 1074              		.loc 1 245 10 is_stmt 0 view .LVU316
+ 1075 001e 8DF80630 		strb	r3, [sp, #6]
+ 246:Library/Src/motor.c **** 	data[7] = 0xFD;
+ 1076              		.loc 1 246 2 is_stmt 1 view .LVU317
+ 1077              		.loc 1 246 10 is_stmt 0 view .LVU318
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 24
+
+
+ 1078 0022 FD23     		movs	r3, #253
+ 1079 0024 8DF80730 		strb	r3, [sp, #7]
+ 247:Library/Src/motor.c **** 	canx_send_data(hcan , motor_id , data, 8);
+ 1080              		.loc 1 247 2 is_stmt 1 view .LVU319
+ 1081 0028 0823     		movs	r3, #8
+ 1082 002a 6A46     		mov	r2, sp
+ 1083 002c FFF7FEFF 		bl	canx_send_data
+ 1084              	.LVL70:
+ 248:Library/Src/motor.c **** }
+ 1085              		.loc 1 248 1 is_stmt 0 view .LVU320
+ 1086 0030 03B0     		add	sp, sp, #12
+ 1087              	.LCFI22:
+ 1088              		.cfi_def_cfa_offset 4
+ 1089              		@ sp needed
+ 1090 0032 5DF804FB 		ldr	pc, [sp], #4
+ 1091              		.cfi_endproc
+ 1092              	.LFE145:
+ 1094              		.section	.text.DM_motor_zeroset,"ax",%progbits
+ 1095              		.align	1
+ 1096              		.global	DM_motor_zeroset
+ 1097              		.syntax unified
+ 1098              		.thumb
+ 1099              		.thumb_func
+ 1101              	DM_motor_zeroset:
+ 1102              	.LVL71:
+ 1103              	.LFB146:
+ 249:Library/Src/motor.c **** 
+ 250:Library/Src/motor.c **** 
+ 251:Library/Src/motor.c **** void DM_motor_zeroset(CAN_HandleTypeDef* hcan , uint16_t motor_id)
+ 252:Library/Src/motor.c **** {
+ 1104              		.loc 1 252 1 is_stmt 1 view -0
+ 1105              		.cfi_startproc
+ 1106              		@ args = 0, pretend = 0, frame = 8
+ 1107              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1108              		.loc 1 252 1 is_stmt 0 view .LVU322
+ 1109 0000 00B5     		push	{lr}
+ 1110              	.LCFI23:
+ 1111              		.cfi_def_cfa_offset 4
+ 1112              		.cfi_offset 14, -4
+ 1113 0002 83B0     		sub	sp, sp, #12
+ 1114              	.LCFI24:
+ 1115              		.cfi_def_cfa_offset 16
+ 253:Library/Src/motor.c ****   uint8_t data[8];
+ 1116              		.loc 1 253 3 is_stmt 1 view .LVU323
+ 254:Library/Src/motor.c ****   data[0] = 0xFF;
+ 1117              		.loc 1 254 3 view .LVU324
+ 1118              		.loc 1 254 11 is_stmt 0 view .LVU325
+ 1119 0004 FF23     		movs	r3, #255
+ 1120 0006 8DF80030 		strb	r3, [sp]
+ 255:Library/Src/motor.c **** 	data[1] = 0xFF;
+ 1121              		.loc 1 255 2 is_stmt 1 view .LVU326
+ 1122              		.loc 1 255 10 is_stmt 0 view .LVU327
+ 1123 000a 8DF80130 		strb	r3, [sp, #1]
+ 256:Library/Src/motor.c **** 	data[2] = 0xFF;
+ 1124              		.loc 1 256 2 is_stmt 1 view .LVU328
+ 1125              		.loc 1 256 10 is_stmt 0 view .LVU329
+ 1126 000e 8DF80230 		strb	r3, [sp, #2]
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 25
+
+
+ 257:Library/Src/motor.c **** 	data[3] = 0xFF;
+ 1127              		.loc 1 257 2 is_stmt 1 view .LVU330
+ 1128              		.loc 1 257 10 is_stmt 0 view .LVU331
+ 1129 0012 8DF80330 		strb	r3, [sp, #3]
+ 258:Library/Src/motor.c **** 	data[4] = 0xFF;
+ 1130              		.loc 1 258 2 is_stmt 1 view .LVU332
+ 1131              		.loc 1 258 10 is_stmt 0 view .LVU333
+ 1132 0016 8DF80430 		strb	r3, [sp, #4]
+ 259:Library/Src/motor.c **** 	data[5] = 0xFF;
+ 1133              		.loc 1 259 2 is_stmt 1 view .LVU334
+ 1134              		.loc 1 259 10 is_stmt 0 view .LVU335
+ 1135 001a 8DF80530 		strb	r3, [sp, #5]
+ 260:Library/Src/motor.c **** 	data[6] = 0xFF;
+ 1136              		.loc 1 260 2 is_stmt 1 view .LVU336
+ 1137              		.loc 1 260 10 is_stmt 0 view .LVU337
+ 1138 001e 8DF80630 		strb	r3, [sp, #6]
+ 261:Library/Src/motor.c **** 	data[7] = 0xFE;
+ 1139              		.loc 1 261 2 is_stmt 1 view .LVU338
+ 1140              		.loc 1 261 10 is_stmt 0 view .LVU339
+ 1141 0022 FE23     		movs	r3, #254
+ 1142 0024 8DF80730 		strb	r3, [sp, #7]
+ 262:Library/Src/motor.c **** 	canx_send_data(hcan , motor_id , data, 8);
+ 1143              		.loc 1 262 2 is_stmt 1 view .LVU340
+ 1144 0028 0823     		movs	r3, #8
+ 1145 002a 6A46     		mov	r2, sp
+ 1146 002c FFF7FEFF 		bl	canx_send_data
+ 1147              	.LVL72:
+ 263:Library/Src/motor.c **** }
+ 1148              		.loc 1 263 1 is_stmt 0 view .LVU341
+ 1149 0030 03B0     		add	sp, sp, #12
+ 1150              	.LCFI25:
+ 1151              		.cfi_def_cfa_offset 4
+ 1152              		@ sp needed
+ 1153 0032 5DF804FB 		ldr	pc, [sp], #4
+ 1154              		.cfi_endproc
+ 1155              	.LFE146:
+ 1157              		.global	data_motor
+ 1158              		.section	.bss.data_motor,"aw",%nobits
+ 1159              		.align	2
+ 1162              	data_motor:
+ 1163 0000 00000000 		.space	224
+ 1163      00000000 
+ 1163      00000000 
+ 1163      00000000 
+ 1163      00000000 
+ 1164              		.section	.bss.i.1,"aw",%nobits
+ 1165              		.set	.LANCHOR3,. + 0
+ 1168              	i.1:
+ 1169 0000 00       		.space	1
+ 1170              		.section	.bss.i.3,"aw",%nobits
+ 1171              		.set	.LANCHOR1,. + 0
+ 1174              	i.3:
+ 1175 0000 00       		.space	1
+ 1176              		.section	.bss.motor_I.0,"aw",%nobits
+ 1177              		.align	2
+ 1178              		.set	.LANCHOR4,. + 0
+ 1181              	motor_I.0:
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 26
+
+
+ 1182 0000 00000000 		.space	8
+ 1182      00000000 
+ 1183              		.section	.bss.motor_I.2,"aw",%nobits
+ 1184              		.align	2
+ 1185              		.set	.LANCHOR2,. + 0
+ 1188              	motor_I.2:
+ 1189 0000 00000000 		.space	8
+ 1189      00000000 
+ 1190              		.section	.bss.tx_data.4,"aw",%nobits
+ 1191              		.align	2
+ 1192              		.set	.LANCHOR0,. + 0
+ 1195              	tx_data.4:
+ 1196 0000 00000000 		.space	8
+ 1196      00000000 
+ 1197              		.text
+ 1198              	.Letext0:
+ 1199              		.file 2 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 1200              		.file 3 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 1201              		.file 4 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
+ 1202              		.file 5 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h"
+ 1203              		.file 6 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 1204              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_can.h"
+ 1205              		.file 8 "Library/Inc/PID.h"
+ 1206              		.file 9 "Library/Inc/motor.h"
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s 			page 27
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 motor.c
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:20     .text.float_to_uint:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:26     .text.float_to_uint:00000000 float_to_uint
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:66     .text.uint_to_float:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:72     .text.uint_to_float:00000000 uint_to_float
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:112    .text.canx_send_data:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:118    .text.canx_send_data:00000000 canx_send_data
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:203    .text.DJ_motor_fbdata:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:209    .text.DJ_motor_fbdata:00000000 DJ_motor_fbdata
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:272    .text.DJ_124_ctrl:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:278    .text.DJ_124_ctrl:00000000 DJ_124_ctrl
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:341    .text.DJ_124_ctrl:0000003c $d
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:346    .text.DJ_124_ctrl_vel:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:352    .text.DJ_124_ctrl_vel:00000000 DJ_124_ctrl_vel
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:495    .text.DJ_124_ctrl_vel:000000d4 $d
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:501    .text.DJ_124_ctrl_pos:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:507    .text.DJ_124_ctrl_pos:00000000 DJ_124_ctrl_pos
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:632    .text.DJ_124_ctrl_pos:000000bc $d
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:641    .text.DM_motor_fbdata:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:647    .text.DM_motor_fbdata:00000000 DM_motor_fbdata
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:777    .text.DM_motor_fbdata:000000a8 $d
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:783    .text.DM_motor_MIT_ctrl:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:789    .text.DM_motor_MIT_ctrl:00000000 DM_motor_MIT_ctrl
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:963    .text.DM_motor_MIT_ctrl:000000d8 $d
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:969    .text.DM_motor_enable:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:975    .text.DM_motor_enable:00000000 DM_motor_enable
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:1032   .text.DM_motor_disable:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:1038   .text.DM_motor_disable:00000000 DM_motor_disable
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:1095   .text.DM_motor_zeroset:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:1101   .text.DM_motor_zeroset:00000000 DM_motor_zeroset
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:1162   .bss.data_motor:00000000 data_motor
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:1159   .bss.data_motor:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:1168   .bss.i.1:00000000 i.1
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:1169   .bss.i.1:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:1174   .bss.i.3:00000000 i.3
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:1175   .bss.i.3:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:1177   .bss.motor_I.0:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:1181   .bss.motor_I.0:00000000 motor_I.0
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:1184   .bss.motor_I.2:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:1188   .bss.motor_I.2:00000000 motor_I.2
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:1191   .bss.tx_data.4:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccZsvRyf.s:1195   .bss.tx_data.4:00000000 tx_data.4
+
+UNDEFINED SYMBOLS
+HAL_CAN_AddTxMessage
+PID_Calc
+PID_Calc_motorpos
+__aeabi_f2d
+__aeabi_dmul
+__aeabi_d2f

@@ -1,0 +1,25 @@
+{
+    "configurations": [
+        
+    
+
+        {
+            "showDevDebugOutput": "parsed",
+            "cwd": "${workspaceRoot}",
+            "executable": "./build/feibiaoinitial.elf",
+            "name": "Cboard",
+            "request": "launch",
+            "type": "cortex-debug",
+            "servertype": "openocd",
+            "device": "stm32f407",
+            "configFiles": [
+                "interface/stlink-v2.cfg",
+                "target/stm32f4x.cfg"
+            ],
+            "liveWatch": {
+            "enabled": true,
+            "samplesPerSecond": 20
+            }
+        }
+    ]
+}

@@ -1,0 +1,729 @@
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"c2c.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.g2c_chassis_fbdata,"ax",%progbits
+  20              		.align	1
+  21              		.global	g2c_chassis_fbdata
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	g2c_chassis_fbdata:
+  27              	.LVL0:
+  28              	.LFB135:
+  29              		.file 1 "Library/Src/c2c.c"
+   1:Library/Src/c2c.c **** #include "c2c.h"
+   2:Library/Src/c2c.c **** 
+   3:Library/Src/c2c.c **** data_g2c_gimbal_t data_g2c_gimbal = {0};  //云台发送到底盘数据
+   4:Library/Src/c2c.c **** data_g2c_chassis_t data_g2c_chassis = {0};  //云台接收自底盘数据
+   5:Library/Src/c2c.c **** data_c2g_gimbal_t data_c2g_gimbal = {0};  
+   6:Library/Src/c2c.c **** 
+   7:Library/Src/c2c.c **** 
+   8:Library/Src/c2c.c **** void g2c_chassis_fbdata(data_g2c_chassis_t *c2c , uint8_t *rx_data)
+   9:Library/Src/c2c.c **** {
+  30              		.loc 1 9 1 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		@ link register save eliminated.
+  10:Library/Src/c2c.c ****   c2c->c2c_info_chassis_status = (rx_data)[0];
+  35              		.loc 1 10 3 view .LVU1
+  36              		.loc 1 10 43 is_stmt 0 view .LVU2
+  37 0000 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+  38              		.loc 1 10 32 view .LVU3
+  39 0002 0370     		strb	r3, [r0]
+  11:Library/Src/c2c.c ****   c2c->c2c_info_x_vel = (uint16_t)((rx_data)[1] << 8 | (rx_data)[2]);
+  40              		.loc 1 11 3 is_stmt 1 view .LVU4
+  41              		.loc 1 11 45 is_stmt 0 view .LVU5
+  42 0004 4B78     		ldrb	r3, [r1, #1]	@ zero_extendqisi2
+  43              		.loc 1 11 49 view .LVU6
+  44 0006 1B02     		lsls	r3, r3, #8
+  45              		.loc 1 11 25 view .LVU7
+  46 0008 1BB2     		sxth	r3, r3
+  47              		.loc 1 11 65 view .LVU8
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s 			page 2
+
+
+  48 000a 8A78     		ldrb	r2, [r1, #2]	@ zero_extendqisi2
+  49              		.loc 1 11 54 view .LVU9
+  50 000c 1343     		orrs	r3, r3, r2
+  51              		.loc 1 11 23 view .LVU10
+  52 000e 4380     		strh	r3, [r0, #2]	@ movhi
+  12:Library/Src/c2c.c ****   c2c->c2c_info_y_vel = (uint16_t)((rx_data)[3] << 8 | (rx_data)[4]);
+  53              		.loc 1 12 3 is_stmt 1 view .LVU11
+  54              		.loc 1 12 45 is_stmt 0 view .LVU12
+  55 0010 CB78     		ldrb	r3, [r1, #3]	@ zero_extendqisi2
+  56              		.loc 1 12 49 view .LVU13
+  57 0012 1B02     		lsls	r3, r3, #8
+  58              		.loc 1 12 25 view .LVU14
+  59 0014 1BB2     		sxth	r3, r3
+  60              		.loc 1 12 65 view .LVU15
+  61 0016 0A79     		ldrb	r2, [r1, #4]	@ zero_extendqisi2
+  62              		.loc 1 12 54 view .LVU16
+  63 0018 1343     		orrs	r3, r3, r2
+  64              		.loc 1 12 23 view .LVU17
+  65 001a 8380     		strh	r3, [r0, #4]	@ movhi
+  13:Library/Src/c2c.c ****   c2c->c2c_info_yaw_vel = (uint16_t)((rx_data)[5] << 8 | (rx_data)[6]);
+  66              		.loc 1 13 3 is_stmt 1 view .LVU18
+  67              		.loc 1 13 47 is_stmt 0 view .LVU19
+  68 001c 4B79     		ldrb	r3, [r1, #5]	@ zero_extendqisi2
+  69              		.loc 1 13 51 view .LVU20
+  70 001e 1B02     		lsls	r3, r3, #8
+  71              		.loc 1 13 27 view .LVU21
+  72 0020 1BB2     		sxth	r3, r3
+  73              		.loc 1 13 67 view .LVU22
+  74 0022 8A79     		ldrb	r2, [r1, #6]	@ zero_extendqisi2
+  75              		.loc 1 13 56 view .LVU23
+  76 0024 1343     		orrs	r3, r3, r2
+  77              		.loc 1 13 25 view .LVU24
+  78 0026 C380     		strh	r3, [r0, #6]	@ movhi
+  14:Library/Src/c2c.c **** }
+  79              		.loc 1 14 1 view .LVU25
+  80 0028 7047     		bx	lr
+  81              		.cfi_endproc
+  82              	.LFE135:
+  84              		.section	.text.g2c_gimbal_fbdata,"ax",%progbits
+  85              		.align	1
+  86              		.global	g2c_gimbal_fbdata
+  87              		.syntax unified
+  88              		.thumb
+  89              		.thumb_func
+  91              	g2c_gimbal_fbdata:
+  92              	.LVL1:
+  93              	.LFB136:
+  15:Library/Src/c2c.c **** 
+  16:Library/Src/c2c.c **** void g2c_gimbal_fbdata(data_g2c_gimbal_t *c2c , uint8_t *rx_data)
+  17:Library/Src/c2c.c **** {
+  94              		.loc 1 17 1 is_stmt 1 view -0
+  95              		.cfi_startproc
+  96              		@ args = 0, pretend = 0, frame = 0
+  97              		@ frame_needed = 0, uses_anonymous_args = 0
+  98              		@ link register save eliminated.
+  18:Library/Src/c2c.c ****   c2c->c2c_info_gimbal_status = (rx_data)[0];
+  99              		.loc 1 18 3 view .LVU27
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s 			page 3
+
+
+ 100              		.loc 1 18 42 is_stmt 0 view .LVU28
+ 101 0000 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 102              		.loc 1 18 31 view .LVU29
+ 103 0002 0370     		strb	r3, [r0]
+  19:Library/Src/c2c.c ****   c2c->c2c_info_ammo_status = (rx_data)[1];
+ 104              		.loc 1 19 3 is_stmt 1 view .LVU30
+ 105              		.loc 1 19 29 is_stmt 0 view .LVU31
+ 106 0004 4B78     		ldrb	r3, [r1, #1]	@ zero_extendqisi2
+ 107 0006 4370     		strb	r3, [r0, #1]
+  20:Library/Src/c2c.c ****   c2c->c2c_info_yaw_aim_pos = (uint16_t)((rx_data)[2] << 8 | (rx_data)[3]);
+ 108              		.loc 1 20 3 is_stmt 1 view .LVU32
+ 109              		.loc 1 20 51 is_stmt 0 view .LVU33
+ 110 0008 8B78     		ldrb	r3, [r1, #2]	@ zero_extendqisi2
+ 111              		.loc 1 20 55 view .LVU34
+ 112 000a 1B02     		lsls	r3, r3, #8
+ 113              		.loc 1 20 31 view .LVU35
+ 114 000c 1BB2     		sxth	r3, r3
+ 115              		.loc 1 20 71 view .LVU36
+ 116 000e CA78     		ldrb	r2, [r1, #3]	@ zero_extendqisi2
+ 117              		.loc 1 20 60 view .LVU37
+ 118 0010 1343     		orrs	r3, r3, r2
+ 119              		.loc 1 20 29 view .LVU38
+ 120 0012 4380     		strh	r3, [r0, #2]	@ movhi
+  21:Library/Src/c2c.c ****   c2c->c2c_info_yaw_fre_pos = (uint16_t)((rx_data)[4] << 8 | (rx_data)[5]);
+ 121              		.loc 1 21 3 is_stmt 1 view .LVU39
+ 122              		.loc 1 21 51 is_stmt 0 view .LVU40
+ 123 0014 0B79     		ldrb	r3, [r1, #4]	@ zero_extendqisi2
+ 124              		.loc 1 21 55 view .LVU41
+ 125 0016 1B02     		lsls	r3, r3, #8
+ 126              		.loc 1 21 31 view .LVU42
+ 127 0018 1BB2     		sxth	r3, r3
+ 128              		.loc 1 21 71 view .LVU43
+ 129 001a 4A79     		ldrb	r2, [r1, #5]	@ zero_extendqisi2
+ 130              		.loc 1 21 60 view .LVU44
+ 131 001c 1343     		orrs	r3, r3, r2
+ 132              		.loc 1 21 29 view .LVU45
+ 133 001e 8380     		strh	r3, [r0, #4]	@ movhi
+  22:Library/Src/c2c.c **** }
+ 134              		.loc 1 22 1 view .LVU46
+ 135 0020 7047     		bx	lr
+ 136              		.cfi_endproc
+ 137              	.LFE136:
+ 139              		.section	.text.c2g_gimbal_fbdata,"ax",%progbits
+ 140              		.align	1
+ 141              		.global	c2g_gimbal_fbdata
+ 142              		.syntax unified
+ 143              		.thumb
+ 144              		.thumb_func
+ 146              	c2g_gimbal_fbdata:
+ 147              	.LVL2:
+ 148              	.LFB137:
+  23:Library/Src/c2c.c **** 
+  24:Library/Src/c2c.c **** void c2g_gimbal_fbdata(data_c2g_gimbal_t *c2c , uint8_t *rx_data)
+  25:Library/Src/c2c.c **** {
+ 149              		.loc 1 25 1 is_stmt 1 view -0
+ 150              		.cfi_startproc
+ 151              		@ args = 0, pretend = 0, frame = 0
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s 			page 4
+
+
+ 152              		@ frame_needed = 0, uses_anonymous_args = 0
+ 153              		@ link register save eliminated.
+  26:Library/Src/c2c.c ****   c2c->c2c_info_gimbal_power = (rx_data)[0];
+ 154              		.loc 1 26 3 view .LVU48
+ 155              		.loc 1 26 41 is_stmt 0 view .LVU49
+ 156 0000 0B78     		ldrb	r3, [r1]	@ zero_extendqisi2
+ 157              		.loc 1 26 30 view .LVU50
+ 158 0002 0370     		strb	r3, [r0]
+  27:Library/Src/c2c.c ****   c2c->c2c_info_ammo_power = (rx_data)[1];
+ 159              		.loc 1 27 3 is_stmt 1 view .LVU51
+ 160              		.loc 1 27 28 is_stmt 0 view .LVU52
+ 161 0004 4B78     		ldrb	r3, [r1, #1]	@ zero_extendqisi2
+ 162 0006 4370     		strb	r3, [r0, #1]
+  28:Library/Src/c2c.c **** }
+ 163              		.loc 1 28 1 view .LVU53
+ 164 0008 7047     		bx	lr
+ 165              		.cfi_endproc
+ 166              	.LFE137:
+ 168              		.section	.text.can_send_data,"ax",%progbits
+ 169              		.align	1
+ 170              		.global	can_send_data
+ 171              		.syntax unified
+ 172              		.thumb
+ 173              		.thumb_func
+ 175              	can_send_data:
+ 176              	.LVL3:
+ 177              	.LFB140:
+  29:Library/Src/c2c.c **** 
+  30:Library/Src/c2c.c **** 
+  31:Library/Src/c2c.c **** void g2c_send_data(CAN_HandleTypeDef *hcan)
+  32:Library/Src/c2c.c **** {
+  33:Library/Src/c2c.c ****     static uint8_t tx_data[8];
+  34:Library/Src/c2c.c **** 
+  35:Library/Src/c2c.c ****     tx_data[0] = data_g2c_gimbal.c2c_info_gimbal_status;
+  36:Library/Src/c2c.c ****     tx_data[1] = data_g2c_gimbal.c2c_info_ammo_status;
+  37:Library/Src/c2c.c ****     tx_data[2] = data_g2c_gimbal.c2c_info_yaw_aim_pos >> 8;
+  38:Library/Src/c2c.c ****     tx_data[3] = data_g2c_gimbal.c2c_info_yaw_aim_pos;
+  39:Library/Src/c2c.c ****     tx_data[4] = data_g2c_gimbal.c2c_info_yaw_fre_pos >> 8;
+  40:Library/Src/c2c.c ****     tx_data[5] = data_g2c_gimbal.c2c_info_yaw_fre_pos;
+  41:Library/Src/c2c.c ****     tx_data[6] = 6;
+  42:Library/Src/c2c.c ****     tx_data[7] = 7;
+  43:Library/Src/c2c.c ****     can_send_data(hcan , G2C_GIMBAL_ID , tx_data , 8);
+  44:Library/Src/c2c.c ****     osDelay(1);
+  45:Library/Src/c2c.c ****     tx_data[0] = data_g2c_chassis.c2c_info_chassis_status;
+  46:Library/Src/c2c.c ****     tx_data[1] = data_g2c_chassis.c2c_info_x_vel >> 8;
+  47:Library/Src/c2c.c ****     tx_data[2] = data_g2c_chassis.c2c_info_x_vel;
+  48:Library/Src/c2c.c ****     tx_data[3] = data_g2c_chassis.c2c_info_y_vel >> 8;
+  49:Library/Src/c2c.c ****     tx_data[4] = data_g2c_chassis.c2c_info_y_vel;
+  50:Library/Src/c2c.c ****     tx_data[5] = data_g2c_chassis.c2c_info_yaw_vel >> 8;
+  51:Library/Src/c2c.c ****     tx_data[6] = data_g2c_chassis.c2c_info_yaw_vel;
+  52:Library/Src/c2c.c ****     tx_data[7] = 7;
+  53:Library/Src/c2c.c ****     can_send_data(hcan , G2C_CHASSIS_ID , tx_data , 8);
+  54:Library/Src/c2c.c **** }
+  55:Library/Src/c2c.c **** 
+  56:Library/Src/c2c.c **** void c2g_send_data(CAN_HandleTypeDef *hcan)
+  57:Library/Src/c2c.c **** {
+  58:Library/Src/c2c.c ****     static uint8_t tx_data[8];
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s 			page 5
+
+
+  59:Library/Src/c2c.c **** 
+  60:Library/Src/c2c.c ****     tx_data[0] = data_c2g_gimbal.c2c_info_gimbal_power;
+  61:Library/Src/c2c.c ****     tx_data[1] = data_c2g_gimbal.c2c_info_ammo_power;
+  62:Library/Src/c2c.c ****     tx_data[2] = 2;
+  63:Library/Src/c2c.c ****     tx_data[3] = 3;
+  64:Library/Src/c2c.c ****     tx_data[4] = 4;
+  65:Library/Src/c2c.c ****     tx_data[5] = 5;
+  66:Library/Src/c2c.c ****     tx_data[6] = 6;
+  67:Library/Src/c2c.c ****     tx_data[7] = 7;
+  68:Library/Src/c2c.c ****     can_send_data(hcan , C2G_GIMBAL_ID , tx_data , 8);
+  69:Library/Src/c2c.c **** }
+  70:Library/Src/c2c.c **** 
+  71:Library/Src/c2c.c **** 
+  72:Library/Src/c2c.c **** /**
+  73:Library/Src/c2c.c ****   * @brief          can发数据
+  74:Library/Src/c2c.c ****   * @param hcan     can位（&hcan1/&hcan2）
+  75:Library/Src/c2c.c ****   * @param id       can id
+  76:Library/Src/c2c.c ****   * @param data     发送数据
+  77:Library/Src/c2c.c ****   * @param len      数据长度
+  78:Library/Src/c2c.c ****   * @return         none 
+  79:Library/Src/c2c.c ****   */
+  80:Library/Src/c2c.c **** uint8_t can_send_data(CAN_HandleTypeDef *hcan , uint16_t id , uint8_t *data , uint32_t len)
+  81:Library/Src/c2c.c **** {	
+ 178              		.loc 1 81 1 is_stmt 1 view -0
+ 179              		.cfi_startproc
+ 180              		@ args = 0, pretend = 0, frame = 24
+ 181              		@ frame_needed = 0, uses_anonymous_args = 0
+ 182              		.loc 1 81 1 is_stmt 0 view .LVU55
+ 183 0000 30B5     		push	{r4, r5, lr}
+ 184              	.LCFI0:
+ 185              		.cfi_def_cfa_offset 12
+ 186              		.cfi_offset 4, -12
+ 187              		.cfi_offset 5, -8
+ 188              		.cfi_offset 14, -4
+ 189 0002 87B0     		sub	sp, sp, #28
+ 190              	.LCFI1:
+ 191              		.cfi_def_cfa_offset 40
+ 192 0004 0446     		mov	r4, r0
+ 193 0006 1546     		mov	r5, r2
+  82:Library/Src/c2c.c **** 	CAN_TxHeaderTypeDef	tx_header;
+ 194              		.loc 1 82 2 is_stmt 1 view .LVU56
+  83:Library/Src/c2c.c **** 	
+  84:Library/Src/c2c.c **** 	tx_header.StdId = id;
+ 195              		.loc 1 84 2 view .LVU57
+ 196              		.loc 1 84 18 is_stmt 0 view .LVU58
+ 197 0008 0091     		str	r1, [sp]
+  85:Library/Src/c2c.c **** 	tx_header.ExtId = 0;
+ 198              		.loc 1 85 2 is_stmt 1 view .LVU59
+ 199              		.loc 1 85 18 is_stmt 0 view .LVU60
+ 200 000a 0021     		movs	r1, #0
+ 201              	.LVL4:
+ 202              		.loc 1 85 18 view .LVU61
+ 203 000c 0191     		str	r1, [sp, #4]
+  86:Library/Src/c2c.c **** 	tx_header.IDE   = 0;
+ 204              		.loc 1 86 2 is_stmt 1 view .LVU62
+ 205              		.loc 1 86 18 is_stmt 0 view .LVU63
+ 206 000e 0291     		str	r1, [sp, #8]
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s 			page 6
+
+
+  87:Library/Src/c2c.c **** 	tx_header.RTR   = 0;
+ 207              		.loc 1 87 2 is_stmt 1 view .LVU64
+ 208              		.loc 1 87 18 is_stmt 0 view .LVU65
+ 209 0010 0391     		str	r1, [sp, #12]
+  88:Library/Src/c2c.c **** 	tx_header.DLC   = len;
+ 210              		.loc 1 88 2 is_stmt 1 view .LVU66
+ 211              		.loc 1 88 18 is_stmt 0 view .LVU67
+ 212 0012 0493     		str	r3, [sp, #16]
+  89:Library/Src/c2c.c **** 	if(HAL_CAN_AddTxMessage(hcan , &tx_header , data , (uint32_t*)CAN_TX_MAILBOX0) != HAL_OK) 
+ 213              		.loc 1 89 2 is_stmt 1 view .LVU68
+ 214              		.loc 1 89 5 is_stmt 0 view .LVU69
+ 215 0014 0123     		movs	r3, #1
+ 216              	.LVL5:
+ 217              		.loc 1 89 5 view .LVU70
+ 218 0016 6946     		mov	r1, sp
+ 219 0018 FFF7FEFF 		bl	HAL_CAN_AddTxMessage
+ 220              	.LVL6:
+ 221              		.loc 1 89 4 view .LVU71
+ 222 001c 10B9     		cbnz	r0, .L7
+ 223              	.L5:
+  90:Library/Src/c2c.c ****     {
+  91:Library/Src/c2c.c **** 		if(HAL_CAN_AddTxMessage(hcan , &tx_header , data , (uint32_t*)CAN_TX_MAILBOX1) != HAL_OK) 
+  92:Library/Src/c2c.c ****         {
+  93:Library/Src/c2c.c **** 			HAL_CAN_AddTxMessage(hcan , &tx_header , data , (uint32_t*)CAN_TX_MAILBOX2);
+  94:Library/Src/c2c.c ****         }
+  95:Library/Src/c2c.c ****     }
+  96:Library/Src/c2c.c ****     return 0;
+ 224              		.loc 1 96 5 is_stmt 1 view .LVU72
+  97:Library/Src/c2c.c **** }...
+ 225              		.loc 1 97 1 is_stmt 0 view .LVU73
+ 226 001e 0020     		movs	r0, #0
+ 227 0020 07B0     		add	sp, sp, #28
+ 228              	.LCFI2:
+ 229              		.cfi_remember_state
+ 230              		.cfi_def_cfa_offset 12
+ 231              		@ sp needed
+ 232 0022 30BD     		pop	{r4, r5, pc}
+ 233              	.LVL7:
+ 234              	.L7:
+ 235              	.LCFI3:
+ 236              		.cfi_restore_state
+  91:Library/Src/c2c.c **** 		if(HAL_CAN_AddTxMessage(hcan , &tx_header , data , (uint32_t*)CAN_TX_MAILBOX1) != HAL_OK) 
+ 237              		.loc 1 91 3 is_stmt 1 view .LVU74
+  91:Library/Src/c2c.c **** 		if(HAL_CAN_AddTxMessage(hcan , &tx_header , data , (uint32_t*)CAN_TX_MAILBOX1) != HAL_OK) 
+ 238              		.loc 1 91 6 is_stmt 0 view .LVU75
+ 239 0024 0223     		movs	r3, #2
+ 240 0026 2A46     		mov	r2, r5
+ 241 0028 6946     		mov	r1, sp
+ 242 002a 2046     		mov	r0, r4
+ 243 002c FFF7FEFF 		bl	HAL_CAN_AddTxMessage
+ 244              	.LVL8:
+  91:Library/Src/c2c.c **** 		if(HAL_CAN_AddTxMessage(hcan , &tx_header , data , (uint32_t*)CAN_TX_MAILBOX1) != HAL_OK) 
+ 245              		.loc 1 91 5 view .LVU76
+ 246 0030 0028     		cmp	r0, #0
+ 247 0032 F4D0     		beq	.L5
+  93:Library/Src/c2c.c **** 			HAL_CAN_AddTxMessage(hcan , &tx_header , data , (uint32_t*)CAN_TX_MAILBOX2);
+ 248              		.loc 1 93 4 is_stmt 1 view .LVU77
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s 			page 7
+
+
+ 249 0034 0423     		movs	r3, #4
+ 250 0036 2A46     		mov	r2, r5
+ 251 0038 6946     		mov	r1, sp
+ 252 003a 2046     		mov	r0, r4
+ 253 003c FFF7FEFF 		bl	HAL_CAN_AddTxMessage
+ 254              	.LVL9:
+ 255 0040 EDE7     		b	.L5
+ 256              		.cfi_endproc
+ 257              	.LFE140:
+ 259              		.section	.text.g2c_send_data,"ax",%progbits
+ 260              		.align	1
+ 261              		.global	g2c_send_data
+ 262              		.syntax unified
+ 263              		.thumb
+ 264              		.thumb_func
+ 266              	g2c_send_data:
+ 267              	.LVL10:
+ 268              	.LFB138:
+  32:Library/Src/c2c.c **** {
+ 269              		.loc 1 32 1 view -0
+ 270              		.cfi_startproc
+ 271              		@ args = 0, pretend = 0, frame = 0
+ 272              		@ frame_needed = 0, uses_anonymous_args = 0
+  32:Library/Src/c2c.c **** {
+ 273              		.loc 1 32 1 is_stmt 0 view .LVU79
+ 274 0000 70B5     		push	{r4, r5, r6, lr}
+ 275              	.LCFI4:
+ 276              		.cfi_def_cfa_offset 16
+ 277              		.cfi_offset 4, -16
+ 278              		.cfi_offset 5, -12
+ 279              		.cfi_offset 6, -8
+ 280              		.cfi_offset 14, -4
+ 281 0002 0546     		mov	r5, r0
+  33:Library/Src/c2c.c ****     static uint8_t tx_data[8];
+ 282              		.loc 1 33 5 is_stmt 1 view .LVU80
+  35:Library/Src/c2c.c ****     tx_data[0] = data_g2c_gimbal.c2c_info_gimbal_status;
+ 283              		.loc 1 35 5 view .LVU81
+  35:Library/Src/c2c.c ****     tx_data[0] = data_g2c_gimbal.c2c_info_gimbal_status;
+ 284              		.loc 1 35 33 is_stmt 0 view .LVU82
+ 285 0004 1E4B     		ldr	r3, .L10
+ 286 0006 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+  35:Library/Src/c2c.c ****     tx_data[0] = data_g2c_gimbal.c2c_info_gimbal_status;
+ 287              		.loc 1 35 16 view .LVU83
+ 288 0008 1E4C     		ldr	r4, .L10+4
+ 289 000a 2270     		strb	r2, [r4]
+  36:Library/Src/c2c.c ****     tx_data[1] = data_g2c_gimbal.c2c_info_ammo_status;
+ 290              		.loc 1 36 5 is_stmt 1 view .LVU84
+  36:Library/Src/c2c.c ****     tx_data[1] = data_g2c_gimbal.c2c_info_ammo_status;
+ 291              		.loc 1 36 33 is_stmt 0 view .LVU85
+ 292 000c 5A78     		ldrb	r2, [r3, #1]	@ zero_extendqisi2
+  36:Library/Src/c2c.c ****     tx_data[1] = data_g2c_gimbal.c2c_info_ammo_status;
+ 293              		.loc 1 36 16 view .LVU86
+ 294 000e 6270     		strb	r2, [r4, #1]
+  37:Library/Src/c2c.c ****     tx_data[2] = data_g2c_gimbal.c2c_info_yaw_aim_pos >> 8;
+ 295              		.loc 1 37 5 is_stmt 1 view .LVU87
+  37:Library/Src/c2c.c ****     tx_data[2] = data_g2c_gimbal.c2c_info_yaw_aim_pos >> 8;
+ 296              		.loc 1 37 33 is_stmt 0 view .LVU88
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s 			page 8
+
+
+ 297 0010 B3F90220 		ldrsh	r2, [r3, #2]
+  37:Library/Src/c2c.c ****     tx_data[2] = data_g2c_gimbal.c2c_info_yaw_aim_pos >> 8;
+ 298              		.loc 1 37 16 view .LVU89
+ 299 0014 93F90310 		ldrsb	r1, [r3, #3]
+ 300 0018 A170     		strb	r1, [r4, #2]
+  38:Library/Src/c2c.c ****     tx_data[3] = data_g2c_gimbal.c2c_info_yaw_aim_pos;
+ 301              		.loc 1 38 5 is_stmt 1 view .LVU90
+  38:Library/Src/c2c.c ****     tx_data[3] = data_g2c_gimbal.c2c_info_yaw_aim_pos;
+ 302              		.loc 1 38 16 is_stmt 0 view .LVU91
+ 303 001a E270     		strb	r2, [r4, #3]
+  39:Library/Src/c2c.c ****     tx_data[4] = data_g2c_gimbal.c2c_info_yaw_fre_pos >> 8;
+ 304              		.loc 1 39 5 is_stmt 1 view .LVU92
+  39:Library/Src/c2c.c ****     tx_data[4] = data_g2c_gimbal.c2c_info_yaw_fre_pos >> 8;
+ 305              		.loc 1 39 33 is_stmt 0 view .LVU93
+ 306 001c B3F90420 		ldrsh	r2, [r3, #4]
+  39:Library/Src/c2c.c ****     tx_data[4] = data_g2c_gimbal.c2c_info_yaw_fre_pos >> 8;
+ 307              		.loc 1 39 16 view .LVU94
+ 308 0020 93F90530 		ldrsb	r3, [r3, #5]
+ 309 0024 2371     		strb	r3, [r4, #4]
+  40:Library/Src/c2c.c ****     tx_data[5] = data_g2c_gimbal.c2c_info_yaw_fre_pos;
+ 310              		.loc 1 40 5 is_stmt 1 view .LVU95
+  40:Library/Src/c2c.c ****     tx_data[5] = data_g2c_gimbal.c2c_info_yaw_fre_pos;
+ 311              		.loc 1 40 16 is_stmt 0 view .LVU96
+ 312 0026 6271     		strb	r2, [r4, #5]
+  41:Library/Src/c2c.c ****     tx_data[6] = 6;
+ 313              		.loc 1 41 5 is_stmt 1 view .LVU97
+  41:Library/Src/c2c.c ****     tx_data[6] = 6;
+ 314              		.loc 1 41 16 is_stmt 0 view .LVU98
+ 315 0028 0623     		movs	r3, #6
+ 316 002a A371     		strb	r3, [r4, #6]
+  42:Library/Src/c2c.c ****     tx_data[7] = 7;
+ 317              		.loc 1 42 5 is_stmt 1 view .LVU99
+  42:Library/Src/c2c.c ****     tx_data[7] = 7;
+ 318              		.loc 1 42 16 is_stmt 0 view .LVU100
+ 319 002c 0726     		movs	r6, #7
+ 320 002e E671     		strb	r6, [r4, #7]
+  43:Library/Src/c2c.c ****     can_send_data(hcan , G2C_GIMBAL_ID , tx_data , 8);
+ 321              		.loc 1 43 5 is_stmt 1 view .LVU101
+ 322 0030 0823     		movs	r3, #8
+ 323 0032 2246     		mov	r2, r4
+ 324 0034 4FF48071 		mov	r1, #256
+ 325 0038 FFF7FEFF 		bl	can_send_data
+ 326              	.LVL11:
+  44:Library/Src/c2c.c ****     osDelay(1);
+ 327              		.loc 1 44 5 view .LVU102
+ 328 003c 0120     		movs	r0, #1
+ 329 003e FFF7FEFF 		bl	osDelay
+ 330              	.LVL12:
+  45:Library/Src/c2c.c ****     tx_data[0] = data_g2c_chassis.c2c_info_chassis_status;
+ 331              		.loc 1 45 5 view .LVU103
+  45:Library/Src/c2c.c ****     tx_data[0] = data_g2c_chassis.c2c_info_chassis_status;
+ 332              		.loc 1 45 34 is_stmt 0 view .LVU104
+ 333 0042 114B     		ldr	r3, .L10+8
+ 334 0044 1A78     		ldrb	r2, [r3]	@ zero_extendqisi2
+  45:Library/Src/c2c.c ****     tx_data[0] = data_g2c_chassis.c2c_info_chassis_status;
+ 335              		.loc 1 45 16 view .LVU105
+ 336 0046 2270     		strb	r2, [r4]
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s 			page 9
+
+
+  46:Library/Src/c2c.c ****     tx_data[1] = data_g2c_chassis.c2c_info_x_vel >> 8;
+ 337              		.loc 1 46 5 is_stmt 1 view .LVU106
+  46:Library/Src/c2c.c ****     tx_data[1] = data_g2c_chassis.c2c_info_x_vel >> 8;
+ 338              		.loc 1 46 34 is_stmt 0 view .LVU107
+ 339 0048 B3F90220 		ldrsh	r2, [r3, #2]
+  46:Library/Src/c2c.c ****     tx_data[1] = data_g2c_chassis.c2c_info_x_vel >> 8;
+ 340              		.loc 1 46 16 view .LVU108
+ 341 004c 93F90310 		ldrsb	r1, [r3, #3]
+ 342 0050 6170     		strb	r1, [r4, #1]
+  47:Library/Src/c2c.c ****     tx_data[2] = data_g2c_chassis.c2c_info_x_vel;
+ 343              		.loc 1 47 5 is_stmt 1 view .LVU109
+  47:Library/Src/c2c.c ****     tx_data[2] = data_g2c_chassis.c2c_info_x_vel;
+ 344              		.loc 1 47 16 is_stmt 0 view .LVU110
+ 345 0052 A270     		strb	r2, [r4, #2]
+  48:Library/Src/c2c.c ****     tx_data[3] = data_g2c_chassis.c2c_info_y_vel >> 8;
+ 346              		.loc 1 48 5 is_stmt 1 view .LVU111
+  48:Library/Src/c2c.c ****     tx_data[3] = data_g2c_chassis.c2c_info_y_vel >> 8;
+ 347              		.loc 1 48 34 is_stmt 0 view .LVU112
+ 348 0054 B3F90420 		ldrsh	r2, [r3, #4]
+  48:Library/Src/c2c.c ****     tx_data[3] = data_g2c_chassis.c2c_info_y_vel >> 8;
+ 349              		.loc 1 48 16 view .LVU113
+ 350 0058 93F90510 		ldrsb	r1, [r3, #5]
+ 351 005c E170     		strb	r1, [r4, #3]
+  49:Library/Src/c2c.c ****     tx_data[4] = data_g2c_chassis.c2c_info_y_vel;
+ 352              		.loc 1 49 5 is_stmt 1 view .LVU114
+  49:Library/Src/c2c.c ****     tx_data[4] = data_g2c_chassis.c2c_info_y_vel;
+ 353              		.loc 1 49 16 is_stmt 0 view .LVU115
+ 354 005e 2271     		strb	r2, [r4, #4]
+  50:Library/Src/c2c.c ****     tx_data[5] = data_g2c_chassis.c2c_info_yaw_vel >> 8;
+ 355              		.loc 1 50 5 is_stmt 1 view .LVU116
+  50:Library/Src/c2c.c ****     tx_data[5] = data_g2c_chassis.c2c_info_yaw_vel >> 8;
+ 356              		.loc 1 50 34 is_stmt 0 view .LVU117
+ 357 0060 B3F90620 		ldrsh	r2, [r3, #6]
+  50:Library/Src/c2c.c ****     tx_data[5] = data_g2c_chassis.c2c_info_yaw_vel >> 8;
+ 358              		.loc 1 50 16 view .LVU118
+ 359 0064 93F90730 		ldrsb	r3, [r3, #7]
+ 360 0068 6371     		strb	r3, [r4, #5]
+  51:Library/Src/c2c.c ****     tx_data[6] = data_g2c_chassis.c2c_info_yaw_vel;
+ 361              		.loc 1 51 5 is_stmt 1 view .LVU119
+  51:Library/Src/c2c.c ****     tx_data[6] = data_g2c_chassis.c2c_info_yaw_vel;
+ 362              		.loc 1 51 16 is_stmt 0 view .LVU120
+ 363 006a A271     		strb	r2, [r4, #6]
+  52:Library/Src/c2c.c ****     tx_data[7] = 7;
+ 364              		.loc 1 52 5 is_stmt 1 view .LVU121
+  52:Library/Src/c2c.c ****     tx_data[7] = 7;
+ 365              		.loc 1 52 16 is_stmt 0 view .LVU122
+ 366 006c E671     		strb	r6, [r4, #7]
+  53:Library/Src/c2c.c ****     can_send_data(hcan , G2C_CHASSIS_ID , tx_data , 8);
+ 367              		.loc 1 53 5 is_stmt 1 view .LVU123
+ 368 006e 0823     		movs	r3, #8
+ 369 0070 2246     		mov	r2, r4
+ 370 0072 40F20111 		movw	r1, #257
+ 371 0076 2846     		mov	r0, r5
+ 372 0078 FFF7FEFF 		bl	can_send_data
+ 373              	.LVL13:
+  54:Library/Src/c2c.c **** }
+ 374              		.loc 1 54 1 is_stmt 0 view .LVU124
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s 			page 10
+
+
+ 375 007c 70BD     		pop	{r4, r5, r6, pc}
+ 376              	.LVL14:
+ 377              	.L11:
+  54:Library/Src/c2c.c **** }
+ 378              		.loc 1 54 1 view .LVU125
+ 379 007e 00BF     		.align	2
+ 380              	.L10:
+ 381 0080 00000000 		.word	.LANCHOR0
+ 382 0084 00000000 		.word	.LANCHOR1
+ 383 0088 00000000 		.word	.LANCHOR2
+ 384              		.cfi_endproc
+ 385              	.LFE138:
+ 387              		.section	.text.c2g_send_data,"ax",%progbits
+ 388              		.align	1
+ 389              		.global	c2g_send_data
+ 390              		.syntax unified
+ 391              		.thumb
+ 392              		.thumb_func
+ 394              	c2g_send_data:
+ 395              	.LVL15:
+ 396              	.LFB139:
+  57:Library/Src/c2c.c **** {
+ 397              		.loc 1 57 1 is_stmt 1 view -0
+ 398              		.cfi_startproc
+ 399              		@ args = 0, pretend = 0, frame = 0
+ 400              		@ frame_needed = 0, uses_anonymous_args = 0
+  57:Library/Src/c2c.c **** {
+ 401              		.loc 1 57 1 is_stmt 0 view .LVU127
+ 402 0000 08B5     		push	{r3, lr}
+ 403              	.LCFI5:
+ 404              		.cfi_def_cfa_offset 8
+ 405              		.cfi_offset 3, -8
+ 406              		.cfi_offset 14, -4
+  58:Library/Src/c2c.c ****     static uint8_t tx_data[8];
+ 407              		.loc 1 58 5 is_stmt 1 view .LVU128
+  60:Library/Src/c2c.c ****     tx_data[0] = data_c2g_gimbal.c2c_info_gimbal_power;
+ 408              		.loc 1 60 5 view .LVU129
+  60:Library/Src/c2c.c ****     tx_data[0] = data_c2g_gimbal.c2c_info_gimbal_power;
+ 409              		.loc 1 60 33 is_stmt 0 view .LVU130
+ 410 0002 0C4B     		ldr	r3, .L14
+ 411 0004 1978     		ldrb	r1, [r3]	@ zero_extendqisi2
+  60:Library/Src/c2c.c ****     tx_data[0] = data_c2g_gimbal.c2c_info_gimbal_power;
+ 412              		.loc 1 60 16 view .LVU131
+ 413 0006 0C4A     		ldr	r2, .L14+4
+ 414 0008 1170     		strb	r1, [r2]
+  61:Library/Src/c2c.c ****     tx_data[1] = data_c2g_gimbal.c2c_info_ammo_power;
+ 415              		.loc 1 61 5 is_stmt 1 view .LVU132
+  61:Library/Src/c2c.c ****     tx_data[1] = data_c2g_gimbal.c2c_info_ammo_power;
+ 416              		.loc 1 61 33 is_stmt 0 view .LVU133
+ 417 000a 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+  61:Library/Src/c2c.c ****     tx_data[1] = data_c2g_gimbal.c2c_info_ammo_power;
+ 418              		.loc 1 61 16 view .LVU134
+ 419 000c 5370     		strb	r3, [r2, #1]
+  62:Library/Src/c2c.c ****     tx_data[2] = 2;
+ 420              		.loc 1 62 5 is_stmt 1 view .LVU135
+  62:Library/Src/c2c.c ****     tx_data[2] = 2;
+ 421              		.loc 1 62 16 is_stmt 0 view .LVU136
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s 			page 11
+
+
+ 422 000e 0223     		movs	r3, #2
+ 423 0010 9370     		strb	r3, [r2, #2]
+  63:Library/Src/c2c.c ****     tx_data[3] = 3;
+ 424              		.loc 1 63 5 is_stmt 1 view .LVU137
+  63:Library/Src/c2c.c ****     tx_data[3] = 3;
+ 425              		.loc 1 63 16 is_stmt 0 view .LVU138
+ 426 0012 0323     		movs	r3, #3
+ 427 0014 D370     		strb	r3, [r2, #3]
+  64:Library/Src/c2c.c ****     tx_data[4] = 4;
+ 428              		.loc 1 64 5 is_stmt 1 view .LVU139
+  64:Library/Src/c2c.c ****     tx_data[4] = 4;
+ 429              		.loc 1 64 16 is_stmt 0 view .LVU140
+ 430 0016 0423     		movs	r3, #4
+ 431 0018 1371     		strb	r3, [r2, #4]
+  65:Library/Src/c2c.c ****     tx_data[5] = 5;
+ 432              		.loc 1 65 5 is_stmt 1 view .LVU141
+  65:Library/Src/c2c.c ****     tx_data[5] = 5;
+ 433              		.loc 1 65 16 is_stmt 0 view .LVU142
+ 434 001a 0523     		movs	r3, #5
+ 435 001c 5371     		strb	r3, [r2, #5]
+  66:Library/Src/c2c.c ****     tx_data[6] = 6;
+ 436              		.loc 1 66 5 is_stmt 1 view .LVU143
+  66:Library/Src/c2c.c ****     tx_data[6] = 6;
+ 437              		.loc 1 66 16 is_stmt 0 view .LVU144
+ 438 001e 0623     		movs	r3, #6
+ 439 0020 9371     		strb	r3, [r2, #6]
+  67:Library/Src/c2c.c ****     tx_data[7] = 7;
+ 440              		.loc 1 67 5 is_stmt 1 view .LVU145
+  67:Library/Src/c2c.c ****     tx_data[7] = 7;
+ 441              		.loc 1 67 16 is_stmt 0 view .LVU146
+ 442 0022 0723     		movs	r3, #7
+ 443 0024 D371     		strb	r3, [r2, #7]
+  68:Library/Src/c2c.c ****     can_send_data(hcan , C2G_GIMBAL_ID , tx_data , 8);
+ 444              		.loc 1 68 5 is_stmt 1 view .LVU147
+ 445 0026 0823     		movs	r3, #8
+ 446 0028 4FF48871 		mov	r1, #272
+ 447 002c FFF7FEFF 		bl	can_send_data
+ 448              	.LVL16:
+  69:Library/Src/c2c.c **** }
+ 449              		.loc 1 69 1 is_stmt 0 view .LVU148
+ 450 0030 08BD     		pop	{r3, pc}
+ 451              	.L15:
+ 452 0032 00BF     		.align	2
+ 453              	.L14:
+ 454 0034 00000000 		.word	.LANCHOR3
+ 455 0038 00000000 		.word	.LANCHOR4
+ 456              		.cfi_endproc
+ 457              	.LFE139:
+ 459              		.global	data_c2g_gimbal
+ 460              		.global	data_g2c_chassis
+ 461              		.global	data_g2c_gimbal
+ 462              		.section	.bss.data_c2g_gimbal,"aw",%nobits
+ 463              		.align	2
+ 464              		.set	.LANCHOR3,. + 0
+ 467              	data_c2g_gimbal:
+ 468 0000 0000     		.space	2
+ 469              		.section	.bss.data_g2c_chassis,"aw",%nobits
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s 			page 12
+
+
+ 470              		.align	2
+ 471              		.set	.LANCHOR2,. + 0
+ 474              	data_g2c_chassis:
+ 475 0000 00000000 		.space	8
+ 475      00000000 
+ 476              		.section	.bss.data_g2c_gimbal,"aw",%nobits
+ 477              		.align	2
+ 478              		.set	.LANCHOR0,. + 0
+ 481              	data_g2c_gimbal:
+ 482 0000 00000000 		.space	6
+ 482      0000
+ 483              		.section	.bss.tx_data.0,"aw",%nobits
+ 484              		.align	2
+ 485              		.set	.LANCHOR4,. + 0
+ 488              	tx_data.0:
+ 489 0000 00000000 		.space	8
+ 489      00000000 
+ 490              		.section	.bss.tx_data.1,"aw",%nobits
+ 491              		.align	2
+ 492              		.set	.LANCHOR1,. + 0
+ 495              	tx_data.1:
+ 496 0000 00000000 		.space	8
+ 496      00000000 
+ 497              		.text
+ 498              	.Letext0:
+ 499              		.file 2 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 500              		.file 3 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 501              		.file 4 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
+ 502              		.file 5 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h"
+ 503              		.file 6 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 504              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_can.h"
+ 505              		.file 8 "Library/Inc/c2c.h"
+ 506              		.file 9 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h"
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s 			page 13
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 c2c.c
+C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s:20     .text.g2c_chassis_fbdata:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s:26     .text.g2c_chassis_fbdata:00000000 g2c_chassis_fbdata
+C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s:85     .text.g2c_gimbal_fbdata:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s:91     .text.g2c_gimbal_fbdata:00000000 g2c_gimbal_fbdata
+C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s:140    .text.c2g_gimbal_fbdata:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s:146    .text.c2g_gimbal_fbdata:00000000 c2g_gimbal_fbdata
+C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s:169    .text.can_send_data:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s:175    .text.can_send_data:00000000 can_send_data
+C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s:260    .text.g2c_send_data:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s:266    .text.g2c_send_data:00000000 g2c_send_data
+C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s:381    .text.g2c_send_data:00000080 $d
+C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s:388    .text.c2g_send_data:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s:394    .text.c2g_send_data:00000000 c2g_send_data
+C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s:454    .text.c2g_send_data:00000034 $d
+C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s:467    .bss.data_c2g_gimbal:00000000 data_c2g_gimbal
+C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s:474    .bss.data_g2c_chassis:00000000 data_g2c_chassis
+C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s:481    .bss.data_g2c_gimbal:00000000 data_g2c_gimbal
+C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s:463    .bss.data_c2g_gimbal:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s:470    .bss.data_g2c_chassis:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s:477    .bss.data_g2c_gimbal:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s:484    .bss.tx_data.0:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s:488    .bss.tx_data.0:00000000 tx_data.0
+C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s:491    .bss.tx_data.1:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccVcjOnR.s:495    .bss.tx_data.1:00000000 tx_data.1
+
+UNDEFINED SYMBOLS
+HAL_CAN_AddTxMessage
+osDelay

@@ -1,0 +1,1319 @@
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"Gimbal.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.Gimbal_Task,"ax",%progbits
+  20              		.align	1
+  21              		.global	Gimbal_Task
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	Gimbal_Task:
+  27              	.LFB138:
+  28              		.file 1 "App/Src/Gimbal.c"
+   1:App/Src/Gimbal.c **** #include "Gimbal.h"
+   2:App/Src/Gimbal.c **** #include "Ammo.h"
+   3:App/Src/Gimbal.c **** 
+   4:App/Src/Gimbal.c **** //gimbal_step_e gimbal_step = STEP_GIMBAL_CLOSE;
+   5:App/Src/Gimbal.c **** gimbal_step_e gimbal_step = STEP_GIMBAL_STOP;
+   6:App/Src/Gimbal.c **** 
+   7:App/Src/Gimbal.c **** extern data_g2c_gimbal_t data_g2c_gimbal;
+   8:App/Src/Gimbal.c **** extern data_ins_t data_ins;
+   9:App/Src/Gimbal.c **** extern data_motor_t data_motor;
+  10:App/Src/Gimbal.c **** extern data_referee_t data_referee;
+  11:App/Src/Gimbal.c **** extern CAN_HandleTypeDef hcan1;
+  12:App/Src/Gimbal.c **** extern CAN_HandleTypeDef hcan2;
+  13:App/Src/Gimbal.c **** extern data_rc_t data_rc;
+  14:App/Src/Gimbal.c **** 
+  15:App/Src/Gimbal.c **** pid_type_def PID_Yaw_TRANS;
+  16:App/Src/Gimbal.c **** pid_type_def PID_Yaw_START;
+  17:App/Src/Gimbal.c **** extern  pid_type_def PID_ammo1_trans_vel[4];
+  18:App/Src/Gimbal.c **** extern  pid_type_def PID_ammo2_trans_vel[4];
+  19:App/Src/Gimbal.c **** extern pid_type_def PID_ammo1_vel[4];
+  20:App/Src/Gimbal.c **** extern pid_type_def PID_ammo2_vel[4];
+  21:App/Src/Gimbal.c **** extern pid_type_def PID_chassis_vel[4];
+  22:App/Src/Gimbal.c **** float yaw_motor_vel = 0;
+  23:App/Src/Gimbal.c **** float yaw_motor_pos = 0;
+  24:App/Src/Gimbal.c **** float yaw_motor_pos_zero = 0;
+  25:App/Src/Gimbal.c **** float yaw_gimbal_pos;
+  26:App/Src/Gimbal.c **** extern int vel_trans[6];
+  27:App/Src/Gimbal.c **** extern int vel_before[6];
+  28:App/Src/Gimbal.c **** extern int vel_last[6];
+  29:App/Src/Gimbal.c **** int count = 0;
+  30:App/Src/Gimbal.c **** int n = 0;
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s 			page 2
+
+
+  31:App/Src/Gimbal.c **** int m = 0;
+  32:App/Src/Gimbal.c **** int circle = 0;
+  33:App/Src/Gimbal.c **** int trans_time = 0;
+  34:App/Src/Gimbal.c **** int flag = 0;
+  35:App/Src/Gimbal.c **** 
+  36:App/Src/Gimbal.c **** static int yaw_trans_time = 0;
+  37:App/Src/Gimbal.c **** int16_t countBuffer[20];
+  38:App/Src/Gimbal.c **** uint8_t countPointer = 0;
+  39:App/Src/Gimbal.c **** #define MAX_DIFFERENCE 500
+  40:App/Src/Gimbal.c **** // countBuffer[countPointer] = data_motor.Ammo1_motor_measure[0].given_current;
+  41:App/Src/Gimbal.c **** // countPointer = (countPointer  +  1) % 20;
+  42:App/Src/Gimbal.c **** // uint16_t maxItem = 0;
+  43:App/Src/Gimbal.c **** // uint32_t averageItem = 0;
+  44:App/Src/Gimbal.c **** // for(uint16_t i = 0; i < 20; i++)
+  45:App/Src/Gimbal.c **** //{
+  46:App/Src/Gimbal.c **** //     if (abs(countBuffer[i]) > maxItem) maxItem = countBuffer[i];
+  47:App/Src/Gimbal.c **** //     averageItem += abs(countBuffer[i]);
+  48:App/Src/Gimbal.c **** //
+  49:App/Src/Gimbal.c **** //}
+  50:App/Src/Gimbal.c **** // averageItem /= 20;
+  51:App/Src/Gimbal.c **** // if (maxItem - averageItem > MAX_DIFFERENCE)//data_motor.Chassis_motor_measure->given_current>)
+  52:App/Src/Gimbal.c **** //{
+  53:App/Src/Gimbal.c **** //    n++;
+  54:App/Src/Gimbal.c **** //}
+  55:App/Src/Gimbal.c **** 
+  56:App/Src/Gimbal.c **** uint32_t testV = 0;
+  57:App/Src/Gimbal.c **** void Gimbal_Task()
+  58:App/Src/Gimbal.c **** {
+  29              		.loc 1 58 1 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33 0000 2DE9F043 		push	{r4, r5, r6, r7, r8, r9, lr}
+  34              	.LCFI0:
+  35              		.cfi_def_cfa_offset 28
+  36              		.cfi_offset 4, -28
+  37              		.cfi_offset 5, -24
+  38              		.cfi_offset 6, -20
+  39              		.cfi_offset 7, -16
+  40              		.cfi_offset 8, -12
+  41              		.cfi_offset 9, -8
+  42              		.cfi_offset 14, -4
+  43 0004 2DED068B 		vpush.64	{d8, d9, d10}
+  44              	.LCFI1:
+  45              		.cfi_def_cfa_offset 52
+  46              		.cfi_offset 80, -52
+  47              		.cfi_offset 81, -48
+  48              		.cfi_offset 82, -44
+  49              		.cfi_offset 83, -40
+  50              		.cfi_offset 84, -36
+  51              		.cfi_offset 85, -32
+  52 0008 85B0     		sub	sp, sp, #20
+  53              	.LCFI2:
+  54              		.cfi_def_cfa_offset 72
+  59:App/Src/Gimbal.c ****     PID_init(&PID_Yaw_TRANS, PID_Yaw_TRANS_Kp, PID_Yaw_TRANS_Ki, PID_Yaw_TRANS_Kd, PID_Yaw_TRANS_im
+  55              		.loc 1 59 5 view .LVU1
+  56 000a 9FEDCF8A 		vldr.32	s16, .L34
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s 			page 3
+
+
+  57 000e B1EE0E2A 		vmov.f32	s4, #7.5e+0
+  58 0012 F2EE041A 		vmov.f32	s3, #1.0e+1
+  59 0016 B0EE481A 		vmov.f32	s2, s16
+  60 001a F0EE480A 		vmov.f32	s1, s16
+  61 001e 9FEDCB0A 		vldr.32	s0, .L34+4
+  62 0022 CB48     		ldr	r0, .L34+8
+  63 0024 FFF7FEFF 		bl	PID_init
+  64              	.LVL0:
+  60:App/Src/Gimbal.c ****     PID_init(&PID_Yaw_START, PID_Yaw_START_Kp, PID_Yaw_START_Ki, PID_Yaw_START_Kd, PID_Yaw_START_im
+  65              		.loc 1 60 5 view .LVU2
+  66 0028 DFEDCA9A 		vldr.32	s19, .L34+12
+  67 002c B2EE042A 		vmov.f32	s4, #1.0e+1
+  68 0030 F0EE421A 		vmov.f32	s3, s4
+  69 0034 9FEDC81A 		vldr.32	s2, .L34+16
+  70 0038 F0EE480A 		vmov.f32	s1, s16
+  71 003c B0EE690A 		vmov.f32	s0, s19
+  72 0040 C648     		ldr	r0, .L34+20
+  73 0042 FFF7FEFF 		bl	PID_init
+  74              	.LVL1:
+  61:App/Src/Gimbal.c ****     PID_init(&PID_ammo1_vel[0] , PID_ammo1_vel_Kp , PID_ammo1_vel_Ki , PID_ammo1_vel_Kd , PID_ammo1
+  75              		.loc 1 61 5 view .LVU3
+  76 0046 9FEDC69A 		vldr.32	s18, .L34+24
+  77 004a DFEDC68A 		vldr.32	s17, .L34+28
+  78 004e 9FEDC6AA 		vldr.32	s20, .L34+32
+  79 0052 C64C     		ldr	r4, .L34+36
+  80 0054 B0EE492A 		vmov.f32	s4, s18
+  81 0058 F0EE681A 		vmov.f32	s3, s17
+  82 005c B0EE691A 		vmov.f32	s2, s19
+  83 0060 F0EE4A0A 		vmov.f32	s1, s20
+  84 0064 B1EE020A 		vmov.f32	s0, #4.5e+0
+  85 0068 2046     		mov	r0, r4
+  86 006a FFF7FEFF 		bl	PID_init
+  87              	.LVL2:
+  62:App/Src/Gimbal.c ****     PID_init(&PID_ammo1_vel[1] , PID_ammo2_vel_Kp , PID_ammo2_vel_Ki , PID_ammo2_vel_Kd , PID_ammo2
+  88              		.loc 1 62 5 view .LVU4
+  89 006e B0EE492A 		vmov.f32	s4, s18
+  90 0072 F0EE681A 		vmov.f32	s3, s17
+  91 0076 B0EE691A 		vmov.f32	s2, s19
+  92 007a F0EE4A0A 		vmov.f32	s1, s20
+  93 007e B1EE020A 		vmov.f32	s0, #4.5e+0
+  94 0082 04F13400 		add	r0, r4, #52
+  95 0086 FFF7FEFF 		bl	PID_init
+  96              	.LVL3:
+  63:App/Src/Gimbal.c ****     PID_init(&PID_ammo1_vel[2] , PID_ammo3_vel_Kp , PID_ammo3_vel_Ki , PID_ammo3_vel_Kd , PID_ammo3
+  97              		.loc 1 63 5 view .LVU5
+  98 008a 9FEDB9AA 		vldr.32	s20, .L34+40
+  99 008e DFEDB99A 		vldr.32	s19, .L34+44
+ 100 0092 B0EE492A 		vmov.f32	s4, s18
+ 101 0096 F0EE681A 		vmov.f32	s3, s17
+ 102 009a B0EE4A1A 		vmov.f32	s2, s20
+ 103 009e F0EE480A 		vmov.f32	s1, s16
+ 104 00a2 B0EE690A 		vmov.f32	s0, s19
+ 105 00a6 04F16800 		add	r0, r4, #104
+ 106 00aa FFF7FEFF 		bl	PID_init
+ 107              	.LVL4:
+  64:App/Src/Gimbal.c ****     PID_init(&PID_ammo1_vel[3] , PID_ammo4_vel_Kp , PID_ammo4_vel_Ki , PID_ammo4_vel_Kd , PID_ammo4
+ 108              		.loc 1 64 5 view .LVU6
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s 			page 4
+
+
+ 109 00ae B0EE492A 		vmov.f32	s4, s18
+ 110 00b2 F0EE681A 		vmov.f32	s3, s17
+ 111 00b6 B0EE4A1A 		vmov.f32	s2, s20
+ 112 00ba F0EE480A 		vmov.f32	s1, s16
+ 113 00be B0EE690A 		vmov.f32	s0, s19
+ 114 00c2 04F19C00 		add	r0, r4, #156
+ 115 00c6 FFF7FEFF 		bl	PID_init
+ 116              	.LVL5:
+  65:App/Src/Gimbal.c ****     PID_init(&PID_ammo2_vel[0] , PID_ammo5_vel_Kp , PID_ammo5_vel_Ki , PID_ammo5_vel_Kd , PID_ammo5
+ 117              		.loc 1 65 5 view .LVU7
+ 118 00ca AB4C     		ldr	r4, .L34+48
+ 119 00cc B0EE492A 		vmov.f32	s4, s18
+ 120 00d0 F0EE681A 		vmov.f32	s3, s17
+ 121 00d4 B0EE4A1A 		vmov.f32	s2, s20
+ 122 00d8 F0EE480A 		vmov.f32	s1, s16
+ 123 00dc B0EE690A 		vmov.f32	s0, s19
+ 124 00e0 2046     		mov	r0, r4
+ 125 00e2 FFF7FEFF 		bl	PID_init
+ 126              	.LVL6:
+  66:App/Src/Gimbal.c ****     PID_init(&PID_ammo2_vel[1] , PID_ammo6_vel_Kp , PID_ammo6_vel_Ki , PID_ammo6_vel_Kd , PID_ammo6
+ 127              		.loc 1 66 5 view .LVU8
+ 128 00e6 B0EE492A 		vmov.f32	s4, s18
+ 129 00ea F0EE681A 		vmov.f32	s3, s17
+ 130 00ee B0EE4A1A 		vmov.f32	s2, s20
+ 131 00f2 F0EE480A 		vmov.f32	s1, s16
+ 132 00f6 B0EE690A 		vmov.f32	s0, s19
+ 133 00fa 04F13400 		add	r0, r4, #52
+ 134 00fe FFF7FEFF 		bl	PID_init
+ 135              	.LVL7:
+  67:App/Src/Gimbal.c ****     PID_init(&PID_ammo2_vel[2] , PID_ammo_vel_Kp , PID_ammo_vel_Ki , PID_ammo_vel_Kd , PID_ammo_vel
+ 136              		.loc 1 67 5 view .LVU9
+ 137 0102 B0EE492A 		vmov.f32	s4, s18
+ 138 0106 F0EE681A 		vmov.f32	s3, s17
+ 139 010a B0EE481A 		vmov.f32	s2, s16
+ 140 010e F0EE480A 		vmov.f32	s1, s16
+ 141 0112 B6EE080A 		vmov.f32	s0, #7.5e-1
+ 142 0116 04F16800 		add	r0, r4, #104
+ 143 011a FFF7FEFF 		bl	PID_init
+ 144              	.LVL8:
+  68:App/Src/Gimbal.c ****     PID_init(&PID_ammo2_vel[3] , PID_ammo_vel_Kp , PID_ammo_vel_Ki , PID_ammo_vel_Kd , PID_ammo_vel
+ 145              		.loc 1 68 5 view .LVU10
+ 146 011e B0EE492A 		vmov.f32	s4, s18
+ 147 0122 F0EE681A 		vmov.f32	s3, s17
+ 148 0126 B0EE481A 		vmov.f32	s2, s16
+ 149 012a F0EE480A 		vmov.f32	s1, s16
+ 150 012e B6EE080A 		vmov.f32	s0, #7.5e-1
+ 151 0132 04F19C00 		add	r0, r4, #156
+ 152 0136 FFF7FEFF 		bl	PID_init
+ 153              	.LVL9:
+  69:App/Src/Gimbal.c ****     PID_init(&PID_chassis_vel[0], PID_chassis1_vel_Kp, PID_chassis1_vel_Ki, PID_chassis1_vel_Kd, PI
+ 154              		.loc 1 69 5 view .LVU11
+ 155 013a 9FED909A 		vldr.32	s18, .L34+52
+ 156 013e DFED908A 		vldr.32	s17, .L34+56
+ 157 0142 904C     		ldr	r4, .L34+60
+ 158 0144 B0EE492A 		vmov.f32	s4, s18
+ 159 0148 F0EE681A 		vmov.f32	s3, s17
+ 160 014c B7EE001A 		vmov.f32	s2, #1.0e+0
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s 			page 5
+
+
+ 161 0150 F6EE040A 		vmov.f32	s1, #6.25e-1
+ 162 0154 B2EE000A 		vmov.f32	s0, #8.0e+0
+ 163 0158 2046     		mov	r0, r4
+ 164 015a FFF7FEFF 		bl	PID_init
+ 165              	.LVL10:
+  70:App/Src/Gimbal.c ****     PID_init(&PID_chassis_vel[1], PID_chassis2_vel_Kp, PID_chassis2_vel_Ki, PID_chassis2_vel_Kd, PI
+ 166              		.loc 1 70 5 view .LVU12
+ 167 015e 9FED8A2A 		vldr.32	s4, .L34+64
+ 168 0162 DFED8A1A 		vldr.32	s3, .L34+68
+ 169 0166 B0EE481A 		vmov.f32	s2, s16
+ 170 016a DFED890A 		vldr.32	s1, .L34+72
+ 171 016e B3EE090A 		vmov.f32	s0, #2.5e+1
+ 172 0172 04F13400 		add	r0, r4, #52
+ 173 0176 FFF7FEFF 		bl	PID_init
+ 174              	.LVL11:
+  71:App/Src/Gimbal.c ****     PID_init(&PID_chassis_vel[2], PID_chassis3_vel_Kp, PID_chassis3_vel_Ki, PID_chassis3_vel_Kd, PI
+ 175              		.loc 1 71 5 view .LVU13
+ 176 017a B0EE492A 		vmov.f32	s4, s18
+ 177 017e F0EE681A 		vmov.f32	s3, s17
+ 178 0182 B0EE481A 		vmov.f32	s2, s16
+ 179 0186 F0EE480A 		vmov.f32	s1, s16
+ 180 018a B7EE000A 		vmov.f32	s0, #1.0e+0
+ 181 018e 04F16800 		add	r0, r4, #104
+ 182 0192 FFF7FEFF 		bl	PID_init
+ 183              	.LVL12:
+  72:App/Src/Gimbal.c ****     PID_init(&PID_chassis_vel[3], PID_chassis4_vel_Kp, PID_chassis4_vel_Ki, PID_chassis4_vel_Kd, PI
+ 184              		.loc 1 72 5 view .LVU14
+ 185 0196 B0EE492A 		vmov.f32	s4, s18
+ 186 019a F0EE681A 		vmov.f32	s3, s17
+ 187 019e B7EE001A 		vmov.f32	s2, #1.0e+0
+ 188 01a2 F6EE040A 		vmov.f32	s1, #6.25e-1
+ 189 01a6 B2EE000A 		vmov.f32	s0, #8.0e+0
+ 190 01aa 04F19C00 		add	r0, r4, #156
+ 191 01ae FFF7FEFF 		bl	PID_init
+ 192              	.LVL13:
+ 193 01b2 30E0     		b	.L24
+ 194              	.L7:
+  73:App/Src/Gimbal.c ****     while (1)
+  74:App/Src/Gimbal.c ****     {
+  75:App/Src/Gimbal.c ****         // testV = *(uint32_t *)(&(data_referee.GameRobotState.chassis_power_limit));
+  76:App/Src/Gimbal.c **** 
+  77:App/Src/Gimbal.c ****         switch (gimbal_step)
+  78:App/Src/Gimbal.c ****         {
+  79:App/Src/Gimbal.c ****             //case STEP_GIMBAL_CLOSE:
+  80:App/Src/Gimbal.c ****             //{
+  81:App/Src/Gimbal.c ****             //    if(data_referee.GameRobotState.power_management_gimbal_output == 0)
+  82:App/Src/Gimbal.c ****             //    {
+  83:App/Src/Gimbal.c ****             //        gimbal_step = STEP_GIMBAL_CLOSE;
+  84:App/Src/Gimbal.c ****             //    }
+  85:App/Src/Gimbal.c ****             //    else if ((data_referee.GameRobotState.power_management_gimbal_output == 1))
+  86:App/Src/Gimbal.c ****             //    {
+  87:App/Src/Gimbal.c ****             //        gimbal_step = STEP_GIMBAL_STOP;
+  88:App/Src/Gimbal.c ****             //    }
+  89:App/Src/Gimbal.c **** //
+  90:App/Src/Gimbal.c ****             //    break;
+  91:App/Src/Gimbal.c ****             //    
+  92:App/Src/Gimbal.c ****             //}
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s 			page 6
+
+
+  93:App/Src/Gimbal.c ****             case STEP_GIMBAL_STOP: // 有电但不开启
+  94:App/Src/Gimbal.c ****             {
+  95:App/Src/Gimbal.c ****                 DJ_124_ctrl(&hcan1, AMMO1_ALL_ID, 0, 0, 0, 0);
+ 195              		.loc 1 95 17 view .LVU15
+ 196 01b4 774D     		ldr	r5, .L34+76
+ 197 01b6 0024     		movs	r4, #0
+ 198 01b8 0194     		str	r4, [sp, #4]
+ 199 01ba 0094     		str	r4, [sp]
+ 200 01bc 2346     		mov	r3, r4
+ 201 01be 2246     		mov	r2, r4
+ 202 01c0 4FF40071 		mov	r1, #512
+ 203 01c4 2846     		mov	r0, r5
+ 204 01c6 FFF7FEFF 		bl	DJ_124_ctrl
+ 205              	.LVL14:
+  96:App/Src/Gimbal.c ****                 DJ_124_ctrl(&hcan1, AMMO2_ALL_ID, 0, 0, 0, 0);
+ 206              		.loc 1 96 17 view .LVU16
+ 207 01ca 0194     		str	r4, [sp, #4]
+ 208 01cc 0094     		str	r4, [sp]
+ 209 01ce 2346     		mov	r3, r4
+ 210 01d0 2246     		mov	r2, r4
+ 211 01d2 40F2FF11 		movw	r1, #511
+ 212 01d6 2846     		mov	r0, r5
+ 213 01d8 FFF7FEFF 		bl	DJ_124_ctrl
+ 214              	.LVL15:
+  97:App/Src/Gimbal.c ****                 DJ_124_ctrl(&hcan2, AMMO2_ALL_ID, 0, 0, 0, 0); // 摩擦轮不开启
+ 215              		.loc 1 97 17 view .LVU17
+ 216 01dc 6E4D     		ldr	r5, .L34+80
+ 217 01de 0194     		str	r4, [sp, #4]
+ 218 01e0 0094     		str	r4, [sp]
+ 219 01e2 2346     		mov	r3, r4
+ 220 01e4 2246     		mov	r2, r4
+ 221 01e6 40F2FF11 		movw	r1, #511
+ 222 01ea 2846     		mov	r0, r5
+ 223 01ec FFF7FEFF 		bl	DJ_124_ctrl
+ 224              	.LVL16:
+  98:App/Src/Gimbal.c ****                 DJ_124_ctrl(&hcan2, 0x200, 0, 0, 0, 0);        // pitch、yaw、切轨道、推杆�
+ 225              		.loc 1 98 17 view .LVU18
+ 226 01f0 0194     		str	r4, [sp, #4]
+ 227 01f2 0094     		str	r4, [sp]
+ 228 01f4 2346     		mov	r3, r4
+ 229 01f6 2246     		mov	r2, r4
+ 230 01f8 4FF40071 		mov	r1, #512
+ 231 01fc 2846     		mov	r0, r5
+ 232 01fe FFF7FEFF 		bl	DJ_124_ctrl
+ 233              	.LVL17:
+  99:App/Src/Gimbal.c **** 
+ 100:App/Src/Gimbal.c ****                 //if(data_referee.GameRobotState.power_management_gimbal_output == 0)
+ 101:App/Src/Gimbal.c ****                 //{
+ 102:App/Src/Gimbal.c ****                 //    gimbal_step = STEP_GIMBAL_CLOSE;
+ 103:App/Src/Gimbal.c ****                 //}
+ 104:App/Src/Gimbal.c ****                 //else if ((data_referee.GameRobotState.power_management_gimbal_output == 1))
+ 105:App/Src/Gimbal.c ****                 //{
+ 106:App/Src/Gimbal.c ****                     if (data_rc.status_gimbal == 0) // 右推杆最下全部不开启
+ 234              		.loc 1 106 21 view .LVU19
+ 235              		.loc 1 106 32 is_stmt 0 view .LVU20
+ 236 0202 664B     		ldr	r3, .L34+84
+ 237 0204 5B7C     		ldrb	r3, [r3, #17]	@ zero_extendqisi2
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s 			page 7
+
+
+ 238              		.loc 1 106 24 view .LVU21
+ 239 0206 002B     		cmp	r3, #0
+ 240 0208 3AD1     		bne	.L8
+ 107:App/Src/Gimbal.c ****                     {
+ 108:App/Src/Gimbal.c ****                         gimbal_step = STEP_GIMBAL_STOP;
+ 241              		.loc 1 108 25 is_stmt 1 view .LVU22
+ 242              		.loc 1 108 37 is_stmt 0 view .LVU23
+ 243 020a 654B     		ldr	r3, .L34+88
+ 244 020c 0122     		movs	r2, #1
+ 245 020e 1A70     		strb	r2, [r3]
+ 246              	.L2:
+ 109:App/Src/Gimbal.c ****                     }
+ 110:App/Src/Gimbal.c ****                     else if (data_rc.status_gimbal == 1 || data_rc.status_gimbal == 2) // 右推杆
+ 111:App/Src/Gimbal.c ****                     {
+ 112:App/Src/Gimbal.c ****                         gimbal_step = STEP_GIMBAL_TRANS;
+ 113:App/Src/Gimbal.c ****                     }
+ 114:App/Src/Gimbal.c ****                 //}
+ 115:App/Src/Gimbal.c ****                 
+ 116:App/Src/Gimbal.c ****                 break;
+ 117:App/Src/Gimbal.c ****             }
+ 118:App/Src/Gimbal.c ****             case STEP_GIMBAL_TRANS: // 瞄准前哨站
+ 119:App/Src/Gimbal.c ****             {
+ 120:App/Src/Gimbal.c ****                 DJ_124_ctrl_vel(&hcan1 , AMMO1_ALL_ID , PID_ammo1_trans_vel, data_motor.Ammo1_motor
+ 121:App/Src/Gimbal.c ****                 DJ_124_ctrl_vel(&hcan1, AMMO2_ALL_ID, PID_ammo2_trans_vel, data_motor.Ammo2_motor_m
+ 122:App/Src/Gimbal.c ****                 DJ_124_ctrl_vel(&hcan2 , AMMO2_ALL_ID , PID_ammo2_trans_vel, data_motor.Ammo2_motor
+ 123:App/Src/Gimbal.c **** 
+ 124:App/Src/Gimbal.c ****                 //if(data_referee.GameRobotState.power_management_gimbal_output == 0)
+ 125:App/Src/Gimbal.c ****                 //{
+ 126:App/Src/Gimbal.c ****                 //    gimbal_step = STEP_GIMBAL_CLOSE;
+ 127:App/Src/Gimbal.c ****                 //}
+ 128:App/Src/Gimbal.c ****                 //else if ((data_referee.GameRobotState.power_management_gimbal_output == 1))
+ 129:App/Src/Gimbal.c ****                 //{
+ 130:App/Src/Gimbal.c ****                     if(data_rc.status_gimbal == 0)
+ 131:App/Src/Gimbal.c ****                     {
+ 132:App/Src/Gimbal.c ****                         gimbal_step = STEP_GIMBAL_STOP;
+ 133:App/Src/Gimbal.c ****                     }
+ 134:App/Src/Gimbal.c ****                     else if (data_rc.status_gimbal == 1 || data_rc.status_gimbal == 2)
+ 135:App/Src/Gimbal.c ****                     {
+ 136:App/Src/Gimbal.c ****                         if(trans_time >= 270)
+ 137:App/Src/Gimbal.c ****                         {
+ 138:App/Src/Gimbal.c ****                             if (data_rc.status_gimbal == 1)
+ 139:App/Src/Gimbal.c ****                             {
+ 140:App/Src/Gimbal.c ****                                 gimbal_step = STEP_GIMBAL_FIRE;
+ 141:App/Src/Gimbal.c ****                             }
+ 142:App/Src/Gimbal.c ****                             else if(data_rc.status_gimbal == 2)
+ 143:App/Src/Gimbal.c ****                             {
+ 144:App/Src/Gimbal.c ****                                 gimbal_step = STEP_GIMBAL_FIRE_LAST;
+ 145:App/Src/Gimbal.c ****                             }
+ 146:App/Src/Gimbal.c **** 
+ 147:App/Src/Gimbal.c ****                             trans_time = 0;
+ 148:App/Src/Gimbal.c ****                         }
+ 149:App/Src/Gimbal.c ****                         else if(trans_time < 270)
+ 150:App/Src/Gimbal.c ****                         {
+ 151:App/Src/Gimbal.c ****                             gimbal_step = STEP_GIMBAL_TRANS;
+ 152:App/Src/Gimbal.c ****                             trans_time++;
+ 153:App/Src/Gimbal.c ****                         }
+ 154:App/Src/Gimbal.c ****                     }
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s 			page 8
+
+
+ 155:App/Src/Gimbal.c ****                 //}
+ 156:App/Src/Gimbal.c ****                 
+ 157:App/Src/Gimbal.c **** 
+ 158:App/Src/Gimbal.c ****                 break;
+ 159:App/Src/Gimbal.c ****             }
+ 160:App/Src/Gimbal.c ****             case STEP_GIMBAL_FIRE: // 瞄准基地
+ 161:App/Src/Gimbal.c ****             {
+ 162:App/Src/Gimbal.c ****                 DJ_124_ctrl_vel(&hcan1 , AMMO1_ALL_ID , PID_ammo1_vel, data_motor.Ammo1_motor_measu
+ 163:App/Src/Gimbal.c ****                 DJ_124_ctrl_vel(&hcan1, AMMO2_ALL_ID, PID_ammo2_vel, data_motor.Ammo2_motor_measure
+ 164:App/Src/Gimbal.c ****                 DJ_124_ctrl_vel(&hcan2 , AMMO2_ALL_ID , PID_ammo2_vel, data_motor.Ammo2_motor_measu
+ 165:App/Src/Gimbal.c **** 
+ 166:App/Src/Gimbal.c ****                 if(data_motor.Ammo1_motor_measure[0].given_current >= 5450)
+ 167:App/Src/Gimbal.c ****                 {
+ 168:App/Src/Gimbal.c ****                     m++;
+ 169:App/Src/Gimbal.c ****                 }
+ 170:App/Src/Gimbal.c **** 
+ 171:App/Src/Gimbal.c ****                 if(m > 0 && data_motor.Ammo1_motor_measure[0].given_current <= 700)
+ 172:App/Src/Gimbal.c ****                 {
+ 173:App/Src/Gimbal.c ****                     n = 1;
+ 174:App/Src/Gimbal.c ****                     m =0;
+ 175:App/Src/Gimbal.c ****                 }
+ 176:App/Src/Gimbal.c **** 
+ 177:App/Src/Gimbal.c ****                 if(n == 1)
+ 178:App/Src/Gimbal.c ****                 {
+ 179:App/Src/Gimbal.c ****                     for(int i = 0; i < 6; i++)
+ 180:App/Src/Gimbal.c ****                     {
+ 181:App/Src/Gimbal.c ****                         if(vel_before[i] > 0)
+ 182:App/Src/Gimbal.c ****                         {
+ 183:App/Src/Gimbal.c ****                             vel_before[i] = vel_before[i] - 1;
+ 184:App/Src/Gimbal.c ****                         }
+ 185:App/Src/Gimbal.c ****                         else if(vel_before[i] < 0)
+ 186:App/Src/Gimbal.c ****                         {
+ 187:App/Src/Gimbal.c ****                             vel_before[i] = vel_before[i] + 1;
+ 188:App/Src/Gimbal.c ****                         }
+ 189:App/Src/Gimbal.c ****                     }
+ 190:App/Src/Gimbal.c ****                     n = 0;
+ 191:App/Src/Gimbal.c ****                 }
+ 192:App/Src/Gimbal.c **** 
+ 193:App/Src/Gimbal.c **** 
+ 194:App/Src/Gimbal.c ****                 //if(data_referee.GameRobotState.power_management_gimbal_output == 0)
+ 195:App/Src/Gimbal.c ****                 //{
+ 196:App/Src/Gimbal.c ****                 //    gimbal_step = STEP_GIMBAL_CLOSE;
+ 197:App/Src/Gimbal.c ****                 //}
+ 198:App/Src/Gimbal.c ****                 //else if ((data_referee.GameRobotState.power_management_gimbal_output == 1))
+ 199:App/Src/Gimbal.c ****                 //{
+ 200:App/Src/Gimbal.c ****                     if (data_rc.status_gimbal == 0)
+ 201:App/Src/Gimbal.c ****                     {
+ 202:App/Src/Gimbal.c ****                         gimbal_step = STEP_GIMBAL_STOP;
+ 203:App/Src/Gimbal.c ****                     }
+ 204:App/Src/Gimbal.c ****                     else if (data_rc.status_gimbal == 1)
+ 205:App/Src/Gimbal.c ****                     {
+ 206:App/Src/Gimbal.c ****                         gimbal_step = STEP_GIMBAL_FIRE;
+ 207:App/Src/Gimbal.c ****                     }
+ 208:App/Src/Gimbal.c ****                     else if(data_rc.status_gimbal == 2)
+ 209:App/Src/Gimbal.c ****                     {
+ 210:App/Src/Gimbal.c ****                         gimbal_step = STEP_GIMBAL_FIRE_LAST;
+ 211:App/Src/Gimbal.c ****                     }
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s 			page 9
+
+
+ 212:App/Src/Gimbal.c ****                 //}
+ 213:App/Src/Gimbal.c **** 
+ 214:App/Src/Gimbal.c ****                 break;
+ 215:App/Src/Gimbal.c ****             }
+ 216:App/Src/Gimbal.c **** 
+ 217:App/Src/Gimbal.c ****             case STEP_GIMBAL_FIRE_LAST: // 瞄准基地
+ 218:App/Src/Gimbal.c ****             {
+ 219:App/Src/Gimbal.c ****                 DJ_124_ctrl_vel(&hcan1 , AMMO1_ALL_ID , PID_ammo1_vel, data_motor.Ammo1_motor_measu
+ 220:App/Src/Gimbal.c ****                 DJ_124_ctrl_vel(&hcan1, AMMO2_ALL_ID, PID_ammo2_vel, data_motor.Ammo2_motor_measure
+ 221:App/Src/Gimbal.c ****                 DJ_124_ctrl_vel(&hcan2 , AMMO2_ALL_ID , PID_ammo2_vel, data_motor.Ammo2_motor_measu
+ 222:App/Src/Gimbal.c **** 
+ 223:App/Src/Gimbal.c ****                 
+ 224:App/Src/Gimbal.c **** 
+ 225:App/Src/Gimbal.c ****                 //if(data_referee.GameRobotState.power_management_gimbal_output == 0)
+ 226:App/Src/Gimbal.c ****                 //{
+ 227:App/Src/Gimbal.c ****                 //    gimbal_step = STEP_GIMBAL_CLOSE;
+ 228:App/Src/Gimbal.c ****                 //}
+ 229:App/Src/Gimbal.c ****                 //else if ((data_referee.GameRobotState.power_management_gimbal_output == 1))
+ 230:App/Src/Gimbal.c ****                 //{
+ 231:App/Src/Gimbal.c ****                     if (data_rc.status_gimbal == 0)
+ 232:App/Src/Gimbal.c ****                     {
+ 233:App/Src/Gimbal.c ****                         gimbal_step = STEP_GIMBAL_STOP;
+ 234:App/Src/Gimbal.c ****                     }
+ 235:App/Src/Gimbal.c ****                     else if (data_rc.status_gimbal == 1)
+ 236:App/Src/Gimbal.c ****                     {
+ 237:App/Src/Gimbal.c ****                         gimbal_step = STEP_GIMBAL_FIRE;
+ 238:App/Src/Gimbal.c ****                     }
+ 239:App/Src/Gimbal.c ****                     else if(data_rc.status_gimbal == 2)
+ 240:App/Src/Gimbal.c ****                     {
+ 241:App/Src/Gimbal.c ****                         gimbal_step = STEP_GIMBAL_FIRE_LAST;
+ 242:App/Src/Gimbal.c ****                     }
+ 243:App/Src/Gimbal.c ****                 //}
+ 244:App/Src/Gimbal.c ****                 break;
+ 245:App/Src/Gimbal.c ****             }
+ 246:App/Src/Gimbal.c ****         }
+ 247:App/Src/Gimbal.c ****         osDelay(10);
+ 247              		.loc 1 247 9 is_stmt 1 view .LVU24
+ 248 0210 0A20     		movs	r0, #10
+ 249 0212 FFF7FEFF 		bl	osDelay
+ 250              	.LVL18:
+  73:App/Src/Gimbal.c ****     {
+ 251              		.loc 1 73 11 view .LVU25
+ 252              	.L24:
+  73:App/Src/Gimbal.c ****     {
+ 253              		.loc 1 73 5 view .LVU26
+  77:App/Src/Gimbal.c ****         {
+ 254              		.loc 1 77 9 view .LVU27
+ 255 0216 624B     		ldr	r3, .L34+88
+ 256 0218 1B78     		ldrb	r3, [r3]	@ zero_extendqisi2
+ 257 021a 013B     		subs	r3, r3, #1
+ 258 021c 152B     		cmp	r3, #21
+ 259 021e F7D8     		bhi	.L2
+ 260 0220 01A2     		adr	r2, .L4
+ 261 0222 52F823F0 		ldr	pc, [r2, r3, lsl #2]
+ 262 0226 00BF     		.p2align 2
+ 263              	.L4:
+ 264 0228 B5010000 		.word	.L7+1
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s 			page 10
+
+
+ 265 022c 11020000 		.word	.L2+1
+ 266 0230 11020000 		.word	.L2+1
+ 267 0234 11020000 		.word	.L2+1
+ 268 0238 11020000 		.word	.L2+1
+ 269 023c 11020000 		.word	.L2+1
+ 270 0240 11020000 		.word	.L2+1
+ 271 0244 11020000 		.word	.L2+1
+ 272 0248 11020000 		.word	.L2+1
+ 273 024c 91020000 		.word	.L6+1
+ 274 0250 11020000 		.word	.L2+1
+ 275 0254 11020000 		.word	.L2+1
+ 276 0258 11020000 		.word	.L2+1
+ 277 025c 11020000 		.word	.L2+1
+ 278 0260 11020000 		.word	.L2+1
+ 279 0264 11020000 		.word	.L2+1
+ 280 0268 11020000 		.word	.L2+1
+ 281 026c 11020000 		.word	.L2+1
+ 282 0270 11020000 		.word	.L2+1
+ 283 0274 11020000 		.word	.L2+1
+ 284 0278 B9030000 		.word	.L5+1
+ 285 027c B5040000 		.word	.L3+1
+ 286              		.p2align 1
+ 287              	.L8:
+ 110:App/Src/Gimbal.c ****                     {
+ 288              		.loc 1 110 26 view .LVU28
+ 110:App/Src/Gimbal.c ****                     {
+ 289              		.loc 1 110 57 is_stmt 0 view .LVU29
+ 290 0280 013B     		subs	r3, r3, #1
+ 291 0282 DBB2     		uxtb	r3, r3
+ 110:App/Src/Gimbal.c ****                     {
+ 292              		.loc 1 110 29 view .LVU30
+ 293 0284 012B     		cmp	r3, #1
+ 294 0286 C3D8     		bhi	.L2
+ 112:App/Src/Gimbal.c ****                     }
+ 295              		.loc 1 112 25 is_stmt 1 view .LVU31
+ 112:App/Src/Gimbal.c ****                     }
+ 296              		.loc 1 112 37 is_stmt 0 view .LVU32
+ 297 0288 454B     		ldr	r3, .L34+88
+ 298 028a 0A22     		movs	r2, #10
+ 299 028c 1A70     		strb	r2, [r3]
+ 300 028e BFE7     		b	.L2
+ 301              	.L6:
+ 120:App/Src/Gimbal.c ****                 DJ_124_ctrl_vel(&hcan1, AMMO2_ALL_ID, PID_ammo2_trans_vel, data_motor.Ammo2_motor_m
+ 302              		.loc 1 120 17 is_stmt 1 view .LVU33
+ 120:App/Src/Gimbal.c ****                 DJ_124_ctrl_vel(&hcan1, AMMO2_ALL_ID, PID_ammo2_trans_vel, data_motor.Ammo2_motor_m
+ 303              		.loc 1 120 119 is_stmt 0 view .LVU34
+ 304 0290 444C     		ldr	r4, .L34+92
+ 120:App/Src/Gimbal.c ****                 DJ_124_ctrl_vel(&hcan1, AMMO2_ALL_ID, PID_ammo2_trans_vel, data_motor.Ammo2_motor_m
+ 305              		.loc 1 120 17 view .LVU35
+ 306 0292 454E     		ldr	r6, .L34+96
+ 307 0294 DFF8FC80 		ldr	r8, .L34+76
+ 308 0298 B4F90C30 		ldrsh	r3, [r4, #12]
+ 309 029c 0393     		str	r3, [sp, #12]
+ 310 029e B4F90830 		ldrsh	r3, [r4, #8]
+ 311 02a2 0293     		str	r3, [sp, #8]
+ 312 02a4 B4F90430 		ldrsh	r3, [r4, #4]
+ 313 02a8 0193     		str	r3, [sp, #4]
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s 			page 11
+
+
+ 314 02aa B4F90030 		ldrsh	r3, [r4]
+ 315 02ae 0093     		str	r3, [sp]
+ 316 02b0 3346     		mov	r3, r6
+ 317 02b2 3E4A     		ldr	r2, .L34+100
+ 318 02b4 4FF40071 		mov	r1, #512
+ 319 02b8 4046     		mov	r0, r8
+ 320 02ba FFF7FEFF 		bl	DJ_124_ctrl_vel
+ 321              	.LVL19:
+ 121:App/Src/Gimbal.c ****                 DJ_124_ctrl_vel(&hcan2 , AMMO2_ALL_ID , PID_ammo2_trans_vel, data_motor.Ammo2_motor
+ 322              		.loc 1 121 17 is_stmt 1 view .LVU36
+ 323 02be 3036     		adds	r6, r6, #48
+ 324 02c0 3B4F     		ldr	r7, .L34+104
+ 325 02c2 0025     		movs	r5, #0
+ 326 02c4 0395     		str	r5, [sp, #12]
+ 327 02c6 0295     		str	r5, [sp, #8]
+ 328 02c8 B4F91430 		ldrsh	r3, [r4, #20]
+ 329 02cc 0193     		str	r3, [sp, #4]
+ 330 02ce 0095     		str	r5, [sp]
+ 331 02d0 3346     		mov	r3, r6
+ 332 02d2 3A46     		mov	r2, r7
+ 333 02d4 40F2FF11 		movw	r1, #511
+ 334 02d8 4046     		mov	r0, r8
+ 335 02da FFF7FEFF 		bl	DJ_124_ctrl_vel
+ 336              	.LVL20:
+ 122:App/Src/Gimbal.c **** 
+ 337              		.loc 1 122 17 view .LVU37
+ 338 02de 0395     		str	r5, [sp, #12]
+ 339 02e0 0295     		str	r5, [sp, #8]
+ 340 02e2 0195     		str	r5, [sp, #4]
+ 341 02e4 B4F91030 		ldrsh	r3, [r4, #16]
+ 342 02e8 0093     		str	r3, [sp]
+ 343 02ea 3346     		mov	r3, r6
+ 344 02ec 3A46     		mov	r2, r7
+ 345 02ee 40F2FF11 		movw	r1, #511
+ 346 02f2 2948     		ldr	r0, .L34+80
+ 347 02f4 FFF7FEFF 		bl	DJ_124_ctrl_vel
+ 348              	.LVL21:
+ 130:App/Src/Gimbal.c ****                     {
+ 349              		.loc 1 130 21 view .LVU38
+ 130:App/Src/Gimbal.c ****                     {
+ 350              		.loc 1 130 31 is_stmt 0 view .LVU39
+ 351 02f8 284B     		ldr	r3, .L34+84
+ 352 02fa 5B7C     		ldrb	r3, [r3, #17]	@ zero_extendqisi2
+ 130:App/Src/Gimbal.c ****                     {
+ 353              		.loc 1 130 23 view .LVU40
+ 354 02fc 1BB9     		cbnz	r3, .L9
+ 132:App/Src/Gimbal.c ****                     }
+ 355              		.loc 1 132 25 is_stmt 1 view .LVU41
+ 132:App/Src/Gimbal.c ****                     }
+ 356              		.loc 1 132 37 is_stmt 0 view .LVU42
+ 357 02fe 284B     		ldr	r3, .L34+88
+ 358 0300 0122     		movs	r2, #1
+ 359 0302 1A70     		strb	r2, [r3]
+ 360 0304 84E7     		b	.L2
+ 361              	.L9:
+ 134:App/Src/Gimbal.c ****                     {
+ 362              		.loc 1 134 26 is_stmt 1 view .LVU43
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s 			page 12
+
+
+ 134:App/Src/Gimbal.c ****                     {
+ 363              		.loc 1 134 57 is_stmt 0 view .LVU44
+ 364 0306 5A1E     		subs	r2, r3, #1
+ 365 0308 D2B2     		uxtb	r2, r2
+ 134:App/Src/Gimbal.c ****                     {
+ 366              		.loc 1 134 29 view .LVU45
+ 367 030a 012A     		cmp	r2, #1
+ 368 030c 80D8     		bhi	.L2
+ 136:App/Src/Gimbal.c ****                         {
+ 369              		.loc 1 136 25 is_stmt 1 view .LVU46
+ 136:App/Src/Gimbal.c ****                         {
+ 370              		.loc 1 136 39 is_stmt 0 view .LVU47
+ 371 030e 294A     		ldr	r2, .L34+108
+ 372 0310 1268     		ldr	r2, [r2]
+ 136:App/Src/Gimbal.c ****                         {
+ 373              		.loc 1 136 27 view .LVU48
+ 374 0312 B2F5877F 		cmp	r2, #270
+ 375 0316 0FDB     		blt	.L10
+ 138:App/Src/Gimbal.c ****                             {
+ 376              		.loc 1 138 29 is_stmt 1 view .LVU49
+ 138:App/Src/Gimbal.c ****                             {
+ 377              		.loc 1 138 32 is_stmt 0 view .LVU50
+ 378 0318 012B     		cmp	r3, #1
+ 379 031a 05D0     		beq	.L27
+ 142:App/Src/Gimbal.c ****                             {
+ 380              		.loc 1 142 34 is_stmt 1 view .LVU51
+ 142:App/Src/Gimbal.c ****                             {
+ 381              		.loc 1 142 36 is_stmt 0 view .LVU52
+ 382 031c 022B     		cmp	r3, #2
+ 383 031e 07D0     		beq	.L28
+ 384              	.L12:
+ 147:App/Src/Gimbal.c ****                         }
+ 385              		.loc 1 147 29 is_stmt 1 view .LVU53
+ 147:App/Src/Gimbal.c ****                         }
+ 386              		.loc 1 147 40 is_stmt 0 view .LVU54
+ 387 0320 244B     		ldr	r3, .L34+108
+ 388 0322 0022     		movs	r2, #0
+ 389 0324 1A60     		str	r2, [r3]
+ 390 0326 73E7     		b	.L2
+ 391              	.L27:
+ 140:App/Src/Gimbal.c ****                             }
+ 392              		.loc 1 140 33 is_stmt 1 view .LVU55
+ 140:App/Src/Gimbal.c ****                             }
+ 393              		.loc 1 140 45 is_stmt 0 view .LVU56
+ 394 0328 1D4B     		ldr	r3, .L34+88
+ 395 032a 1522     		movs	r2, #21
+ 396 032c 1A70     		strb	r2, [r3]
+ 397 032e F7E7     		b	.L12
+ 398              	.L28:
+ 144:App/Src/Gimbal.c ****                             }
+ 399              		.loc 1 144 33 is_stmt 1 view .LVU57
+ 144:App/Src/Gimbal.c ****                             }
+ 400              		.loc 1 144 45 is_stmt 0 view .LVU58
+ 401 0330 1B4B     		ldr	r3, .L34+88
+ 402 0332 1622     		movs	r2, #22
+ 403 0334 1A70     		strb	r2, [r3]
+ 404 0336 F3E7     		b	.L12
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s 			page 13
+
+
+ 405              	.L10:
+ 149:App/Src/Gimbal.c ****                         {
+ 406              		.loc 1 149 30 is_stmt 1 view .LVU59
+ 151:App/Src/Gimbal.c ****                             trans_time++;
+ 407              		.loc 1 151 29 view .LVU60
+ 151:App/Src/Gimbal.c ****                             trans_time++;
+ 408              		.loc 1 151 41 is_stmt 0 view .LVU61
+ 409 0338 194B     		ldr	r3, .L34+88
+ 410 033a 0A21     		movs	r1, #10
+ 411 033c 1970     		strb	r1, [r3]
+ 152:App/Src/Gimbal.c ****                         }
+ 412              		.loc 1 152 29 is_stmt 1 view .LVU62
+ 152:App/Src/Gimbal.c ****                         }
+ 413              		.loc 1 152 39 is_stmt 0 view .LVU63
+ 414 033e 0132     		adds	r2, r2, #1
+ 415 0340 1C4B     		ldr	r3, .L34+108
+ 416 0342 1A60     		str	r2, [r3]
+ 417 0344 64E7     		b	.L2
+ 418              	.L35:
+ 419 0346 00BF     		.align	2
+ 420              	.L34:
+ 421 0348 00000000 		.word	0
+ 422 034c 9A99993E 		.word	1050253722
+ 423 0350 00000000 		.word	.LANCHOR0
+ 424 0354 3333333F 		.word	1060320051
+ 425 0358 CDCCCC3D 		.word	1036831949
+ 426 035c 00000000 		.word	.LANCHOR1
+ 427 0360 0060EA45 		.word	1172987904
+ 428 0364 00007A46 		.word	1182400512
+ 429 0368 0AD7A33C 		.word	1017370378
+ 430 036c 00000000 		.word	PID_ammo1_vel
+ 431 0370 8FC2753D 		.word	1031127695
+ 432 0374 CDCC4C40 		.word	1078774989
+ 433 0378 00000000 		.word	PID_ammo2_vel
+ 434 037c 00D00446 		.word	1174720512
+ 435 0380 00007A44 		.word	1148846080
+ 436 0384 00000000 		.word	PID_chassis_vel
+ 437 0388 00803B46 		.word	1178304512
+ 438 038c 00409C45 		.word	1167867904
+ 439 0390 6F12833A 		.word	981668463
+ 440 0394 00000000 		.word	hcan1
+ 441 0398 00000000 		.word	hcan2
+ 442 039c 00000000 		.word	data_rc
+ 443 03a0 00000000 		.word	.LANCHOR2
+ 444 03a4 00000000 		.word	vel_trans
+ 445 03a8 80000000 		.word	data_motor+128
+ 446 03ac 00000000 		.word	PID_ammo1_trans_vel
+ 447 03b0 00000000 		.word	PID_ammo2_trans_vel
+ 448 03b4 00000000 		.word	.LANCHOR3
+ 449              	.L5:
+ 162:App/Src/Gimbal.c ****                 DJ_124_ctrl_vel(&hcan1, AMMO2_ALL_ID, PID_ammo2_vel, data_motor.Ammo2_motor_measure
+ 450              		.loc 1 162 17 is_stmt 1 view .LVU64
+ 162:App/Src/Gimbal.c ****                 DJ_124_ctrl_vel(&hcan1, AMMO2_ALL_ID, PID_ammo2_vel, data_motor.Ammo2_motor_measure
+ 451              		.loc 1 162 114 is_stmt 0 view .LVU65
+ 452 03b8 624C     		ldr	r4, .L36
+ 162:App/Src/Gimbal.c ****                 DJ_124_ctrl_vel(&hcan1, AMMO2_ALL_ID, PID_ammo2_vel, data_motor.Ammo2_motor_measure
+ 453              		.loc 1 162 17 view .LVU66
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s 			page 14
+
+
+ 454 03ba 634E     		ldr	r6, .L36+4
+ 455 03bc DFF8AC91 		ldr	r9, .L36+40
+ 456 03c0 B4F90C30 		ldrsh	r3, [r4, #12]
+ 457 03c4 0393     		str	r3, [sp, #12]
+ 458 03c6 B4F90830 		ldrsh	r3, [r4, #8]
+ 459 03ca 0293     		str	r3, [sp, #8]
+ 460 03cc B4F90430 		ldrsh	r3, [r4, #4]
+ 461 03d0 0193     		str	r3, [sp, #4]
+ 462 03d2 B4F90030 		ldrsh	r3, [r4]
+ 463 03d6 0093     		str	r3, [sp]
+ 464 03d8 3346     		mov	r3, r6
+ 465 03da 5C4A     		ldr	r2, .L36+8
+ 466 03dc 4FF40071 		mov	r1, #512
+ 467 03e0 4846     		mov	r0, r9
+ 468 03e2 FFF7FEFF 		bl	DJ_124_ctrl_vel
+ 469              	.LVL22:
+ 163:App/Src/Gimbal.c ****                 DJ_124_ctrl_vel(&hcan2 , AMMO2_ALL_ID , PID_ammo2_vel, data_motor.Ammo2_motor_measu
+ 470              		.loc 1 163 17 is_stmt 1 view .LVU67
+ 471 03e6 06F13008 		add	r8, r6, #48
+ 472 03ea 594F     		ldr	r7, .L36+12
+ 473 03ec 0025     		movs	r5, #0
+ 474 03ee 0395     		str	r5, [sp, #12]
+ 475 03f0 0295     		str	r5, [sp, #8]
+ 476 03f2 B4F91430 		ldrsh	r3, [r4, #20]
+ 477 03f6 0193     		str	r3, [sp, #4]
+ 478 03f8 0095     		str	r5, [sp]
+ 479 03fa 4346     		mov	r3, r8
+ 480 03fc 3A46     		mov	r2, r7
+ 481 03fe 40F2FF11 		movw	r1, #511
+ 482 0402 4846     		mov	r0, r9
+ 483 0404 FFF7FEFF 		bl	DJ_124_ctrl_vel
+ 484              	.LVL23:
+ 164:App/Src/Gimbal.c **** 
+ 485              		.loc 1 164 17 view .LVU68
+ 486 0408 0395     		str	r5, [sp, #12]
+ 487 040a 0295     		str	r5, [sp, #8]
+ 488 040c 0195     		str	r5, [sp, #4]
+ 489 040e B4F91030 		ldrsh	r3, [r4, #16]
+ 490 0412 0093     		str	r3, [sp]
+ 491 0414 4346     		mov	r3, r8
+ 492 0416 3A46     		mov	r2, r7
+ 493 0418 40F2FF11 		movw	r1, #511
+ 494 041c 4D48     		ldr	r0, .L36+16
+ 495 041e FFF7FEFF 		bl	DJ_124_ctrl_vel
+ 496              	.LVL24:
+ 166:App/Src/Gimbal.c ****                 {
+ 497              		.loc 1 166 17 view .LVU69
+ 166:App/Src/Gimbal.c ****                 {
+ 498              		.loc 1 166 53 is_stmt 0 view .LVU70
+ 499 0422 B6F90430 		ldrsh	r3, [r6, #4]
+ 166:App/Src/Gimbal.c ****                 {
+ 500              		.loc 1 166 19 view .LVU71
+ 501 0426 41F24952 		movw	r2, #5449
+ 502 042a 9342     		cmp	r3, r2
+ 503 042c 03DD     		ble	.L13
+ 168:App/Src/Gimbal.c ****                 }
+ 504              		.loc 1 168 21 is_stmt 1 view .LVU72
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s 			page 15
+
+
+ 168:App/Src/Gimbal.c ****                 }
+ 505              		.loc 1 168 22 is_stmt 0 view .LVU73
+ 506 042e 4A49     		ldr	r1, .L36+20
+ 507 0430 0A68     		ldr	r2, [r1]
+ 508 0432 0132     		adds	r2, r2, #1
+ 509 0434 0A60     		str	r2, [r1]
+ 510              	.L13:
+ 171:App/Src/Gimbal.c ****                 {
+ 511              		.loc 1 171 17 is_stmt 1 view .LVU74
+ 171:App/Src/Gimbal.c ****                 {
+ 512              		.loc 1 171 22 is_stmt 0 view .LVU75
+ 513 0436 484A     		ldr	r2, .L36+20
+ 514 0438 1268     		ldr	r2, [r2]
+ 171:App/Src/Gimbal.c ****                 {
+ 515              		.loc 1 171 19 view .LVU76
+ 516 043a 002A     		cmp	r2, #0
+ 517 043c 08DD     		ble	.L14
+ 171:App/Src/Gimbal.c ****                 {
+ 518              		.loc 1 171 26 discriminator 1 view .LVU77
+ 519 043e B3F52F7F 		cmp	r3, #700
+ 520 0442 05DC     		bgt	.L14
+ 173:App/Src/Gimbal.c ****                     m =0;
+ 521              		.loc 1 173 21 is_stmt 1 view .LVU78
+ 173:App/Src/Gimbal.c ****                     m =0;
+ 522              		.loc 1 173 23 is_stmt 0 view .LVU79
+ 523 0444 454B     		ldr	r3, .L36+24
+ 524 0446 0122     		movs	r2, #1
+ 525 0448 1A60     		str	r2, [r3]
+ 174:App/Src/Gimbal.c ****                 }
+ 526              		.loc 1 174 21 is_stmt 1 view .LVU80
+ 174:App/Src/Gimbal.c ****                 }
+ 527              		.loc 1 174 23 is_stmt 0 view .LVU81
+ 528 044a 434B     		ldr	r3, .L36+20
+ 529 044c 0022     		movs	r2, #0
+ 530 044e 1A60     		str	r2, [r3]
+ 531              	.L14:
+ 177:App/Src/Gimbal.c ****                 {
+ 532              		.loc 1 177 17 is_stmt 1 view .LVU82
+ 177:App/Src/Gimbal.c ****                 {
+ 533              		.loc 1 177 22 is_stmt 0 view .LVU83
+ 534 0450 424B     		ldr	r3, .L36+24
+ 535 0452 1B68     		ldr	r3, [r3]
+ 177:App/Src/Gimbal.c ****                 {
+ 536              		.loc 1 177 19 view .LVU84
+ 537 0454 012B     		cmp	r3, #1
+ 538 0456 1AD0     		beq	.L29
+ 539              	.L16:
+ 200:App/Src/Gimbal.c ****                     {
+ 540              		.loc 1 200 21 is_stmt 1 view .LVU85
+ 200:App/Src/Gimbal.c ****                     {
+ 541              		.loc 1 200 32 is_stmt 0 view .LVU86
+ 542 0458 414B     		ldr	r3, .L36+28
+ 543 045a 5B7C     		ldrb	r3, [r3, #17]	@ zero_extendqisi2
+ 200:App/Src/Gimbal.c ****                     {
+ 544              		.loc 1 200 24 view .LVU87
+ 545 045c EBB9     		cbnz	r3, .L20
+ 202:App/Src/Gimbal.c ****                     }
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s 			page 16
+
+
+ 546              		.loc 1 202 25 is_stmt 1 view .LVU88
+ 202:App/Src/Gimbal.c ****                     }
+ 547              		.loc 1 202 37 is_stmt 0 view .LVU89
+ 548 045e 414B     		ldr	r3, .L36+32
+ 549 0460 0122     		movs	r2, #1
+ 550 0462 1A70     		strb	r2, [r3]
+ 551 0464 D4E6     		b	.L2
+ 552              	.LVL25:
+ 553              	.L17:
+ 554              	.LBB2:
+ 185:App/Src/Gimbal.c ****                         {
+ 555              		.loc 1 185 30 is_stmt 1 view .LVU90
+ 185:App/Src/Gimbal.c ****                         {
+ 556              		.loc 1 185 32 is_stmt 0 view .LVU91
+ 557 0466 002A     		cmp	r2, #0
+ 558 0468 0CDB     		blt	.L30
+ 559              	.L18:
+ 179:App/Src/Gimbal.c ****                     {
+ 560              		.loc 1 179 43 is_stmt 1 discriminator 2 view .LVU92
+ 179:App/Src/Gimbal.c ****                     {
+ 561              		.loc 1 179 44 is_stmt 0 discriminator 2 view .LVU93
+ 562 046a 0133     		adds	r3, r3, #1
+ 563              	.LVL26:
+ 564              	.L15:
+ 179:App/Src/Gimbal.c ****                     {
+ 565              		.loc 1 179 36 is_stmt 1 discriminator 1 view .LVU94
+ 179:App/Src/Gimbal.c ****                     {
+ 566              		.loc 1 179 21 is_stmt 0 discriminator 1 view .LVU95
+ 567 046c 052B     		cmp	r3, #5
+ 568 046e 10DC     		bgt	.L31
+ 181:App/Src/Gimbal.c ****                         {
+ 569              		.loc 1 181 25 is_stmt 1 view .LVU96
+ 181:App/Src/Gimbal.c ****                         {
+ 570              		.loc 1 181 38 is_stmt 0 view .LVU97
+ 571 0470 344A     		ldr	r2, .L36
+ 572 0472 52F82320 		ldr	r2, [r2, r3, lsl #2]
+ 181:App/Src/Gimbal.c ****                         {
+ 573              		.loc 1 181 27 view .LVU98
+ 574 0476 002A     		cmp	r2, #0
+ 575 0478 F5DD     		ble	.L17
+ 183:App/Src/Gimbal.c ****                         }
+ 576              		.loc 1 183 29 is_stmt 1 view .LVU99
+ 183:App/Src/Gimbal.c ****                         }
+ 577              		.loc 1 183 59 is_stmt 0 view .LVU100
+ 578 047a 013A     		subs	r2, r2, #1
+ 183:App/Src/Gimbal.c ****                         }
+ 579              		.loc 1 183 43 view .LVU101
+ 580 047c 3149     		ldr	r1, .L36
+ 581 047e 41F82320 		str	r2, [r1, r3, lsl #2]
+ 582 0482 F2E7     		b	.L18
+ 583              	.L30:
+ 187:App/Src/Gimbal.c ****                         }
+ 584              		.loc 1 187 29 is_stmt 1 view .LVU102
+ 187:App/Src/Gimbal.c ****                         }
+ 585              		.loc 1 187 59 is_stmt 0 view .LVU103
+ 586 0484 0132     		adds	r2, r2, #1
+ 187:App/Src/Gimbal.c ****                         }
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s 			page 17
+
+
+ 587              		.loc 1 187 43 view .LVU104
+ 588 0486 2F49     		ldr	r1, .L36
+ 589 0488 41F82320 		str	r2, [r1, r3, lsl #2]
+ 590 048c EDE7     		b	.L18
+ 591              	.LVL27:
+ 592              	.L29:
+ 179:App/Src/Gimbal.c ****                     {
+ 593              		.loc 1 179 29 view .LVU105
+ 594 048e 0023     		movs	r3, #0
+ 595 0490 ECE7     		b	.L15
+ 596              	.LVL28:
+ 597              	.L31:
+ 179:App/Src/Gimbal.c ****                     {
+ 598              		.loc 1 179 29 view .LVU106
+ 599              	.LBE2:
+ 190:App/Src/Gimbal.c ****                 }
+ 600              		.loc 1 190 21 is_stmt 1 view .LVU107
+ 190:App/Src/Gimbal.c ****                 }
+ 601              		.loc 1 190 23 is_stmt 0 view .LVU108
+ 602 0492 324B     		ldr	r3, .L36+24
+ 603              	.LVL29:
+ 190:App/Src/Gimbal.c ****                 }
+ 604              		.loc 1 190 23 view .LVU109
+ 605 0494 0022     		movs	r2, #0
+ 606 0496 1A60     		str	r2, [r3]
+ 607 0498 DEE7     		b	.L16
+ 608              	.L20:
+ 204:App/Src/Gimbal.c ****                     {
+ 609              		.loc 1 204 26 is_stmt 1 view .LVU110
+ 204:App/Src/Gimbal.c ****                     {
+ 610              		.loc 1 204 29 is_stmt 0 view .LVU111
+ 611 049a 012B     		cmp	r3, #1
+ 612 049c 06D0     		beq	.L32
+ 208:App/Src/Gimbal.c ****                     {
+ 613              		.loc 1 208 26 is_stmt 1 view .LVU112
+ 208:App/Src/Gimbal.c ****                     {
+ 614              		.loc 1 208 28 is_stmt 0 view .LVU113
+ 615 049e 022B     		cmp	r3, #2
+ 616 04a0 7FF4B6AE 		bne	.L2
+ 210:App/Src/Gimbal.c ****                     }
+ 617              		.loc 1 210 25 is_stmt 1 view .LVU114
+ 210:App/Src/Gimbal.c ****                     }
+ 618              		.loc 1 210 37 is_stmt 0 view .LVU115
+ 619 04a4 2F4B     		ldr	r3, .L36+32
+ 620 04a6 1622     		movs	r2, #22
+ 621 04a8 1A70     		strb	r2, [r3]
+ 622 04aa B1E6     		b	.L2
+ 623              	.L32:
+ 206:App/Src/Gimbal.c ****                     }
+ 624              		.loc 1 206 25 is_stmt 1 view .LVU116
+ 206:App/Src/Gimbal.c ****                     }
+ 625              		.loc 1 206 37 is_stmt 0 view .LVU117
+ 626 04ac 2D4B     		ldr	r3, .L36+32
+ 627 04ae 1522     		movs	r2, #21
+ 628 04b0 1A70     		strb	r2, [r3]
+ 629 04b2 ADE6     		b	.L2
+ 630              	.L3:
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s 			page 18
+
+
+ 219:App/Src/Gimbal.c ****                 DJ_124_ctrl_vel(&hcan1, AMMO2_ALL_ID, PID_ammo2_vel, data_motor.Ammo2_motor_measure
+ 631              		.loc 1 219 17 is_stmt 1 view .LVU118
+ 219:App/Src/Gimbal.c ****                 DJ_124_ctrl_vel(&hcan1, AMMO2_ALL_ID, PID_ammo2_vel, data_motor.Ammo2_motor_measure
+ 632              		.loc 1 219 112 is_stmt 0 view .LVU119
+ 633 04b4 2C4C     		ldr	r4, .L36+36
+ 219:App/Src/Gimbal.c ****                 DJ_124_ctrl_vel(&hcan1, AMMO2_ALL_ID, PID_ammo2_vel, data_motor.Ammo2_motor_measure
+ 634              		.loc 1 219 17 view .LVU120
+ 635 04b6 244E     		ldr	r6, .L36+4
+ 636 04b8 DFF8B080 		ldr	r8, .L36+40
+ 637 04bc B4F90C30 		ldrsh	r3, [r4, #12]
+ 638 04c0 0393     		str	r3, [sp, #12]
+ 639 04c2 B4F90830 		ldrsh	r3, [r4, #8]
+ 640 04c6 0293     		str	r3, [sp, #8]
+ 641 04c8 B4F90430 		ldrsh	r3, [r4, #4]
+ 642 04cc 0193     		str	r3, [sp, #4]
+ 643 04ce B4F90030 		ldrsh	r3, [r4]
+ 644 04d2 0093     		str	r3, [sp]
+ 645 04d4 3346     		mov	r3, r6
+ 646 04d6 1D4A     		ldr	r2, .L36+8
+ 647 04d8 4FF40071 		mov	r1, #512
+ 648 04dc 4046     		mov	r0, r8
+ 649 04de FFF7FEFF 		bl	DJ_124_ctrl_vel
+ 650              	.LVL30:
+ 220:App/Src/Gimbal.c ****                 DJ_124_ctrl_vel(&hcan2 , AMMO2_ALL_ID , PID_ammo2_vel, data_motor.Ammo2_motor_measu
+ 651              		.loc 1 220 17 is_stmt 1 view .LVU121
+ 652 04e2 3036     		adds	r6, r6, #48
+ 653 04e4 1A4F     		ldr	r7, .L36+12
+ 654 04e6 0025     		movs	r5, #0
+ 655 04e8 0395     		str	r5, [sp, #12]
+ 656 04ea 0295     		str	r5, [sp, #8]
+ 657 04ec B4F91430 		ldrsh	r3, [r4, #20]
+ 658 04f0 0193     		str	r3, [sp, #4]
+ 659 04f2 0095     		str	r5, [sp]
+ 660 04f4 3346     		mov	r3, r6
+ 661 04f6 3A46     		mov	r2, r7
+ 662 04f8 40F2FF11 		movw	r1, #511
+ 663 04fc 4046     		mov	r0, r8
+ 664 04fe FFF7FEFF 		bl	DJ_124_ctrl_vel
+ 665              	.LVL31:
+ 221:App/Src/Gimbal.c **** 
+ 666              		.loc 1 221 17 view .LVU122
+ 667 0502 0395     		str	r5, [sp, #12]
+ 668 0504 0295     		str	r5, [sp, #8]
+ 669 0506 0195     		str	r5, [sp, #4]
+ 670 0508 B4F91030 		ldrsh	r3, [r4, #16]
+ 671 050c 0093     		str	r3, [sp]
+ 672 050e 3346     		mov	r3, r6
+ 673 0510 3A46     		mov	r2, r7
+ 674 0512 40F2FF11 		movw	r1, #511
+ 675 0516 0F48     		ldr	r0, .L36+16
+ 676 0518 FFF7FEFF 		bl	DJ_124_ctrl_vel
+ 677              	.LVL32:
+ 231:App/Src/Gimbal.c ****                     {
+ 678              		.loc 1 231 21 view .LVU123
+ 231:App/Src/Gimbal.c ****                     {
+ 679              		.loc 1 231 32 is_stmt 0 view .LVU124
+ 680 051c 104B     		ldr	r3, .L36+28
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s 			page 19
+
+
+ 681 051e 5B7C     		ldrb	r3, [r3, #17]	@ zero_extendqisi2
+ 231:App/Src/Gimbal.c ****                     {
+ 682              		.loc 1 231 24 view .LVU125
+ 683 0520 1BB9     		cbnz	r3, .L22
+ 233:App/Src/Gimbal.c ****                     }
+ 684              		.loc 1 233 25 is_stmt 1 view .LVU126
+ 233:App/Src/Gimbal.c ****                     }
+ 685              		.loc 1 233 37 is_stmt 0 view .LVU127
+ 686 0522 104B     		ldr	r3, .L36+32
+ 687 0524 0122     		movs	r2, #1
+ 688 0526 1A70     		strb	r2, [r3]
+ 689 0528 72E6     		b	.L2
+ 690              	.L22:
+ 235:App/Src/Gimbal.c ****                     {
+ 691              		.loc 1 235 26 is_stmt 1 view .LVU128
+ 235:App/Src/Gimbal.c ****                     {
+ 692              		.loc 1 235 29 is_stmt 0 view .LVU129
+ 693 052a 012B     		cmp	r3, #1
+ 694 052c 06D0     		beq	.L33
+ 239:App/Src/Gimbal.c ****                     {
+ 695              		.loc 1 239 26 is_stmt 1 view .LVU130
+ 239:App/Src/Gimbal.c ****                     {
+ 696              		.loc 1 239 28 is_stmt 0 view .LVU131
+ 697 052e 022B     		cmp	r3, #2
+ 698 0530 7FF46EAE 		bne	.L2
+ 241:App/Src/Gimbal.c ****                     }
+ 699              		.loc 1 241 25 is_stmt 1 view .LVU132
+ 241:App/Src/Gimbal.c ****                     }
+ 700              		.loc 1 241 37 is_stmt 0 view .LVU133
+ 701 0534 0B4B     		ldr	r3, .L36+32
+ 702 0536 1622     		movs	r2, #22
+ 703 0538 1A70     		strb	r2, [r3]
+ 704 053a 69E6     		b	.L2
+ 705              	.L33:
+ 237:App/Src/Gimbal.c ****                     }
+ 706              		.loc 1 237 25 is_stmt 1 view .LVU134
+ 237:App/Src/Gimbal.c ****                     }
+ 707              		.loc 1 237 37 is_stmt 0 view .LVU135
+ 708 053c 094B     		ldr	r3, .L36+32
+ 709 053e 1522     		movs	r2, #21
+ 710 0540 1A70     		strb	r2, [r3]
+ 711 0542 65E6     		b	.L2
+ 712              	.L37:
+ 713              		.align	2
+ 714              	.L36:
+ 715 0544 00000000 		.word	vel_before
+ 716 0548 80000000 		.word	data_motor+128
+ 717 054c 00000000 		.word	PID_ammo1_vel
+ 718 0550 00000000 		.word	PID_ammo2_vel
+ 719 0554 00000000 		.word	hcan2
+ 720 0558 00000000 		.word	.LANCHOR4
+ 721 055c 00000000 		.word	.LANCHOR5
+ 722 0560 00000000 		.word	data_rc
+ 723 0564 00000000 		.word	.LANCHOR2
+ 724 0568 00000000 		.word	vel_last
+ 725 056c 00000000 		.word	hcan1
+ 726              		.cfi_endproc
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s 			page 20
+
+
+ 727              	.LFE138:
+ 729              		.global	testV
+ 730              		.global	countPointer
+ 731              		.global	countBuffer
+ 732              		.global	flag
+ 733              		.global	trans_time
+ 734              		.global	circle
+ 735              		.global	m
+ 736              		.global	n
+ 737              		.global	count
+ 738              		.global	yaw_gimbal_pos
+ 739              		.global	yaw_motor_pos_zero
+ 740              		.global	yaw_motor_pos
+ 741              		.global	yaw_motor_vel
+ 742              		.global	PID_Yaw_START
+ 743              		.global	PID_Yaw_TRANS
+ 744              		.global	gimbal_step
+ 745              		.section	.bss.PID_Yaw_START,"aw",%nobits
+ 746              		.align	2
+ 747              		.set	.LANCHOR1,. + 0
+ 750              	PID_Yaw_START:
+ 751 0000 00000000 		.space	52
+ 751      00000000 
+ 751      00000000 
+ 751      00000000 
+ 751      00000000 
+ 752              		.section	.bss.PID_Yaw_TRANS,"aw",%nobits
+ 753              		.align	2
+ 754              		.set	.LANCHOR0,. + 0
+ 757              	PID_Yaw_TRANS:
+ 758 0000 00000000 		.space	52
+ 758      00000000 
+ 758      00000000 
+ 758      00000000 
+ 758      00000000 
+ 759              		.section	.bss.circle,"aw",%nobits
+ 760              		.align	2
+ 763              	circle:
+ 764 0000 00000000 		.space	4
+ 765              		.section	.bss.count,"aw",%nobits
+ 766              		.align	2
+ 769              	count:
+ 770 0000 00000000 		.space	4
+ 771              		.section	.bss.countBuffer,"aw",%nobits
+ 772              		.align	2
+ 775              	countBuffer:
+ 776 0000 00000000 		.space	40
+ 776      00000000 
+ 776      00000000 
+ 776      00000000 
+ 776      00000000 
+ 777              		.section	.bss.countPointer,"aw",%nobits
+ 780              	countPointer:
+ 781 0000 00       		.space	1
+ 782              		.section	.bss.flag,"aw",%nobits
+ 783              		.align	2
+ 786              	flag:
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s 			page 21
+
+
+ 787 0000 00000000 		.space	4
+ 788              		.section	.bss.m,"aw",%nobits
+ 789              		.align	2
+ 790              		.set	.LANCHOR4,. + 0
+ 793              	m:
+ 794 0000 00000000 		.space	4
+ 795              		.section	.bss.n,"aw",%nobits
+ 796              		.align	2
+ 797              		.set	.LANCHOR5,. + 0
+ 800              	n:
+ 801 0000 00000000 		.space	4
+ 802              		.section	.bss.testV,"aw",%nobits
+ 803              		.align	2
+ 806              	testV:
+ 807 0000 00000000 		.space	4
+ 808              		.section	.bss.trans_time,"aw",%nobits
+ 809              		.align	2
+ 810              		.set	.LANCHOR3,. + 0
+ 813              	trans_time:
+ 814 0000 00000000 		.space	4
+ 815              		.section	.bss.yaw_gimbal_pos,"aw",%nobits
+ 816              		.align	2
+ 819              	yaw_gimbal_pos:
+ 820 0000 00000000 		.space	4
+ 821              		.section	.bss.yaw_motor_pos,"aw",%nobits
+ 822              		.align	2
+ 825              	yaw_motor_pos:
+ 826 0000 00000000 		.space	4
+ 827              		.section	.bss.yaw_motor_pos_zero,"aw",%nobits
+ 828              		.align	2
+ 831              	yaw_motor_pos_zero:
+ 832 0000 00000000 		.space	4
+ 833              		.section	.bss.yaw_motor_vel,"aw",%nobits
+ 834              		.align	2
+ 837              	yaw_motor_vel:
+ 838 0000 00000000 		.space	4
+ 839              		.section	.data.gimbal_step,"aw"
+ 840              		.set	.LANCHOR2,. + 0
+ 843              	gimbal_step:
+ 844 0000 01       		.byte	1
+ 845              		.text
+ 846              	.Letext0:
+ 847              		.file 2 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 848              		.file 3 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 849              		.file 4 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
+ 850              		.file 5 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h"
+ 851              		.file 6 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_can.h"
+ 852              		.file 7 "Library/Inc/PID.h"
+ 853              		.file 8 "Library/Inc/motor.h"
+ 854              		.file 9 "Library/Inc/remote_control.h"
+ 855              		.file 10 "App/Inc/Gimbal.h"
+ 856              		.file 11 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h"
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s 			page 22
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 Gimbal.c
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:20     .text.Gimbal_Task:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:26     .text.Gimbal_Task:00000000 Gimbal_Task
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:264    .text.Gimbal_Task:00000228 $d
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:286    .text.Gimbal_Task:00000280 $t
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:421    .text.Gimbal_Task:00000348 $d
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:452    .text.Gimbal_Task:000003b8 $t
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:715    .text.Gimbal_Task:00000544 $d
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:806    .bss.testV:00000000 testV
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:780    .bss.countPointer:00000000 countPointer
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:775    .bss.countBuffer:00000000 countBuffer
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:786    .bss.flag:00000000 flag
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:813    .bss.trans_time:00000000 trans_time
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:763    .bss.circle:00000000 circle
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:793    .bss.m:00000000 m
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:800    .bss.n:00000000 n
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:769    .bss.count:00000000 count
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:819    .bss.yaw_gimbal_pos:00000000 yaw_gimbal_pos
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:831    .bss.yaw_motor_pos_zero:00000000 yaw_motor_pos_zero
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:825    .bss.yaw_motor_pos:00000000 yaw_motor_pos
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:837    .bss.yaw_motor_vel:00000000 yaw_motor_vel
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:750    .bss.PID_Yaw_START:00000000 PID_Yaw_START
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:757    .bss.PID_Yaw_TRANS:00000000 PID_Yaw_TRANS
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:843    .data.gimbal_step:00000000 gimbal_step
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:746    .bss.PID_Yaw_START:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:753    .bss.PID_Yaw_TRANS:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:760    .bss.circle:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:766    .bss.count:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:772    .bss.countBuffer:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:781    .bss.countPointer:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:783    .bss.flag:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:789    .bss.m:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:796    .bss.n:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:803    .bss.testV:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:809    .bss.trans_time:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:816    .bss.yaw_gimbal_pos:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:822    .bss.yaw_motor_pos:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:828    .bss.yaw_motor_pos_zero:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s:834    .bss.yaw_motor_vel:00000000 $d
+
+UNDEFINED SYMBOLS
+PID_init
+DJ_124_ctrl
+osDelay
+DJ_124_ctrl_vel
+PID_ammo1_vel
+PID_ammo2_vel
+PID_chassis_vel
+hcan1
+hcan2
+data_rc
+vel_trans
+data_motor
+PID_ammo1_trans_vel
+PID_ammo2_trans_vel
+vel_before
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\ccpt72Hb.s 			page 23
+
+
+vel_last

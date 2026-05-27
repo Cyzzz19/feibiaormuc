@@ -1,0 +1,666 @@
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc8jfBJh.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"IST8310.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.ist8310_data_read,"ax",%progbits
+  20              		.align	1
+  21              		.global	ist8310_data_read
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	ist8310_data_read:
+  27              	.LVL0:
+  28              	.LFB136:
+  29              		.file 1 "Library/Src/IST8310.c"
+   1:Library/Src/IST8310.c **** #include "IST8310.h"
+   2:Library/Src/IST8310.c **** 
+   3:Library/Src/IST8310.c **** static uint8_t ist8310_init_matrix[4][2] ={
+   4:Library/Src/IST8310.c ****     {0x0B , 0x08},
+   5:Library/Src/IST8310.c ****     {0x41 , 0x24},
+   6:Library/Src/IST8310.c ****     {0x42 , 0xC0},
+   7:Library/Src/IST8310.c ****     {0x0A , 0x0B},
+   8:Library/Src/IST8310.c **** }; 
+   9:Library/Src/IST8310.c **** 
+  10:Library/Src/IST8310.c **** 
+  11:Library/Src/IST8310.c **** void ist8310_init(void)
+  12:Library/Src/IST8310.c **** {
+  13:Library/Src/IST8310.c ****     static const uint8_t sleepTime = 50;
+  14:Library/Src/IST8310.c ****     static const uint8_t wait_time = 1;
+  15:Library/Src/IST8310.c ****     uint8_t ist8310_state[5];
+  16:Library/Src/IST8310.c ****     while(ist8310_state[4] != 0x10)
+  17:Library/Src/IST8310.c ****     {
+  18:Library/Src/IST8310.c ****         HAL_GPIO_WritePin(GPIOG, GPIO_PIN_6, GPIO_PIN_RESET);
+  19:Library/Src/IST8310.c ****         osDelay(sleepTime);
+  20:Library/Src/IST8310.c ****         HAL_GPIO_WritePin(GPIOG, GPIO_PIN_6, GPIO_PIN_SET);
+  21:Library/Src/IST8310.c ****         osDelay(sleepTime);
+  22:Library/Src/IST8310.c ****         HAL_I2C_Mem_Read(&hi2c3 , IST8310_IIC_ADDRESS <<1 , IST8310_REG_WHO_ADDRESS , I2C_MEMADD_SI
+  23:Library/Src/IST8310.c ****     }
+  24:Library/Src/IST8310.c **** 
+  25:Library/Src/IST8310.c ****     static int i;
+  26:Library/Src/IST8310.c ****     for(i = 0 ; i < 4 ; i++)
+  27:Library/Src/IST8310.c ****     {
+  28:Library/Src/IST8310.c ****         while(ist8310_state[i] != ist8310_init_matrix[i][1])
+  29:Library/Src/IST8310.c ****         {
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc8jfBJh.s 			page 2
+
+
+  30:Library/Src/IST8310.c ****             HAL_I2C_Mem_Write(&hi2c3 , IST8310_IIC_ADDRESS <<1 , ist8310_init_matrix[i][0] , I2C_ME
+  31:Library/Src/IST8310.c ****             ist8310_delay_us(wait_time);
+  32:Library/Src/IST8310.c ****             HAL_I2C_Mem_Read(&hi2c3 , IST8310_IIC_ADDRESS <<1 , ist8310_init_matrix[i][0] , I2C_MEM
+  33:Library/Src/IST8310.c ****             ist8310_delay_us(wait_time);
+  34:Library/Src/IST8310.c ****         }
+  35:Library/Src/IST8310.c ****     }
+  36:Library/Src/IST8310.c **** }
+  37:Library/Src/IST8310.c **** 
+  38:Library/Src/IST8310.c **** 
+  39:Library/Src/IST8310.c **** 
+  40:Library/Src/IST8310.c **** void ist8310_data_read(float ist8310_data[4])
+  41:Library/Src/IST8310.c **** {
+  30              		.loc 1 41 1 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 16
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		.loc 1 41 1 is_stmt 0 view .LVU1
+  35 0000 70B5     		push	{r4, r5, r6, lr}
+  36              	.LCFI0:
+  37              		.cfi_def_cfa_offset 16
+  38              		.cfi_offset 4, -16
+  39              		.cfi_offset 5, -12
+  40              		.cfi_offset 6, -8
+  41              		.cfi_offset 14, -4
+  42 0002 88B0     		sub	sp, sp, #32
+  43              	.LCFI1:
+  44              		.cfi_def_cfa_offset 48
+  45 0004 0446     		mov	r4, r0
+  42:Library/Src/IST8310.c ****     uint8_t ist8310_data_uint8[6];
+  46              		.loc 1 42 5 is_stmt 1 view .LVU2
+  43:Library/Src/IST8310.c ****     uint8_t ist8310_temp_uint8[2];
+  47              		.loc 1 43 5 view .LVU3
+  44:Library/Src/IST8310.c ****     int16_t temp_ist8310_data = 0;
+  48              		.loc 1 44 5 view .LVU4
+  49              	.LVL1:
+  45:Library/Src/IST8310.c ****     HAL_I2C_Mem_Read(&hi2c3 , IST8310_IIC_ADDRESS <<1 , IST8310_REG_PITCH_ADDRESS , I2C_MEMADD_SIZE
+  50              		.loc 1 45 5 view .LVU5
+  51 0006 2C4D     		ldr	r5, .L3
+  52 0008 0A26     		movs	r6, #10
+  53 000a 0296     		str	r6, [sp, #8]
+  54 000c 0623     		movs	r3, #6
+  55 000e 0193     		str	r3, [sp, #4]
+  56 0010 06AB     		add	r3, sp, #24
+  57 0012 0093     		str	r3, [sp]
+  58 0014 0123     		movs	r3, #1
+  59 0016 0322     		movs	r2, #3
+  60 0018 1C21     		movs	r1, #28
+  61 001a 2846     		mov	r0, r5
+  62              	.LVL2:
+  63              		.loc 1 45 5 is_stmt 0 view .LVU6
+  64 001c FFF7FEFF 		bl	HAL_I2C_Mem_Read
+  65              	.LVL3:
+  46:Library/Src/IST8310.c ****     temp_ist8310_data = (int16_t)((ist8310_data_uint8[1] << 8) | ist8310_data_uint8[0]);
+  66              		.loc 1 46 5 is_stmt 1 view .LVU7
+  67              		.loc 1 46 54 is_stmt 0 view .LVU8
+  68 0020 9DF81930 		ldrb	r3, [sp, #25]	@ zero_extendqisi2
+  69              		.loc 1 46 58 view .LVU9
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc8jfBJh.s 			page 3
+
+
+  70 0024 1B02     		lsls	r3, r3, #8
+  71              		.loc 1 46 25 view .LVU10
+  72 0026 1BB2     		sxth	r3, r3
+  73              		.loc 1 46 84 view .LVU11
+  74 0028 9DF81820 		ldrb	r2, [sp, #24]	@ zero_extendqisi2
+  75              		.loc 1 46 23 view .LVU12
+  76 002c 1343     		orrs	r3, r3, r2
+  77 002e 07EE103A 		vmov	s14, r3	@ int
+  78              	.LVL4:
+  47:Library/Src/IST8310.c ****     ist8310_data[0] = MAG_SEN * temp_ist8310_data;
+  79              		.loc 1 47 5 is_stmt 1 view .LVU13
+  80              		.loc 1 47 31 is_stmt 0 view .LVU14
+  81 0032 B8EEC77A 		vcvt.f32.s32	s14, s14
+  82              	.LVL5:
+  83              		.loc 1 47 31 view .LVU15
+  84 0036 DFED216A 		vldr.32	s13, .L3+4
+  85 003a 27EE267A 		vmul.f32	s14, s14, s13
+  86              		.loc 1 47 21 view .LVU16
+  87 003e 84ED007A 		vstr.32	s14, [r4]
+  48:Library/Src/IST8310.c ****     temp_ist8310_data = (int16_t)((ist8310_data_uint8[3] << 8) | ist8310_data_uint8[2]);
+  88              		.loc 1 48 5 is_stmt 1 view .LVU17
+  89              		.loc 1 48 54 is_stmt 0 view .LVU18
+  90 0042 9DF81B30 		ldrb	r3, [sp, #27]	@ zero_extendqisi2
+  91              	.LVL6:
+  92              		.loc 1 48 58 view .LVU19
+  93 0046 1B02     		lsls	r3, r3, #8
+  94              		.loc 1 48 25 view .LVU20
+  95 0048 1BB2     		sxth	r3, r3
+  96              		.loc 1 48 84 view .LVU21
+  97 004a 9DF81A20 		ldrb	r2, [sp, #26]	@ zero_extendqisi2
+  98              		.loc 1 48 23 view .LVU22
+  99 004e 1343     		orrs	r3, r3, r2
+ 100 0050 07EE103A 		vmov	s14, r3	@ int
+ 101              	.LVL7:
+  49:Library/Src/IST8310.c ****     ist8310_data[1] = MAG_SEN * temp_ist8310_data;
+ 102              		.loc 1 49 5 is_stmt 1 view .LVU23
+ 103              		.loc 1 49 31 is_stmt 0 view .LVU24
+ 104 0054 B8EEC77A 		vcvt.f32.s32	s14, s14
+ 105              	.LVL8:
+ 106              		.loc 1 49 31 view .LVU25
+ 107 0058 27EE267A 		vmul.f32	s14, s14, s13
+ 108              		.loc 1 49 21 view .LVU26
+ 109 005c 84ED017A 		vstr.32	s14, [r4, #4]
+  50:Library/Src/IST8310.c ****     temp_ist8310_data = (int16_t)((ist8310_data_uint8[5] << 8) | ist8310_data_uint8[4]);
+ 110              		.loc 1 50 5 is_stmt 1 view .LVU27
+ 111              		.loc 1 50 54 is_stmt 0 view .LVU28
+ 112 0060 9DF81D30 		ldrb	r3, [sp, #29]	@ zero_extendqisi2
+ 113              	.LVL9:
+ 114              		.loc 1 50 58 view .LVU29
+ 115 0064 1B02     		lsls	r3, r3, #8
+ 116              		.loc 1 50 25 view .LVU30
+ 117 0066 1BB2     		sxth	r3, r3
+ 118              		.loc 1 50 84 view .LVU31
+ 119 0068 9DF81C20 		ldrb	r2, [sp, #28]	@ zero_extendqisi2
+ 120              	.LVL10:
+ 121              		.loc 1 50 23 view .LVU32
+ 122 006c 1343     		orrs	r3, r3, r2
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc8jfBJh.s 			page 4
+
+
+ 123 006e 07EE903A 		vmov	s15, r3	@ int
+ 124              	.LVL11:
+  51:Library/Src/IST8310.c ****     ist8310_data[2] = MAG_SEN * temp_ist8310_data;
+ 125              		.loc 1 51 5 is_stmt 1 view .LVU33
+ 126              		.loc 1 51 31 is_stmt 0 view .LVU34
+ 127 0072 F8EEE77A 		vcvt.f32.s32	s15, s15
+ 128              	.LVL12:
+ 129              		.loc 1 51 31 view .LVU35
+ 130 0076 67EEA67A 		vmul.f32	s15, s15, s13
+ 131              		.loc 1 51 21 view .LVU36
+ 132 007a C4ED027A 		vstr.32	s15, [r4, #8]
+  52:Library/Src/IST8310.c ****     HAL_I2C_Mem_Read(&hi2c3 , IST8310_IIC_ADDRESS <<1 , IST8310_REG_TEMP_ADDRESS , I2C_MEMADD_SIZE_
+ 133              		.loc 1 52 5 is_stmt 1 view .LVU37
+ 134 007e 0296     		str	r6, [sp, #8]
+ 135 0080 0223     		movs	r3, #2
+ 136              	.LVL13:
+ 137              		.loc 1 52 5 is_stmt 0 view .LVU38
+ 138 0082 0193     		str	r3, [sp, #4]
+ 139 0084 05AB     		add	r3, sp, #20
+ 140 0086 0093     		str	r3, [sp]
+ 141 0088 0123     		movs	r3, #1
+ 142 008a 1C22     		movs	r2, #28
+ 143              	.LVL14:
+ 144              		.loc 1 52 5 view .LVU39
+ 145 008c 1146     		mov	r1, r2
+ 146 008e 2846     		mov	r0, r5
+ 147 0090 FFF7FEFF 		bl	HAL_I2C_Mem_Read
+ 148              	.LVL15:
+  53:Library/Src/IST8310.c ****     temp_ist8310_data = (int16_t)((ist8310_temp_uint8[1] << 8) | ist8310_temp_uint8[0]);
+ 149              		.loc 1 53 5 is_stmt 1 view .LVU40
+ 150              		.loc 1 53 54 is_stmt 0 view .LVU41
+ 151 0094 9DF81530 		ldrb	r3, [sp, #21]	@ zero_extendqisi2
+ 152              		.loc 1 53 58 view .LVU42
+ 153 0098 1B02     		lsls	r3, r3, #8
+ 154              		.loc 1 53 25 view .LVU43
+ 155 009a 1BB2     		sxth	r3, r3
+ 156              		.loc 1 53 84 view .LVU44
+ 157 009c 9DF81420 		ldrb	r2, [sp, #20]	@ zero_extendqisi2
+ 158              		.loc 1 53 23 view .LVU45
+ 159 00a0 1343     		orrs	r3, r3, r2
+ 160              	.LVL16:
+  54:Library/Src/IST8310.c ****     ist8310_data[3] = temp_ist8310_data;
+ 161              		.loc 1 54 5 is_stmt 1 view .LVU46
+ 162              		.loc 1 54 21 is_stmt 0 view .LVU47
+ 163 00a2 07EE903A 		vmov	s15, r3	@ int
+ 164 00a6 F8EEE77A 		vcvt.f32.s32	s15, s15
+ 165 00aa C4ED037A 		vstr.32	s15, [r4, #12]
+  55:Library/Src/IST8310.c ****     osDelay(1);
+ 166              		.loc 1 55 5 is_stmt 1 view .LVU48
+ 167 00ae 0120     		movs	r0, #1
+ 168 00b0 FFF7FEFF 		bl	osDelay
+ 169              	.LVL17:
+  56:Library/Src/IST8310.c **** }
+ 170              		.loc 1 56 1 is_stmt 0 view .LVU49
+ 171 00b4 08B0     		add	sp, sp, #32
+ 172              	.LCFI2:
+ 173              		.cfi_def_cfa_offset 16
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc8jfBJh.s 			page 5
+
+
+ 174              		@ sp needed
+ 175 00b6 70BD     		pop	{r4, r5, r6, pc}
+ 176              	.LVL18:
+ 177              	.L4:
+ 178              		.loc 1 56 1 view .LVU50
+ 179              		.align	2
+ 180              	.L3:
+ 181 00b8 00000000 		.word	hi2c3
+ 182 00bc 9A99993E 		.word	1050253722
+ 183              		.cfi_endproc
+ 184              	.LFE136:
+ 186              		.section	.text.ist8310_delay_us,"ax",%progbits
+ 187              		.align	1
+ 188              		.global	ist8310_delay_us
+ 189              		.syntax unified
+ 190              		.thumb
+ 191              		.thumb_func
+ 193              	ist8310_delay_us:
+ 194              	.LVL19:
+ 195              	.LFB137:
+  57:Library/Src/IST8310.c **** 
+  58:Library/Src/IST8310.c **** 
+  59:Library/Src/IST8310.c **** 
+  60:Library/Src/IST8310.c **** void ist8310_delay_us(uint16_t us)
+  61:Library/Src/IST8310.c **** {
+ 196              		.loc 1 61 1 is_stmt 1 view -0
+ 197              		.cfi_startproc
+ 198              		@ args = 0, pretend = 0, frame = 0
+ 199              		@ frame_needed = 0, uses_anonymous_args = 0
+ 200              		@ link register save eliminated.
+ 201              		.loc 1 61 1 is_stmt 0 view .LVU52
+ 202 0000 10B4     		push	{r4}
+ 203              	.LCFI3:
+ 204              		.cfi_def_cfa_offset 4
+ 205              		.cfi_offset 4, -4
+  62:Library/Src/IST8310.c ****     uint32_t ticks = 0;
+ 206              		.loc 1 62 5 is_stmt 1 view .LVU53
+ 207              	.LVL20:
+  63:Library/Src/IST8310.c ****     uint32_t told = 0, tnow = 0, tcnt = 0;
+ 208              		.loc 1 63 5 view .LVU54
+  64:Library/Src/IST8310.c ****     uint32_t reload = 0;
+ 209              		.loc 1 64 5 view .LVU55
+  65:Library/Src/IST8310.c ****     reload = SysTick->LOAD;
+ 210              		.loc 1 65 5 view .LVU56
+ 211              		.loc 1 65 12 is_stmt 0 view .LVU57
+ 212 0002 4FF0E023 		mov	r3, #-536813568
+ 213 0006 5C69     		ldr	r4, [r3, #20]
+ 214              	.LVL21:
+  66:Library/Src/IST8310.c ****     ticks = us * 72;
+ 215              		.loc 1 66 5 is_stmt 1 view .LVU58
+ 216              		.loc 1 66 16 is_stmt 0 view .LVU59
+ 217 0008 00EBC000 		add	r0, r0, r0, lsl #3
+ 218              	.LVL22:
+ 219              		.loc 1 66 16 view .LVU60
+ 220 000c 4FEAC00C 		lsl	ip, r0, #3
+ 221              	.LVL23:
+  67:Library/Src/IST8310.c ****     told = SysTick->VAL;
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc8jfBJh.s 			page 6
+
+
+ 222              		.loc 1 67 5 is_stmt 1 view .LVU61
+ 223              		.loc 1 67 10 is_stmt 0 view .LVU62
+ 224 0010 9B69     		ldr	r3, [r3, #24]
+ 225              	.LVL24:
+  63:Library/Src/IST8310.c ****     uint32_t reload = 0;
+ 226              		.loc 1 63 34 view .LVU63
+ 227 0012 0021     		movs	r1, #0
+ 228 0014 04E0     		b	.L9
+ 229              	.LVL25:
+ 230              	.L7:
+  68:Library/Src/IST8310.c ****     while (1)
+  69:Library/Src/IST8310.c ****     {
+  70:Library/Src/IST8310.c ****         tnow = SysTick->VAL;
+  71:Library/Src/IST8310.c ****         if (tnow != told)
+  72:Library/Src/IST8310.c ****         {
+  73:Library/Src/IST8310.c ****             if (tnow < told)
+  74:Library/Src/IST8310.c ****             {
+  75:Library/Src/IST8310.c ****                 tcnt += told - tnow;
+  76:Library/Src/IST8310.c ****             }
+  77:Library/Src/IST8310.c ****             else
+  78:Library/Src/IST8310.c ****             {
+  79:Library/Src/IST8310.c ****                 tcnt += reload - tnow + told;
+ 231              		.loc 1 79 17 is_stmt 1 view .LVU64
+ 232              		.loc 1 79 32 is_stmt 0 view .LVU65
+ 233 0016 E01A     		subs	r0, r4, r3
+ 234              		.loc 1 79 39 view .LVU66
+ 235 0018 0244     		add	r2, r2, r0
+ 236              	.LVL26:
+ 237              		.loc 1 79 22 view .LVU67
+ 238 001a 1144     		add	r1, r1, r2
+ 239              	.LVL27:
+ 240              	.L8:
+  80:Library/Src/IST8310.c ****             }
+  81:Library/Src/IST8310.c ****             told = tnow;
+ 241              		.loc 1 81 13 is_stmt 1 view .LVU68
+  82:Library/Src/IST8310.c ****             if (tcnt >= ticks)
+ 242              		.loc 1 82 13 view .LVU69
+ 243              		.loc 1 82 16 is_stmt 0 view .LVU70
+ 244 001c 6145     		cmp	r1, ip
+ 245 001e 09D2     		bcs	.L11
+ 246              	.LVL28:
+ 247              	.L9:
+  63:Library/Src/IST8310.c ****     uint32_t reload = 0;
+ 248              		.loc 1 63 34 view .LVU71
+ 249 0020 1A46     		mov	r2, r3
+ 250              	.LVL29:
+ 251              	.L6:
+  68:Library/Src/IST8310.c ****     {
+ 252              		.loc 1 68 5 is_stmt 1 view .LVU72
+  70:Library/Src/IST8310.c ****         if (tnow != told)
+ 253              		.loc 1 70 9 view .LVU73
+  70:Library/Src/IST8310.c ****         if (tnow != told)
+ 254              		.loc 1 70 14 is_stmt 0 view .LVU74
+ 255 0022 4FF0E023 		mov	r3, #-536813568
+ 256 0026 9B69     		ldr	r3, [r3, #24]
+ 257              	.LVL30:
+  71:Library/Src/IST8310.c ****         {
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc8jfBJh.s 			page 7
+
+
+ 258              		.loc 1 71 9 is_stmt 1 view .LVU75
+  71:Library/Src/IST8310.c ****         {
+ 259              		.loc 1 71 12 is_stmt 0 view .LVU76
+ 260 0028 9A42     		cmp	r2, r3
+ 261 002a FAD0     		beq	.L6
+  73:Library/Src/IST8310.c ****             {
+ 262              		.loc 1 73 13 is_stmt 1 view .LVU77
+  73:Library/Src/IST8310.c ****             {
+ 263              		.loc 1 73 16 is_stmt 0 view .LVU78
+ 264 002c F3D9     		bls	.L7
+  75:Library/Src/IST8310.c ****             }
+ 265              		.loc 1 75 17 is_stmt 1 view .LVU79
+  75:Library/Src/IST8310.c ****             }
+ 266              		.loc 1 75 30 is_stmt 0 view .LVU80
+ 267 002e D21A     		subs	r2, r2, r3
+ 268              	.LVL31:
+  75:Library/Src/IST8310.c ****             }
+ 269              		.loc 1 75 22 view .LVU81
+ 270 0030 1144     		add	r1, r1, r2
+ 271              	.LVL32:
+  75:Library/Src/IST8310.c ****             }
+ 272              		.loc 1 75 22 view .LVU82
+ 273 0032 F3E7     		b	.L8
+ 274              	.LVL33:
+ 275              	.L11:
+  83:Library/Src/IST8310.c ****             {
+  84:Library/Src/IST8310.c ****                 break;
+  85:Library/Src/IST8310.c ****             }
+  86:Library/Src/IST8310.c ****         }
+  87:Library/Src/IST8310.c ****     }
+  88:Library/Src/IST8310.c **** }...
+ 276              		.loc 1 88 1 view .LVU83
+ 277 0034 5DF8044B 		ldr	r4, [sp], #4
+ 278              	.LCFI4:
+ 279              		.cfi_restore 4
+ 280              		.cfi_def_cfa_offset 0
+ 281              	.LVL34:
+ 282              		.loc 1 88 1 view .LVU84
+ 283 0038 7047     		bx	lr
+ 284              		.cfi_endproc
+ 285              	.LFE137:
+ 287              		.section	.text.ist8310_init,"ax",%progbits
+ 288              		.align	1
+ 289              		.global	ist8310_init
+ 290              		.syntax unified
+ 291              		.thumb
+ 292              		.thumb_func
+ 294              	ist8310_init:
+ 295              	.LFB135:
+  12:Library/Src/IST8310.c **** {
+ 296              		.loc 1 12 1 is_stmt 1 view -0
+ 297              		.cfi_startproc
+ 298              		@ args = 0, pretend = 0, frame = 8
+ 299              		@ frame_needed = 0, uses_anonymous_args = 0
+ 300 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 301              	.LCFI5:
+ 302              		.cfi_def_cfa_offset 20
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc8jfBJh.s 			page 8
+
+
+ 303              		.cfi_offset 4, -20
+ 304              		.cfi_offset 5, -16
+ 305              		.cfi_offset 6, -12
+ 306              		.cfi_offset 7, -8
+ 307              		.cfi_offset 14, -4
+ 308 0002 87B0     		sub	sp, sp, #28
+ 309              	.LCFI6:
+ 310              		.cfi_def_cfa_offset 48
+  13:Library/Src/IST8310.c ****     static const uint8_t sleepTime = 50;
+ 311              		.loc 1 13 5 view .LVU86
+  14:Library/Src/IST8310.c ****     static const uint8_t wait_time = 1;
+ 312              		.loc 1 14 5 view .LVU87
+  15:Library/Src/IST8310.c ****     uint8_t ist8310_state[5];
+ 313              		.loc 1 15 5 view .LVU88
+  16:Library/Src/IST8310.c ****     while(ist8310_state[4] != 0x10)
+ 314              		.loc 1 16 5 view .LVU89
+  16:Library/Src/IST8310.c ****     while(ist8310_state[4] != 0x10)
+ 315              		.loc 1 16 10 is_stmt 0 view .LVU90
+ 316 0004 1BE0     		b	.L13
+ 317              	.L14:
+  18:Library/Src/IST8310.c ****         HAL_GPIO_WritePin(GPIOG, GPIO_PIN_6, GPIO_PIN_RESET);
+ 318              		.loc 1 18 9 is_stmt 1 view .LVU91
+ 319 0006 304C     		ldr	r4, .L19
+ 320 0008 0022     		movs	r2, #0
+ 321 000a 4021     		movs	r1, #64
+ 322 000c 2046     		mov	r0, r4
+ 323 000e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 324              	.LVL35:
+  19:Library/Src/IST8310.c ****         osDelay(sleepTime);
+ 325              		.loc 1 19 9 view .LVU92
+ 326 0012 3220     		movs	r0, #50
+ 327 0014 FFF7FEFF 		bl	osDelay
+ 328              	.LVL36:
+  20:Library/Src/IST8310.c ****         HAL_GPIO_WritePin(GPIOG, GPIO_PIN_6, GPIO_PIN_SET);
+ 329              		.loc 1 20 9 view .LVU93
+ 330 0018 0122     		movs	r2, #1
+ 331 001a 4021     		movs	r1, #64
+ 332 001c 2046     		mov	r0, r4
+ 333 001e FFF7FEFF 		bl	HAL_GPIO_WritePin
+ 334              	.LVL37:
+  21:Library/Src/IST8310.c ****         osDelay(sleepTime);
+ 335              		.loc 1 21 9 view .LVU94
+ 336 0022 3220     		movs	r0, #50
+ 337 0024 FFF7FEFF 		bl	osDelay
+ 338              	.LVL38:
+  22:Library/Src/IST8310.c ****         HAL_I2C_Mem_Read(&hi2c3 , IST8310_IIC_ADDRESS <<1 , IST8310_REG_WHO_ADDRESS , I2C_MEMADD_SI
+ 339              		.loc 1 22 9 view .LVU95
+ 340 0028 0A23     		movs	r3, #10
+ 341 002a 0293     		str	r3, [sp, #8]
+ 342 002c 0123     		movs	r3, #1
+ 343 002e 0193     		str	r3, [sp, #4]
+ 344 0030 05AA     		add	r2, sp, #20
+ 345 0032 0092     		str	r2, [sp]
+ 346 0034 0022     		movs	r2, #0
+ 347 0036 1C21     		movs	r1, #28
+ 348 0038 2448     		ldr	r0, .L19+4
+ 349 003a FFF7FEFF 		bl	HAL_I2C_Mem_Read
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc8jfBJh.s 			page 9
+
+
+ 350              	.LVL39:
+ 351              	.L13:
+  16:Library/Src/IST8310.c ****     while(ist8310_state[4] != 0x10)
+ 352              		.loc 1 16 10 view .LVU96
+  16:Library/Src/IST8310.c ****     while(ist8310_state[4] != 0x10)
+ 353              		.loc 1 16 24 is_stmt 0 view .LVU97
+ 354 003e 9DF81430 		ldrb	r3, [sp, #20]	@ zero_extendqisi2
+  16:Library/Src/IST8310.c ****     while(ist8310_state[4] != 0x10)
+ 355              		.loc 1 16 10 view .LVU98
+ 356 0042 102B     		cmp	r3, #16
+ 357 0044 DFD1     		bne	.L14
+  25:Library/Src/IST8310.c ****     static int i;
+ 358              		.loc 1 25 5 is_stmt 1 view .LVU99
+  26:Library/Src/IST8310.c ****     for(i = 0 ; i < 4 ; i++)
+ 359              		.loc 1 26 5 view .LVU100
+  26:Library/Src/IST8310.c ****     for(i = 0 ; i < 4 ; i++)
+ 360              		.loc 1 26 11 is_stmt 0 view .LVU101
+ 361 0046 224B     		ldr	r3, .L19+8
+ 362 0048 0022     		movs	r2, #0
+ 363 004a 1A60     		str	r2, [r3]
+  26:Library/Src/IST8310.c ****     for(i = 0 ; i < 4 ; i++)
+ 364              		.loc 1 26 5 view .LVU102
+ 365 004c 35E0     		b	.L15
+ 366              	.L16:
+  30:Library/Src/IST8310.c ****             HAL_I2C_Mem_Write(&hi2c3 , IST8310_IIC_ADDRESS <<1 , ist8310_init_matrix[i][0] , I2C_ME
+ 367              		.loc 1 30 13 is_stmt 1 view .LVU103
+  30:Library/Src/IST8310.c ****             HAL_I2C_Mem_Write(&hi2c3 , IST8310_IIC_ADDRESS <<1 , ist8310_init_matrix[i][0] , I2C_ME
+ 368              		.loc 1 30 88 is_stmt 0 view .LVU104
+ 369 004e 214D     		ldr	r5, .L19+12
+  30:Library/Src/IST8310.c ****             HAL_I2C_Mem_Write(&hi2c3 , IST8310_IIC_ADDRESS <<1 , ist8310_init_matrix[i][0] , I2C_ME
+ 370              		.loc 1 30 13 view .LVU105
+ 371 0050 1E4E     		ldr	r6, .L19+4
+ 372 0052 0A27     		movs	r7, #10
+ 373 0054 0297     		str	r7, [sp, #8]
+ 374 0056 0124     		movs	r4, #1
+ 375 0058 0194     		str	r4, [sp, #4]
+ 376 005a 02FA04F3 		lsl	r3, r2, r4
+ 377 005e 2344     		add	r3, r3, r4
+ 378 0060 2B44     		add	r3, r3, r5
+ 379 0062 0093     		str	r3, [sp]
+ 380 0064 2346     		mov	r3, r4
+ 381 0066 15F81220 		ldrb	r2, [r5, r2, lsl #1]	@ zero_extendqisi2
+ 382 006a 1C21     		movs	r1, #28
+ 383 006c 3046     		mov	r0, r6
+ 384 006e FFF7FEFF 		bl	HAL_I2C_Mem_Write
+ 385              	.LVL40:
+  31:Library/Src/IST8310.c ****             ist8310_delay_us(wait_time);
+ 386              		.loc 1 31 13 is_stmt 1 view .LVU106
+ 387 0072 2046     		mov	r0, r4
+ 388 0074 FFF7FEFF 		bl	ist8310_delay_us
+ 389              	.LVL41:
+  32:Library/Src/IST8310.c ****             HAL_I2C_Mem_Read(&hi2c3 , IST8310_IIC_ADDRESS <<1 , ist8310_init_matrix[i][0] , I2C_MEM
+ 390              		.loc 1 32 13 view .LVU107
+  32:Library/Src/IST8310.c ****             HAL_I2C_Mem_Read(&hi2c3 , IST8310_IIC_ADDRESS <<1 , ist8310_init_matrix[i][0] , I2C_MEM
+ 391              		.loc 1 32 87 is_stmt 0 view .LVU108
+ 392 0078 154B     		ldr	r3, .L19+8
+ 393 007a 1A68     		ldr	r2, [r3]
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc8jfBJh.s 			page 10
+
+
+  32:Library/Src/IST8310.c ****             HAL_I2C_Mem_Read(&hi2c3 , IST8310_IIC_ADDRESS <<1 , ist8310_init_matrix[i][0] , I2C_MEM
+ 394              		.loc 1 32 13 view .LVU109
+ 395 007c 0297     		str	r7, [sp, #8]
+ 396 007e 0194     		str	r4, [sp, #4]
+ 397 0080 04AB     		add	r3, sp, #16
+ 398 0082 1344     		add	r3, r3, r2
+ 399 0084 0093     		str	r3, [sp]
+ 400 0086 2346     		mov	r3, r4
+ 401 0088 15F81220 		ldrb	r2, [r5, r2, lsl #1]	@ zero_extendqisi2
+ 402 008c 1C21     		movs	r1, #28
+ 403 008e 3046     		mov	r0, r6
+ 404 0090 FFF7FEFF 		bl	HAL_I2C_Mem_Read
+ 405              	.LVL42:
+  33:Library/Src/IST8310.c ****             ist8310_delay_us(wait_time);
+ 406              		.loc 1 33 13 is_stmt 1 view .LVU110
+ 407 0094 2046     		mov	r0, r4
+ 408 0096 FFF7FEFF 		bl	ist8310_delay_us
+ 409              	.LVL43:
+ 410              	.L17:
+  28:Library/Src/IST8310.c ****         while(ist8310_state[i] != ist8310_init_matrix[i][1])
+ 411              		.loc 1 28 14 view .LVU111
+  28:Library/Src/IST8310.c ****         while(ist8310_state[i] != ist8310_init_matrix[i][1])
+ 412              		.loc 1 28 28 is_stmt 0 view .LVU112
+ 413 009a 0D4B     		ldr	r3, .L19+8
+ 414 009c 1A68     		ldr	r2, [r3]
+ 415 009e 02F11803 		add	r3, r2, #24
+ 416 00a2 6B44     		add	r3, sp, r3
+ 417 00a4 13F8081C 		ldrb	r1, [r3, #-8]	@ zero_extendqisi2
+  28:Library/Src/IST8310.c ****         while(ist8310_state[i] != ist8310_init_matrix[i][1])
+ 418              		.loc 1 28 57 view .LVU113
+ 419 00a8 0A4B     		ldr	r3, .L19+12
+ 420 00aa 03EB4203 		add	r3, r3, r2, lsl #1
+ 421 00ae 5B78     		ldrb	r3, [r3, #1]	@ zero_extendqisi2
+  28:Library/Src/IST8310.c ****         while(ist8310_state[i] != ist8310_init_matrix[i][1])
+ 422              		.loc 1 28 14 view .LVU114
+ 423 00b0 9942     		cmp	r1, r3
+ 424 00b2 CCD1     		bne	.L16
+  26:Library/Src/IST8310.c ****     for(i = 0 ; i < 4 ; i++)
+ 425              		.loc 1 26 25 is_stmt 1 discriminator 2 view .LVU115
+  26:Library/Src/IST8310.c ****     for(i = 0 ; i < 4 ; i++)
+ 426              		.loc 1 26 26 is_stmt 0 discriminator 2 view .LVU116
+ 427 00b4 0132     		adds	r2, r2, #1
+ 428 00b6 064B     		ldr	r3, .L19+8
+ 429 00b8 1A60     		str	r2, [r3]
+ 430              	.L15:
+  26:Library/Src/IST8310.c ****     for(i = 0 ; i < 4 ; i++)
+ 431              		.loc 1 26 17 is_stmt 1 discriminator 1 view .LVU117
+  26:Library/Src/IST8310.c ****     for(i = 0 ; i < 4 ; i++)
+ 432              		.loc 1 26 19 is_stmt 0 discriminator 1 view .LVU118
+ 433 00ba 054B     		ldr	r3, .L19+8
+ 434 00bc 1B68     		ldr	r3, [r3]
+  26:Library/Src/IST8310.c ****     for(i = 0 ; i < 4 ; i++)
+ 435              		.loc 1 26 5 discriminator 1 view .LVU119
+ 436 00be 032B     		cmp	r3, #3
+ 437 00c0 EBDD     		ble	.L17
+  36:Library/Src/IST8310.c **** }
+ 438              		.loc 1 36 1 view .LVU120
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc8jfBJh.s 			page 11
+
+
+ 439 00c2 07B0     		add	sp, sp, #28
+ 440              	.LCFI7:
+ 441              		.cfi_def_cfa_offset 20
+ 442              		@ sp needed
+ 443 00c4 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 444              	.L20:
+ 445 00c6 00BF     		.align	2
+ 446              	.L19:
+ 447 00c8 00180240 		.word	1073879040
+ 448 00cc 00000000 		.word	hi2c3
+ 449 00d0 00000000 		.word	.LANCHOR0
+ 450 00d4 00000000 		.word	.LANCHOR1
+ 451              		.cfi_endproc
+ 452              	.LFE135:
+ 454              		.section	.bss.i.0,"aw",%nobits
+ 455              		.align	2
+ 456              		.set	.LANCHOR0,. + 0
+ 459              	i.0:
+ 460 0000 00000000 		.space	4
+ 461              		.section	.data.ist8310_init_matrix,"aw"
+ 462              		.align	2
+ 463              		.set	.LANCHOR1,. + 0
+ 466              	ist8310_init_matrix:
+ 467 0000 0B08     		.ascii	"\013\010"
+ 468 0002 4124     		.ascii	"A$"
+ 469 0004 42C0     		.ascii	"B\300"
+ 470 0006 0A0B     		.ascii	"\012\013"
+ 471              		.text
+ 472              	.Letext0:
+ 473              		.file 2 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 474              		.file 3 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 475              		.file 4 "Drivers/CMSIS/Include/core_cm4.h"
+ 476              		.file 5 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
+ 477              		.file 6 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 478              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_gpio.h"
+ 479              		.file 8 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 480              		.file 9 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_i2c.h"
+ 481              		.file 10 "Core/Inc/i2c.h"
+ 482              		.file 11 "Middlewares/Third_Party/FreeRTOS/Source/CMSIS_RTOS/cmsis_os.h"
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc8jfBJh.s 			page 12
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 IST8310.c
+C:\Users\cyz19\AppData\Local\Temp\cc8jfBJh.s:20     .text.ist8310_data_read:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\cc8jfBJh.s:26     .text.ist8310_data_read:00000000 ist8310_data_read
+C:\Users\cyz19\AppData\Local\Temp\cc8jfBJh.s:181    .text.ist8310_data_read:000000b8 $d
+C:\Users\cyz19\AppData\Local\Temp\cc8jfBJh.s:187    .text.ist8310_delay_us:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\cc8jfBJh.s:193    .text.ist8310_delay_us:00000000 ist8310_delay_us
+C:\Users\cyz19\AppData\Local\Temp\cc8jfBJh.s:288    .text.ist8310_init:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\cc8jfBJh.s:294    .text.ist8310_init:00000000 ist8310_init
+C:\Users\cyz19\AppData\Local\Temp\cc8jfBJh.s:447    .text.ist8310_init:000000c8 $d
+C:\Users\cyz19\AppData\Local\Temp\cc8jfBJh.s:455    .bss.i.0:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\cc8jfBJh.s:459    .bss.i.0:00000000 i.0
+C:\Users\cyz19\AppData\Local\Temp\cc8jfBJh.s:462    .data.ist8310_init_matrix:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\cc8jfBJh.s:466    .data.ist8310_init_matrix:00000000 ist8310_init_matrix
+
+UNDEFINED SYMBOLS
+HAL_I2C_Mem_Read
+osDelay
+hi2c3
+HAL_GPIO_WritePin
+HAL_I2C_Mem_Write

@@ -1,0 +1,22 @@
+{
+    "files.associations": {
+        "*.m": "matlab",
+        "can_receive.h": "c",
+        "main.h": "c",
+        "ins.h": "c",
+        "chassis.h": "c",
+        "data.h": "c",
+        "c2c.h": "c",
+        "status.h": "c",
+        "motor.h": "c",
+        "pid.h": "c",
+        "uart_minipc.h": "c",
+        "remote_control.h": "c",
+        "gimbal.h": "c",
+        "ammo.h": "c",
+        "string.h": "c",
+        "usart.h": "c",
+        "referee.h": "c",
+        "stdarg.h": "c"
+    }
+}

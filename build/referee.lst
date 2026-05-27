@@ -1,0 +1,1700 @@
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 1
+
+
+   1              		.cpu cortex-m4
+   2              		.arch armv7e-m
+   3              		.fpu fpv4-sp-d16
+   4              		.eabi_attribute 27, 1
+   5              		.eabi_attribute 28, 1
+   6              		.eabi_attribute 20, 1
+   7              		.eabi_attribute 21, 1
+   8              		.eabi_attribute 23, 3
+   9              		.eabi_attribute 24, 1
+  10              		.eabi_attribute 25, 1
+  11              		.eabi_attribute 26, 1
+  12              		.eabi_attribute 30, 1
+  13              		.eabi_attribute 34, 1
+  14              		.eabi_attribute 18, 4
+  15              		.file	"referee.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.referee_Init,"ax",%progbits
+  20              		.align	1
+  21              		.global	referee_Init
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	referee_Init:
+  27              	.LVL0:
+  28              	.LFB138:
+  29              		.file 1 "Library/Src/referee.c"
+   1:Library/Src/referee.c **** #include "referee.h"
+   2:Library/Src/referee.c **** 
+   3:Library/Src/referee.c **** data_referee_t data_referee;
+   4:Library/Src/referee.c **** uint8_t usart6_buf[2][USART_RX_BUF_LENGHT];
+   5:Library/Src/referee.c **** fifo_s_t referee_fifo;
+   6:Library/Src/referee.c **** uint8_t referee_fifo_buf[REFEREE_FIFO_BUF_LENGTH];
+   7:Library/Src/referee.c **** referee_unpack_data_t referee_unpack_obj;
+   8:Library/Src/referee.c **** 
+   9:Library/Src/referee.c **** extern UART_HandleTypeDef huart6;
+  10:Library/Src/referee.c **** extern DMA_HandleTypeDef hdma_usart6_rx;
+  11:Library/Src/referee.c **** extern DMA_HandleTypeDef hdma_usart6_tx;
+  12:Library/Src/referee.c **** 
+  13:Library/Src/referee.c **** void referee_Init(uint8_t *rx1_buf, uint8_t *rx2_buf, uint16_t dma_buf_num)
+  14:Library/Src/referee.c **** {
+  30              		.loc 1 14 1 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		@ link register save eliminated.
+  35              		.loc 1 14 1 is_stmt 0 view .LVU1
+  36 0000 30B4     		push	{r4, r5}
+  37              	.LCFI0:
+  38              		.cfi_def_cfa_offset 8
+  39              		.cfi_offset 4, -8
+  40              		.cfi_offset 5, -4
+  15:Library/Src/referee.c ****     //enable the DMA transfer for the receiver and tramsmit request
+  16:Library/Src/referee.c ****     //使能DMA串口接收和发送
+  17:Library/Src/referee.c ****     SET_BIT(huart6.Instance->CR3, USART_CR3_DMAR);
+  41              		.loc 1 17 5 is_stmt 1 view .LVU2
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 2
+
+
+  42 0002 304B     		ldr	r3, .L11
+  43 0004 1B68     		ldr	r3, [r3]
+  44 0006 5C69     		ldr	r4, [r3, #20]
+  45 0008 44F04004 		orr	r4, r4, #64
+  46 000c 5C61     		str	r4, [r3, #20]
+  18:Library/Src/referee.c ****     SET_BIT(huart6.Instance->CR3, USART_CR3_DMAT);
+  47              		.loc 1 18 5 view .LVU3
+  48 000e 5C69     		ldr	r4, [r3, #20]
+  49 0010 44F08004 		orr	r4, r4, #128
+  50 0014 5C61     		str	r4, [r3, #20]
+  19:Library/Src/referee.c **** 
+  20:Library/Src/referee.c ****     //enalbe idle interrupt
+  21:Library/Src/referee.c ****     //使能空闲中断
+  22:Library/Src/referee.c ****     __HAL_UART_ENABLE_IT(&huart6, UART_IT_IDLE);
+  51              		.loc 1 22 5 view .LVU4
+  52 0016 DC68     		ldr	r4, [r3, #12]
+  53 0018 44F01004 		orr	r4, r4, #16
+  54 001c DC60     		str	r4, [r3, #12]
+  23:Library/Src/referee.c **** 
+  24:Library/Src/referee.c **** 
+  25:Library/Src/referee.c **** 
+  26:Library/Src/referee.c ****     //disable DMA
+  27:Library/Src/referee.c ****     //失效DMA
+  28:Library/Src/referee.c ****     __HAL_DMA_DISABLE(&hdma_usart6_rx);
+  55              		.loc 1 28 5 view .LVU5
+  56 001e 2A4B     		ldr	r3, .L11+4
+  57 0020 1C68     		ldr	r4, [r3]
+  58 0022 2368     		ldr	r3, [r4]
+  59 0024 23F00103 		bic	r3, r3, #1
+  60 0028 2360     		str	r3, [r4]
+  29:Library/Src/referee.c ****     
+  30:Library/Src/referee.c ****     while(hdma_usart6_rx.Instance->CR & DMA_SxCR_EN)
+  61              		.loc 1 30 5 view .LVU6
+  62              		.loc 1 30 10 is_stmt 0 view .LVU7
+  63 002a 03E0     		b	.L2
+  64              	.L3:
+  31:Library/Src/referee.c ****     {
+  32:Library/Src/referee.c ****         __HAL_DMA_DISABLE(&hdma_usart6_rx);
+  65              		.loc 1 32 9 is_stmt 1 view .LVU8
+  66 002c 1C68     		ldr	r4, [r3]
+  67 002e 24F00104 		bic	r4, r4, #1
+  68 0032 1C60     		str	r4, [r3]
+  69              	.L2:
+  30:Library/Src/referee.c ****     {
+  70              		.loc 1 30 10 view .LVU9
+  30:Library/Src/referee.c ****     {
+  71              		.loc 1 30 25 is_stmt 0 view .LVU10
+  72 0034 244B     		ldr	r3, .L11+4
+  73 0036 1B68     		ldr	r3, [r3]
+  30:Library/Src/referee.c ****     {
+  74              		.loc 1 30 34 view .LVU11
+  75 0038 1C68     		ldr	r4, [r3]
+  30:Library/Src/referee.c ****     {
+  76              		.loc 1 30 10 view .LVU12
+  77 003a 14F0010F 		tst	r4, #1
+  78 003e F5D1     		bne	.L3
+  33:Library/Src/referee.c ****     }
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 3
+
+
+  34:Library/Src/referee.c **** 
+  35:Library/Src/referee.c ****     __HAL_DMA_CLEAR_FLAG(&hdma_usart6_rx, DMA_LISR_TCIF1);
+  79              		.loc 1 35 5 is_stmt 1 view .LVU13
+  80 0040 224C     		ldr	r4, .L11+8
+  81 0042 A342     		cmp	r3, r4
+  82 0044 19D9     		bls	.L4
+  83              		.loc 1 35 5 is_stmt 0 discriminator 1 view .LVU14
+  84 0046 583C     		subs	r4, r4, #88
+  85 0048 4FF40065 		mov	r5, #2048
+  86 004c E560     		str	r5, [r4, #12]
+  87              	.L5:
+  36:Library/Src/referee.c **** 
+  37:Library/Src/referee.c ****     hdma_usart6_rx.Instance->PAR = (uint32_t) & (USART6->DR);
+  88              		.loc 1 37 5 is_stmt 1 view .LVU15
+  89              		.loc 1 37 34 is_stmt 0 view .LVU16
+  90 004e 204C     		ldr	r4, .L11+12
+  91 0050 9C60     		str	r4, [r3, #8]
+  38:Library/Src/referee.c ****     //memory buffer 1
+  39:Library/Src/referee.c ****     //内存缓冲区1
+  40:Library/Src/referee.c ****     hdma_usart6_rx.Instance->M0AR = (uint32_t)(rx1_buf);
+  92              		.loc 1 40 5 is_stmt 1 view .LVU17
+  93              		.loc 1 40 35 is_stmt 0 view .LVU18
+  94 0052 D860     		str	r0, [r3, #12]
+  41:Library/Src/referee.c ****     //memory buffer 2
+  42:Library/Src/referee.c ****     //内存缓冲区2
+  43:Library/Src/referee.c ****     hdma_usart6_rx.Instance->M1AR = (uint32_t)(rx2_buf);
+  95              		.loc 1 43 5 is_stmt 1 view .LVU19
+  96              		.loc 1 43 35 is_stmt 0 view .LVU20
+  97 0054 1961     		str	r1, [r3, #16]
+  44:Library/Src/referee.c ****     //data length
+  45:Library/Src/referee.c ****     //数据长度
+  46:Library/Src/referee.c ****     __HAL_DMA_SET_COUNTER(&hdma_usart6_rx, dma_buf_num);
+  98              		.loc 1 46 5 is_stmt 1 view .LVU21
+  99 0056 5A60     		str	r2, [r3, #4]
+  47:Library/Src/referee.c **** 
+  48:Library/Src/referee.c ****     //enable double memory buffer
+  49:Library/Src/referee.c ****     //使能双缓冲区
+  50:Library/Src/referee.c ****     SET_BIT(hdma_usart6_rx.Instance->CR, DMA_SxCR_DBM);
+ 100              		.loc 1 50 5 view .LVU22
+ 101 0058 1A68     		ldr	r2, [r3]
+ 102              	.LVL1:
+ 103              		.loc 1 50 5 is_stmt 0 view .LVU23
+ 104 005a 42F48022 		orr	r2, r2, #262144
+ 105 005e 1A60     		str	r2, [r3]
+  51:Library/Src/referee.c **** 
+  52:Library/Src/referee.c ****     //enable DMA
+  53:Library/Src/referee.c ****     //使能DMA
+  54:Library/Src/referee.c ****     __HAL_DMA_ENABLE(&hdma_usart6_rx);
+ 106              		.loc 1 54 5 is_stmt 1 view .LVU24
+ 107 0060 194B     		ldr	r3, .L11+4
+ 108 0062 1A68     		ldr	r2, [r3]
+ 109 0064 1368     		ldr	r3, [r2]
+ 110 0066 43F00103 		orr	r3, r3, #1
+ 111 006a 1360     		str	r3, [r2]
+  55:Library/Src/referee.c **** 
+  56:Library/Src/referee.c **** 
+  57:Library/Src/referee.c ****     //disable DMA
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 4
+
+
+  58:Library/Src/referee.c ****     //失效DMA
+  59:Library/Src/referee.c ****     __HAL_DMA_DISABLE(&hdma_usart6_tx);
+ 112              		.loc 1 59 5 view .LVU25
+ 113 006c 194B     		ldr	r3, .L11+16
+ 114 006e 1A68     		ldr	r2, [r3]
+ 115 0070 1368     		ldr	r3, [r2]
+ 116 0072 23F00103 		bic	r3, r3, #1
+ 117 0076 1360     		str	r3, [r2]
+  60:Library/Src/referee.c **** 
+  61:Library/Src/referee.c ****     while(hdma_usart6_tx.Instance->CR & DMA_SxCR_EN)
+ 118              		.loc 1 61 5 view .LVU26
+ 119              		.loc 1 61 10 is_stmt 0 view .LVU27
+ 120 0078 19E0     		b	.L8
+ 121              	.LVL2:
+ 122              	.L4:
+  35:Library/Src/referee.c **** 
+ 123              		.loc 1 35 5 discriminator 2 view .LVU28
+ 124 007a 174C     		ldr	r4, .L11+20
+ 125 007c A342     		cmp	r3, r4
+ 126 007e 05D9     		bls	.L6
+  35:Library/Src/referee.c **** 
+ 127              		.loc 1 35 5 discriminator 3 view .LVU29
+ 128 0080 04F55274 		add	r4, r4, #840
+ 129 0084 4FF40065 		mov	r5, #2048
+ 130 0088 A560     		str	r5, [r4, #8]
+ 131 008a E0E7     		b	.L5
+ 132              	.L6:
+  35:Library/Src/referee.c **** 
+ 133              		.loc 1 35 5 discriminator 4 view .LVU30
+ 134 008c 134C     		ldr	r4, .L11+24
+ 135 008e A342     		cmp	r3, r4
+ 136 0090 04D9     		bls	.L7
+  35:Library/Src/referee.c **** 
+ 137              		.loc 1 35 5 discriminator 6 view .LVU31
+ 138 0092 583C     		subs	r4, r4, #88
+ 139 0094 4FF40065 		mov	r5, #2048
+ 140 0098 E560     		str	r5, [r4, #12]
+ 141 009a D8E7     		b	.L5
+ 142              	.L7:
+  35:Library/Src/referee.c **** 
+ 143              		.loc 1 35 5 discriminator 7 view .LVU32
+ 144 009c 104C     		ldr	r4, .L11+28
+ 145 009e 4FF40065 		mov	r5, #2048
+ 146 00a2 A560     		str	r5, [r4, #8]
+ 147 00a4 D3E7     		b	.L5
+ 148              	.LVL3:
+ 149              	.L9:
+  62:Library/Src/referee.c ****     {
+  63:Library/Src/referee.c ****         __HAL_DMA_DISABLE(&hdma_usart6_tx);
+ 150              		.loc 1 63 9 is_stmt 1 view .LVU33
+ 151 00a6 1A68     		ldr	r2, [r3]
+ 152 00a8 22F00102 		bic	r2, r2, #1
+ 153 00ac 1A60     		str	r2, [r3]
+ 154              	.L8:
+  61:Library/Src/referee.c ****     {
+ 155              		.loc 1 61 10 view .LVU34
+  61:Library/Src/referee.c ****     {
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 5
+
+
+ 156              		.loc 1 61 25 is_stmt 0 view .LVU35
+ 157 00ae 094B     		ldr	r3, .L11+16
+ 158 00b0 1B68     		ldr	r3, [r3]
+  61:Library/Src/referee.c ****     {
+ 159              		.loc 1 61 34 view .LVU36
+ 160 00b2 1A68     		ldr	r2, [r3]
+  61:Library/Src/referee.c ****     {
+ 161              		.loc 1 61 10 view .LVU37
+ 162 00b4 12F0010F 		tst	r2, #1
+ 163 00b8 F5D1     		bne	.L9
+  64:Library/Src/referee.c ****     }
+  65:Library/Src/referee.c **** 
+  66:Library/Src/referee.c ****     hdma_usart6_tx.Instance->PAR = (uint32_t) & (USART6->DR);
+ 164              		.loc 1 66 5 is_stmt 1 view .LVU38
+ 165              		.loc 1 66 34 is_stmt 0 view .LVU39
+ 166 00ba 054A     		ldr	r2, .L11+12
+ 167 00bc 9A60     		str	r2, [r3, #8]
+  67:Library/Src/referee.c **** }
+ 168              		.loc 1 67 1 view .LVU40
+ 169 00be 30BC     		pop	{r4, r5}
+ 170              	.LCFI1:
+ 171              		.cfi_restore 5
+ 172              		.cfi_restore 4
+ 173              		.cfi_def_cfa_offset 0
+ 174 00c0 7047     		bx	lr
+ 175              	.L12:
+ 176 00c2 00BF     		.align	2
+ 177              	.L11:
+ 178 00c4 00000000 		.word	huart6
+ 179 00c8 00000000 		.word	hdma_usart6_rx
+ 180 00cc 58640240 		.word	1073898584
+ 181 00d0 04140140 		.word	1073812484
+ 182 00d4 00000000 		.word	hdma_usart6_tx
+ 183 00d8 B8600240 		.word	1073897656
+ 184 00dc 58600240 		.word	1073897560
+ 185 00e0 00600240 		.word	1073897472
+ 186              		.cfi_endproc
+ 187              	.LFE138:
+ 189              		.section	.text.referee_read_data,"ax",%progbits
+ 190              		.align	1
+ 191              		.global	referee_read_data
+ 192              		.syntax unified
+ 193              		.thumb
+ 194              		.thumb_func
+ 196              	referee_read_data:
+ 197              	.LVL4:
+ 198              	.LFB140:
+  68:Library/Src/referee.c **** 
+  69:Library/Src/referee.c **** 
+  70:Library/Src/referee.c **** void referee_unpack_fifo_data(void)
+  71:Library/Src/referee.c **** {
+  72:Library/Src/referee.c ****   uint8_t byte = 0;
+  73:Library/Src/referee.c ****   uint8_t sof = HEADER_SOF;
+  74:Library/Src/referee.c ****   referee_unpack_data_t *p_obj = &referee_unpack_obj;
+  75:Library/Src/referee.c **** 
+  76:Library/Src/referee.c ****   while ( fifo_s_used(&referee_fifo))
+  77:Library/Src/referee.c ****   {
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 6
+
+
+  78:Library/Src/referee.c ****     byte = fifo_s_get(&referee_fifo);
+  79:Library/Src/referee.c ****     switch(p_obj->unpack_step)
+  80:Library/Src/referee.c ****     {
+  81:Library/Src/referee.c ****       case STEP_HEADER_SOF:
+  82:Library/Src/referee.c ****       {
+  83:Library/Src/referee.c ****         if(byte == sof)
+  84:Library/Src/referee.c ****         {
+  85:Library/Src/referee.c ****           p_obj->unpack_step = STEP_LENGTH_LOW;
+  86:Library/Src/referee.c ****           p_obj->protocol_packet[p_obj->index++] = byte;
+  87:Library/Src/referee.c ****         }
+  88:Library/Src/referee.c ****         else
+  89:Library/Src/referee.c ****         {
+  90:Library/Src/referee.c ****           p_obj->index = 0;
+  91:Library/Src/referee.c ****         }
+  92:Library/Src/referee.c ****       }break;
+  93:Library/Src/referee.c ****       
+  94:Library/Src/referee.c ****       case STEP_LENGTH_LOW:
+  95:Library/Src/referee.c ****       {
+  96:Library/Src/referee.c ****         p_obj->data_len = byte;
+  97:Library/Src/referee.c ****         p_obj->protocol_packet[p_obj->index++] = byte;
+  98:Library/Src/referee.c ****         p_obj->unpack_step = STEP_LENGTH_HIGH;
+  99:Library/Src/referee.c ****       }break;
+ 100:Library/Src/referee.c ****       
+ 101:Library/Src/referee.c ****       case STEP_LENGTH_HIGH:
+ 102:Library/Src/referee.c ****       {
+ 103:Library/Src/referee.c ****         p_obj->data_len |= (byte << 8);
+ 104:Library/Src/referee.c ****         p_obj->protocol_packet[p_obj->index++] = byte;
+ 105:Library/Src/referee.c **** 
+ 106:Library/Src/referee.c ****         if(p_obj->data_len < (REF_PROTOCOL_FRAME_MAX_SIZE - REF_HEADER_CRC_CMDID_LEN))
+ 107:Library/Src/referee.c ****         {
+ 108:Library/Src/referee.c ****           p_obj->unpack_step = STEP_FRAME_SEQ;
+ 109:Library/Src/referee.c ****         }
+ 110:Library/Src/referee.c ****         else
+ 111:Library/Src/referee.c ****         {
+ 112:Library/Src/referee.c ****           p_obj->unpack_step = STEP_HEADER_SOF;
+ 113:Library/Src/referee.c ****           p_obj->index = 0;
+ 114:Library/Src/referee.c ****         }
+ 115:Library/Src/referee.c ****       }break;
+ 116:Library/Src/referee.c ****       case STEP_FRAME_SEQ:
+ 117:Library/Src/referee.c ****       {
+ 118:Library/Src/referee.c ****         p_obj->protocol_packet[p_obj->index++] = byte;
+ 119:Library/Src/referee.c ****         p_obj->unpack_step = STEP_HEADER_CRC8;
+ 120:Library/Src/referee.c ****       }break;
+ 121:Library/Src/referee.c **** 
+ 122:Library/Src/referee.c ****       case STEP_HEADER_CRC8:
+ 123:Library/Src/referee.c ****       {
+ 124:Library/Src/referee.c ****         p_obj->protocol_packet[p_obj->index++] = byte;
+ 125:Library/Src/referee.c **** 
+ 126:Library/Src/referee.c ****         if (p_obj->index == 5)
+ 127:Library/Src/referee.c ****         {
+ 128:Library/Src/referee.c ****           if ( Verify_CRC8_Check_Sum(p_obj->protocol_packet, 5) )
+ 129:Library/Src/referee.c ****           {
+ 130:Library/Src/referee.c ****             p_obj->unpack_step = STEP_DATA_CRC16;
+ 131:Library/Src/referee.c ****           }
+ 132:Library/Src/referee.c ****           else
+ 133:Library/Src/referee.c ****           {
+ 134:Library/Src/referee.c ****             p_obj->unpack_step = STEP_HEADER_SOF;
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 7
+
+
+ 135:Library/Src/referee.c ****             p_obj->index = 0;
+ 136:Library/Src/referee.c ****           }
+ 137:Library/Src/referee.c ****         }
+ 138:Library/Src/referee.c ****       }break;  
+ 139:Library/Src/referee.c ****       
+ 140:Library/Src/referee.c ****       case STEP_DATA_CRC16:
+ 141:Library/Src/referee.c ****       {
+ 142:Library/Src/referee.c ****         if (p_obj->index < (REF_HEADER_CRC_CMDID_LEN + p_obj->data_len))
+ 143:Library/Src/referee.c ****         {
+ 144:Library/Src/referee.c ****             p_obj->protocol_packet[p_obj->index++] = byte;  
+ 145:Library/Src/referee.c ****         }
+ 146:Library/Src/referee.c ****         else if (p_obj->index >= (REF_HEADER_CRC_CMDID_LEN + p_obj->data_len))
+ 147:Library/Src/referee.c ****         {
+ 148:Library/Src/referee.c ****             p_obj->unpack_step = STEP_HEADER_SOF;
+ 149:Library/Src/referee.c ****             p_obj->index = 0;
+ 150:Library/Src/referee.c ****             if ( Verify_CRC16_Check_Sum(p_obj->protocol_packet, 9 + p_obj->data_len) )
+ 151:Library/Src/referee.c ****             {
+ 152:Library/Src/referee.c ****                 referee_read_data(p_obj->protocol_packet);
+ 153:Library/Src/referee.c ****             }
+ 154:Library/Src/referee.c ****         }
+ 155:Library/Src/referee.c ****       }break;
+ 156:Library/Src/referee.c **** 
+ 157:Library/Src/referee.c ****       default:
+ 158:Library/Src/referee.c ****       {
+ 159:Library/Src/referee.c ****         p_obj->unpack_step = STEP_HEADER_SOF;
+ 160:Library/Src/referee.c ****         p_obj->index = 0;
+ 161:Library/Src/referee.c ****       }break;
+ 162:Library/Src/referee.c ****     }
+ 163:Library/Src/referee.c ****   }
+ 164:Library/Src/referee.c **** }
+ 165:Library/Src/referee.c **** 
+ 166:Library/Src/referee.c **** void referee_read_data(uint8_t *frame)
+ 167:Library/Src/referee.c **** {
+ 199              		.loc 1 167 1 is_stmt 1 view -0
+ 200              		.cfi_startproc
+ 201              		@ args = 0, pretend = 0, frame = 0
+ 202              		@ frame_needed = 0, uses_anonymous_args = 0
+ 203              		.loc 1 167 1 is_stmt 0 view .LVU42
+ 204 0000 10B5     		push	{r4, lr}
+ 205              	.LCFI2:
+ 206              		.cfi_def_cfa_offset 8
+ 207              		.cfi_offset 4, -8
+ 208              		.cfi_offset 14, -4
+ 209 0002 8446     		mov	ip, r0
+ 168:Library/Src/referee.c ****     uint16_t cmd_id = 0;
+ 210              		.loc 1 168 5 is_stmt 1 view .LVU43
+ 211              	.LVL5:
+ 169:Library/Src/referee.c **** 
+ 170:Library/Src/referee.c ****     uint8_t index = 0;
+ 212              		.loc 1 170 5 view .LVU44
+ 171:Library/Src/referee.c ****     
+ 172:Library/Src/referee.c ****     memcpy(&data_referee.FrameHeader, frame, 5);
+ 213              		.loc 1 172 5 view .LVU45
+ 214 0004 934B     		ldr	r3, .L44
+ 215 0006 0068     		ldr	r0, [r0]	@ unaligned
+ 216              	.LVL6:
+ 217              		.loc 1 172 5 is_stmt 0 view .LVU46
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 8
+
+
+ 218 0008 1860     		str	r0, [r3]
+ 219 000a 9CF80420 		ldrb	r2, [ip, #4]	@ zero_extendqisi2
+ 220 000e 1A71     		strb	r2, [r3, #4]
+ 173:Library/Src/referee.c **** 
+ 174:Library/Src/referee.c ****     index += 5;
+ 221              		.loc 1 174 5 is_stmt 1 view .LVU47
+ 222              	.LVL7:
+ 175:Library/Src/referee.c **** 
+ 176:Library/Src/referee.c ****     memcpy(&cmd_id, frame + index, sizeof(uint16_t));
+ 223              		.loc 1 176 5 view .LVU48
+ 224 0010 BCF80530 		ldrh	r3, [ip, #5]	@ unaligned
+ 225              	.LVL8:
+ 177:Library/Src/referee.c ****     index += sizeof(uint16_t);
+ 226              		.loc 1 177 5 view .LVU49
+ 178:Library/Src/referee.c ****     switch(cmd_id)
+ 227              		.loc 1 178 5 view .LVU50
+ 228 0014 40F20E22 		movw	r2, #526
+ 229 0018 9342     		cmp	r3, r2
+ 230 001a 64D8     		bhi	.L14
+ 231 001c B3F5007F 		cmp	r3, #512
+ 232 0020 13D9     		bls	.L41
+ 233 0022 A3F20123 		subw	r3, r3, #513
+ 234              	.LVL9:
+ 235              		.loc 1 178 5 is_stmt 0 view .LVU51
+ 236 0026 0D2B     		cmp	r3, #13
+ 237 0028 67D8     		bhi	.L13
+ 238 002a DFE813F0 		tbh	[pc, r3, lsl #1]
+ 239              	.L23:
+ 240 002e 7B00     		.2byte	(.L35-.L23)/2
+ 241 0030 8700     		.2byte	(.L34-.L23)/2
+ 242 0032 9900     		.2byte	(.L33-.L23)/2
+ 243 0034 A700     		.2byte	(.L32-.L23)/2
+ 244 0036 6600     		.2byte	(.L13-.L23)/2
+ 245 0038 B500     		.2byte	(.L31-.L23)/2
+ 246 003a BB00     		.2byte	(.L30-.L23)/2
+ 247 003c C900     		.2byte	(.L29-.L23)/2
+ 248 003e D000     		.2byte	(.L28-.L23)/2
+ 249 0040 D900     		.2byte	(.L27-.L23)/2
+ 250 0042 E300     		.2byte	(.L26-.L23)/2
+ 251 0044 FD00     		.2byte	(.L25-.L23)/2
+ 252 0046 0301     		.2byte	(.L24-.L23)/2
+ 253 0048 0D01     		.2byte	(.L22-.L23)/2
+ 254              	.LVL10:
+ 255              		.p2align 1
+ 256              	.L41:
+ 257              		.loc 1 178 5 view .LVU52
+ 258 004a 40F20112 		movw	r2, #257
+ 259 004e 9342     		cmp	r3, r2
+ 260 0050 59D0     		beq	.L16
+ 261 0052 B3F5817F 		cmp	r3, #258
+ 262 0056 10D3     		bcc	.L42
+ 263 0058 B3F5827F 		cmp	r3, #260
+ 264 005c 59D0     		beq	.L36
+ 265 005e 40F20512 		movw	r2, #261
+ 266 0062 9342     		cmp	r3, r2
+ 267 0064 49D1     		bne	.L13
+ 179:Library/Src/referee.c ****     {
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 9
+
+
+ 180:Library/Src/referee.c ****         case 0x0001:
+ 181:Library/Src/referee.c ****             memcpy(&data_referee.GameState , frame + index , sizeof(ext_game_state_t));
+ 182:Library/Src/referee.c ****             break;
+ 183:Library/Src/referee.c ****         case 0x0002:
+ 184:Library/Src/referee.c ****             memcpy(&data_referee.GameResult , frame + index , sizeof(ext_game_result_t));
+ 185:Library/Src/referee.c ****             break;
+ 186:Library/Src/referee.c ****         case 0x0003:
+ 187:Library/Src/referee.c ****             memcpy(&data_referee.GameRobotHP , frame + index , sizeof(ext_game_robot_HP_t));
+ 188:Library/Src/referee.c ****             break;
+ 189:Library/Src/referee.c ****         case 0x0101:
+ 190:Library/Src/referee.c ****             memcpy(&data_referee.EventData , frame + index , sizeof(ext_event_data_t));
+ 191:Library/Src/referee.c ****             break;
+ 192:Library/Src/referee.c ****         case 0x0104:
+ 193:Library/Src/referee.c ****             memcpy(&data_referee.RefereeWarning , frame + index , sizeof(referee_warning_t));
+ 194:Library/Src/referee.c ****             break;
+ 195:Library/Src/referee.c ****         case 0x0105:
+ 196:Library/Src/referee.c ****             memcpy(&data_referee.DartInfo , frame + index , sizeof(dart_info_t));
+ 268              		.loc 1 196 13 is_stmt 1 view .LVU53
+ 269 0066 7B4B     		ldr	r3, .L44
+ 270              	.LVL11:
+ 271              		.loc 1 196 13 is_stmt 0 view .LVU54
+ 272 0068 BCF80710 		ldrh	r1, [ip, #7]	@ unaligned
+ 273 006c 9CF80920 		ldrb	r2, [ip, #9]	@ zero_extendqisi2
+ 274 0070 A3F83910 		strh	r1, [r3, #57]	@ unaligned
+ 275              	.LVL12:
+ 276              		.loc 1 196 13 view .LVU55
+ 277 0074 83F83B20 		strb	r2, [r3, #59]
+ 197:Library/Src/referee.c ****             break;
+ 278              		.loc 1 197 13 is_stmt 1 view .LVU56
+ 279 0078 3FE0     		b	.L13
+ 280              	.LVL13:
+ 281              	.L42:
+ 178:Library/Src/referee.c ****     switch(cmd_id)
+ 282              		.loc 1 178 5 is_stmt 0 view .LVU57
+ 283 007a 022B     		cmp	r3, #2
+ 284 007c 3ED0     		beq	.L18
+ 285 007e 032B     		cmp	r3, #3
+ 286 0080 21D1     		bne	.L43
+ 187:Library/Src/referee.c ****             break;
+ 287              		.loc 1 187 13 is_stmt 1 view .LVU58
+ 288 0082 744B     		ldr	r3, .L44
+ 289              	.LVL14:
+ 187:Library/Src/referee.c ****             break;
+ 290              		.loc 1 187 13 is_stmt 0 view .LVU59
+ 291 0084 DCF80740 		ldr	r4, [ip, #7]	@ unaligned
+ 292 0088 DCF80B00 		ldr	r0, [ip, #11]	@ unaligned
+ 293 008c DCF80F10 		ldr	r1, [ip, #15]	@ unaligned
+ 294 0090 DCF81320 		ldr	r2, [ip, #19]	@ unaligned
+ 295 0094 C3F81240 		str	r4, [r3, #18]	@ unaligned
+ 296              	.LVL15:
+ 187:Library/Src/referee.c ****             break;
+ 297              		.loc 1 187 13 view .LVU60
+ 298 0098 C3F81600 		str	r0, [r3, #22]	@ unaligned
+ 299 009c C3F81A10 		str	r1, [r3, #26]	@ unaligned
+ 300 00a0 C3F81E20 		str	r2, [r3, #30]	@ unaligned
+ 301 00a4 DCF81740 		ldr	r4, [ip, #23]	@ unaligned
+ 302 00a8 DCF81B00 		ldr	r0, [ip, #27]	@ unaligned
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 10
+
+
+ 303 00ac DCF81F10 		ldr	r1, [ip, #31]	@ unaligned
+ 304 00b0 DCF82320 		ldr	r2, [ip, #35]	@ unaligned
+ 305 00b4 C3F82240 		str	r4, [r3, #34]	@ unaligned
+ 306 00b8 C3F82600 		str	r0, [r3, #38]	@ unaligned
+ 307 00bc C3F82A10 		str	r1, [r3, #42]	@ unaligned
+ 308 00c0 C3F82E20 		str	r2, [r3, #46]	@ unaligned
+ 188:Library/Src/referee.c ****         case 0x0101:
+ 309              		.loc 1 188 13 is_stmt 1 view .LVU61
+ 310 00c4 19E0     		b	.L13
+ 311              	.LVL16:
+ 312              	.L43:
+ 178:Library/Src/referee.c ****     {
+ 313              		.loc 1 178 5 is_stmt 0 view .LVU62
+ 314 00c6 012B     		cmp	r3, #1
+ 315 00c8 17D1     		bne	.L13
+ 181:Library/Src/referee.c ****             break;
+ 316              		.loc 1 181 13 is_stmt 1 view .LVU63
+ 317 00ca 624B     		ldr	r3, .L44
+ 318              	.LVL17:
+ 181:Library/Src/referee.c ****             break;
+ 319              		.loc 1 181 13 is_stmt 0 view .LVU64
+ 320 00cc DCF80700 		ldr	r0, [ip, #7]	@ unaligned
+ 321 00d0 DCF80B10 		ldr	r1, [ip, #11]	@ unaligned
+ 322 00d4 DCF80F20 		ldr	r2, [ip, #15]	@ unaligned
+ 323 00d8 C3F80500 		str	r0, [r3, #5]	@ unaligned
+ 324              	.LVL18:
+ 181:Library/Src/referee.c ****             break;
+ 325              		.loc 1 181 13 view .LVU65
+ 326 00dc C3F80910 		str	r1, [r3, #9]	@ unaligned
+ 327 00e0 C3F80D20 		str	r2, [r3, #13]	@ unaligned
+ 182:Library/Src/referee.c ****         case 0x0002:
+ 328              		.loc 1 182 13 is_stmt 1 view .LVU66
+ 329 00e4 09E0     		b	.L13
+ 330              	.LVL19:
+ 331              	.L14:
+ 178:Library/Src/referee.c ****     {
+ 332              		.loc 1 178 5 is_stmt 0 view .LVU67
+ 333 00e6 40F20932 		movw	r2, #777
+ 334 00ea 9342     		cmp	r3, r2
+ 335 00ec 05D1     		bne	.L13
+ 336              	.LVL20:
+ 337              	.L38:
+ 198:Library/Src/referee.c ****         case 0x0201:
+ 199:Library/Src/referee.c ****             memcpy(&data_referee.GameRobotState , frame + index , sizeof(ext_game_robot_state_t));
+ 200:Library/Src/referee.c ****             break;
+ 201:Library/Src/referee.c ****         case 0x0202:
+ 202:Library/Src/referee.c ****             memcpy(&data_referee.PowerHeatData , frame + index , sizeof(ext_power_heat_data_t));
+ 203:Library/Src/referee.c ****             break;
+ 204:Library/Src/referee.c ****         case 0x0203:
+ 205:Library/Src/referee.c ****             memcpy(&data_referee.GameRobotPos , frame + index , sizeof(ext_game_robot_pos_t));
+ 206:Library/Src/referee.c ****             break;
+ 207:Library/Src/referee.c ****         case 0x0204:
+ 208:Library/Src/referee.c ****             memcpy(&data_referee.BuffMusk , frame + index , sizeof(ext_buff_musk_t));
+ 209:Library/Src/referee.c ****             break;
+ 210:Library/Src/referee.c ****         case 0x0206:
+ 211:Library/Src/referee.c ****             memcpy(&data_referee.RobotHurt , frame + index , sizeof(ext_robot_hurt_t));
+ 212:Library/Src/referee.c ****             break;
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 11
+
+
+ 213:Library/Src/referee.c ****         case 0x0207:
+ 214:Library/Src/referee.c ****             memcpy(&data_referee.ShootData , frame + index , sizeof(ext_shoot_data_t));
+ 215:Library/Src/referee.c ****             break;
+ 216:Library/Src/referee.c ****         case 0x0208:
+ 217:Library/Src/referee.c ****             memcpy(&data_referee.ProjectileAllowance , frame + index , sizeof(projectile_allowance_
+ 218:Library/Src/referee.c ****             break;
+ 219:Library/Src/referee.c ****         case 0x0209:
+ 220:Library/Src/referee.c ****             memcpy(&data_referee.RfidStatus , frame + index , sizeof(rfid_status_t));
+ 221:Library/Src/referee.c ****             break;
+ 222:Library/Src/referee.c ****         case 0x020A:
+ 223:Library/Src/referee.c ****             memcpy(&data_referee.DartClient , frame + index , sizeof(dart_client_cmd_t));
+ 224:Library/Src/referee.c ****             break;
+ 225:Library/Src/referee.c ****         case 0x020B:
+ 226:Library/Src/referee.c ****             memcpy(&data_referee.GroundRobotPosition , frame + index , sizeof(ground_robot_position
+ 227:Library/Src/referee.c ****             break;
+ 228:Library/Src/referee.c ****         case 0x020C:
+ 229:Library/Src/referee.c ****             memcpy(&data_referee.RadarMark , frame + index , sizeof(radar_mark_data_t));
+ 230:Library/Src/referee.c ****             break;
+ 231:Library/Src/referee.c ****         case 0x020D:
+ 232:Library/Src/referee.c ****             memcpy(&data_referee.SentryInfo , frame + index , sizeof(sentry_info_t));
+ 233:Library/Src/referee.c ****             break;
+ 234:Library/Src/referee.c ****         case 0x020E:
+ 235:Library/Src/referee.c ****             memcpy(&data_referee.RadarInfo , frame + index , sizeof(radar_info_t));
+ 236:Library/Src/referee.c ****         case 0x0309:
+ 237:Library/Src/referee.c ****             memcpy(&data_referee.ReceiveData , frame + index , sizeof(custom_robot_data_t));
+ 338              		.loc 1 237 13 is_stmt 1 view .LVU68
+ 339 00ee 6422     		movs	r2, #100
+ 340 00f0 0CF10701 		add	r1, ip, #7
+ 341 00f4 5848     		ldr	r0, .L44+4
+ 342 00f6 FFF7FEFF 		bl	memcpy
+ 343              	.LVL21:
+ 238:Library/Src/referee.c ****             break;
+ 344              		.loc 1 238 13 view .LVU69
+ 345              	.L13:
+ 239:Library/Src/referee.c ****         default:
+ 240:Library/Src/referee.c ****             break;
+ 241:Library/Src/referee.c ****     }
+ 242:Library/Src/referee.c **** }
+ 346              		.loc 1 242 1 is_stmt 0 view .LVU70
+ 347 00fa 10BD     		pop	{r4, pc}
+ 348              	.LVL22:
+ 349              	.L18:
+ 184:Library/Src/referee.c ****             break;
+ 350              		.loc 1 184 13 is_stmt 1 view .LVU71
+ 351 00fc 9CF80720 		ldrb	r2, [ip, #7]	@ zero_extendqisi2
+ 352 0100 544B     		ldr	r3, .L44
+ 353              	.LVL23:
+ 184:Library/Src/referee.c ****             break;
+ 354              		.loc 1 184 13 is_stmt 0 view .LVU72
+ 355 0102 5A74     		strb	r2, [r3, #17]
+ 356              	.LVL24:
+ 185:Library/Src/referee.c ****         case 0x0003:
+ 357              		.loc 1 185 13 is_stmt 1 view .LVU73
+ 358 0104 F9E7     		b	.L13
+ 359              	.LVL25:
+ 360              	.L16:
+ 190:Library/Src/referee.c ****             break;
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 12
+
+
+ 361              		.loc 1 190 13 view .LVU74
+ 362 0106 DCF80720 		ldr	r2, [ip, #7]	@ unaligned
+ 363 010a 524B     		ldr	r3, .L44
+ 364              	.LVL26:
+ 190:Library/Src/referee.c ****             break;
+ 365              		.loc 1 190 13 is_stmt 0 view .LVU75
+ 366 010c C3F83220 		str	r2, [r3, #50]	@ unaligned
+ 367              	.LVL27:
+ 191:Library/Src/referee.c ****         case 0x0104:
+ 368              		.loc 1 191 13 is_stmt 1 view .LVU76
+ 369 0110 F3E7     		b	.L13
+ 370              	.LVL28:
+ 371              	.L36:
+ 193:Library/Src/referee.c ****             break;
+ 372              		.loc 1 193 13 view .LVU77
+ 373 0112 504B     		ldr	r3, .L44
+ 374              	.LVL29:
+ 193:Library/Src/referee.c ****             break;
+ 375              		.loc 1 193 13 is_stmt 0 view .LVU78
+ 376 0114 BCF80710 		ldrh	r1, [ip, #7]	@ unaligned
+ 377 0118 9CF80920 		ldrb	r2, [ip, #9]	@ zero_extendqisi2
+ 378 011c D986     		strh	r1, [r3, #54]	@ unaligned
+ 379              	.LVL30:
+ 193:Library/Src/referee.c ****             break;
+ 380              		.loc 1 193 13 view .LVU79
+ 381 011e 83F83820 		strb	r2, [r3, #56]
+ 194:Library/Src/referee.c ****         case 0x0105:
+ 382              		.loc 1 194 13 is_stmt 1 view .LVU80
+ 383 0122 EAE7     		b	.L13
+ 384              	.LVL31:
+ 385              	.L35:
+ 199:Library/Src/referee.c ****             break;
+ 386              		.loc 1 199 13 view .LVU81
+ 387 0124 4D4B     		ldr	r3, .L44+8
+ 388              	.LVL32:
+ 199:Library/Src/referee.c ****             break;
+ 389              		.loc 1 199 13 is_stmt 0 view .LVU82
+ 390 0126 DCF80700 		ldr	r0, [ip, #7]	@ unaligned
+ 391 012a DCF80B10 		ldr	r1, [ip, #11]	@ unaligned
+ 392 012e DCF80F20 		ldr	r2, [ip, #15]	@ unaligned
+ 393 0132 07C3     		stmia	r3!, {r0, r1, r2}
+ 394              	.LVL33:
+ 199:Library/Src/referee.c ****             break;
+ 395              		.loc 1 199 13 view .LVU83
+ 396 0134 9CF81320 		ldrb	r2, [ip, #19]	@ zero_extendqisi2
+ 397 0138 1A70     		strb	r2, [r3]
+ 200:Library/Src/referee.c ****         case 0x0202:
+ 398              		.loc 1 200 13 is_stmt 1 view .LVU84
+ 399 013a DEE7     		b	.L13
+ 400              	.LVL34:
+ 401              	.L34:
+ 202:Library/Src/referee.c ****             break;
+ 402              		.loc 1 202 13 view .LVU85
+ 403 013c 454B     		ldr	r3, .L44
+ 404              	.LVL35:
+ 202:Library/Src/referee.c ****             break;
+ 405              		.loc 1 202 13 is_stmt 0 view .LVU86
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 13
+
+
+ 406 013e DCF80740 		ldr	r4, [ip, #7]	@ unaligned
+ 407 0142 DCF80B00 		ldr	r0, [ip, #11]	@ unaligned
+ 408 0146 DCF80F10 		ldr	r1, [ip, #15]	@ unaligned
+ 409 014a DCF81320 		ldr	r2, [ip, #19]	@ unaligned
+ 410 014e C3F84940 		str	r4, [r3, #73]	@ unaligned
+ 411              	.LVL36:
+ 202:Library/Src/referee.c ****             break;
+ 412              		.loc 1 202 13 view .LVU87
+ 413 0152 C3F84D00 		str	r0, [r3, #77]	@ unaligned
+ 414 0156 C3F85110 		str	r1, [r3, #81]	@ unaligned
+ 415 015a C3F85520 		str	r2, [r3, #85]	@ unaligned
+ 203:Library/Src/referee.c ****         case 0x0203:
+ 416              		.loc 1 203 13 is_stmt 1 view .LVU88
+ 417 015e CCE7     		b	.L13
+ 418              	.LVL37:
+ 419              	.L33:
+ 205:Library/Src/referee.c ****             break;
+ 420              		.loc 1 205 13 view .LVU89
+ 421 0160 3C4B     		ldr	r3, .L44
+ 422              	.LVL38:
+ 205:Library/Src/referee.c ****             break;
+ 423              		.loc 1 205 13 is_stmt 0 view .LVU90
+ 424 0162 DCF80700 		ldr	r0, [ip, #7]	@ unaligned
+ 425 0166 DCF80B10 		ldr	r1, [ip, #11]	@ unaligned
+ 426 016a DCF80F20 		ldr	r2, [ip, #15]	@ unaligned
+ 427 016e C3F85900 		str	r0, [r3, #89]	@ unaligned
+ 428              	.LVL39:
+ 205:Library/Src/referee.c ****             break;
+ 429              		.loc 1 205 13 view .LVU91
+ 430 0172 C3F85D10 		str	r1, [r3, #93]	@ unaligned
+ 431 0176 C3F86120 		str	r2, [r3, #97]	@ unaligned
+ 206:Library/Src/referee.c ****         case 0x0204:
+ 432              		.loc 1 206 13 is_stmt 1 view .LVU92
+ 433 017a BEE7     		b	.L13
+ 434              	.LVL40:
+ 435              	.L32:
+ 208:Library/Src/referee.c ****             break;
+ 436              		.loc 1 208 13 view .LVU93
+ 437 017c 354B     		ldr	r3, .L44
+ 438              	.LVL41:
+ 208:Library/Src/referee.c ****             break;
+ 439              		.loc 1 208 13 is_stmt 0 view .LVU94
+ 440 017e DCF80720 		ldr	r2, [ip, #7]	@ unaligned
+ 441 0182 C3F86520 		str	r2, [r3, #101]	@ unaligned
+ 442              	.LVL42:
+ 208:Library/Src/referee.c ****             break;
+ 443              		.loc 1 208 13 view .LVU95
+ 444 0186 BCF80B10 		ldrh	r1, [ip, #11]	@ unaligned
+ 445 018a 9CF80D20 		ldrb	r2, [ip, #13]	@ zero_extendqisi2
+ 446 018e A3F86910 		strh	r1, [r3, #105]	@ unaligned
+ 447 0192 83F86B20 		strb	r2, [r3, #107]
+ 209:Library/Src/referee.c ****         case 0x0206:
+ 448              		.loc 1 209 13 is_stmt 1 view .LVU96
+ 449 0196 B0E7     		b	.L13
+ 450              	.LVL43:
+ 451              	.L31:
+ 211:Library/Src/referee.c ****             break;
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 14
+
+
+ 452              		.loc 1 211 13 view .LVU97
+ 453 0198 9CF80720 		ldrb	r2, [ip, #7]	@ zero_extendqisi2
+ 454 019c 2D4B     		ldr	r3, .L44
+ 455              	.LVL44:
+ 211:Library/Src/referee.c ****             break;
+ 456              		.loc 1 211 13 is_stmt 0 view .LVU98
+ 457 019e 83F86C20 		strb	r2, [r3, #108]
+ 458              	.LVL45:
+ 212:Library/Src/referee.c ****         case 0x0207:
+ 459              		.loc 1 212 13 is_stmt 1 view .LVU99
+ 460 01a2 AAE7     		b	.L13
+ 461              	.LVL46:
+ 462              	.L30:
+ 214:Library/Src/referee.c ****             break;
+ 463              		.loc 1 214 13 view .LVU100
+ 464 01a4 2B4B     		ldr	r3, .L44
+ 465              	.LVL47:
+ 214:Library/Src/referee.c ****             break;
+ 466              		.loc 1 214 13 is_stmt 0 view .LVU101
+ 467 01a6 DCF80720 		ldr	r2, [ip, #7]	@ unaligned
+ 468 01aa C3F86D20 		str	r2, [r3, #109]	@ unaligned
+ 469              	.LVL48:
+ 214:Library/Src/referee.c ****             break;
+ 470              		.loc 1 214 13 view .LVU102
+ 471 01ae BCF80B10 		ldrh	r1, [ip, #11]	@ unaligned
+ 472 01b2 9CF80D20 		ldrb	r2, [ip, #13]	@ zero_extendqisi2
+ 473 01b6 A3F87110 		strh	r1, [r3, #113]	@ unaligned
+ 474 01ba 83F87320 		strb	r2, [r3, #115]
+ 215:Library/Src/referee.c ****         case 0x0208:
+ 475              		.loc 1 215 13 is_stmt 1 view .LVU103
+ 476 01be 9CE7     		b	.L13
+ 477              	.LVL49:
+ 478              	.L29:
+ 217:Library/Src/referee.c ****             break;
+ 479              		.loc 1 217 13 view .LVU104
+ 480 01c0 274B     		ldr	r3, .L44+12
+ 481              	.LVL50:
+ 217:Library/Src/referee.c ****             break;
+ 482              		.loc 1 217 13 is_stmt 0 view .LVU105
+ 483 01c2 DCF80700 		ldr	r0, [ip, #7]	@ unaligned
+ 484 01c6 DCF80B10 		ldr	r1, [ip, #11]	@ unaligned
+ 485 01ca 03C3     		stmia	r3!, {r0, r1}
+ 486              	.LVL51:
+ 218:Library/Src/referee.c ****         case 0x0209:
+ 487              		.loc 1 218 13 is_stmt 1 view .LVU106
+ 488 01cc 95E7     		b	.L13
+ 489              	.LVL52:
+ 490              	.L28:
+ 220:Library/Src/referee.c ****             break;
+ 491              		.loc 1 220 13 view .LVU107
+ 492 01ce 214B     		ldr	r3, .L44
+ 493              	.LVL53:
+ 220:Library/Src/referee.c ****             break;
+ 494              		.loc 1 220 13 is_stmt 0 view .LVU108
+ 495 01d0 DCF80700 		ldr	r0, [ip, #7]	@ unaligned
+ 496 01d4 D867     		str	r0, [r3, #124]
+ 497              	.LVL54:
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 15
+
+
+ 220:Library/Src/referee.c ****             break;
+ 498              		.loc 1 220 13 view .LVU109
+ 499 01d6 9CF80B20 		ldrb	r2, [ip, #11]	@ zero_extendqisi2
+ 500 01da 83F88020 		strb	r2, [r3, #128]
+ 221:Library/Src/referee.c ****         case 0x020A:
+ 501              		.loc 1 221 13 is_stmt 1 view .LVU110
+ 502 01de 8CE7     		b	.L13
+ 503              	.LVL55:
+ 504              	.L27:
+ 223:Library/Src/referee.c ****             break;
+ 505              		.loc 1 223 13 view .LVU111
+ 506 01e0 1C4B     		ldr	r3, .L44
+ 507              	.LVL56:
+ 223:Library/Src/referee.c ****             break;
+ 508              		.loc 1 223 13 is_stmt 0 view .LVU112
+ 509 01e2 DCF80720 		ldr	r2, [ip, #7]	@ unaligned
+ 510 01e6 C3F88120 		str	r2, [r3, #129]	@ unaligned
+ 511              	.LVL57:
+ 223:Library/Src/referee.c ****             break;
+ 512              		.loc 1 223 13 view .LVU113
+ 513 01ea BCF80B20 		ldrh	r2, [ip, #11]	@ unaligned
+ 514 01ee A3F88520 		strh	r2, [r3, #133]	@ unaligned
+ 224:Library/Src/referee.c ****         case 0x020B:
+ 515              		.loc 1 224 13 is_stmt 1 view .LVU114
+ 516 01f2 82E7     		b	.L13
+ 517              	.LVL58:
+ 518              	.L26:
+ 226:Library/Src/referee.c ****             break;
+ 519              		.loc 1 226 13 view .LVU115
+ 520 01f4 0CF10703 		add	r3, ip, #7
+ 521              	.LVL59:
+ 226:Library/Src/referee.c ****             break;
+ 522              		.loc 1 226 13 is_stmt 0 view .LVU116
+ 523 01f8 1A4A     		ldr	r2, .L44+16
+ 524 01fa 0CF12704 		add	r4, ip, #39
+ 525              	.LVL60:
+ 526              	.L39:
+ 226:Library/Src/referee.c ****             break;
+ 527              		.loc 1 226 13 view .LVU117
+ 528 01fe D3F800C0 		ldr	ip, [r3]	@ unaligned
+ 529 0202 5868     		ldr	r0, [r3, #4]	@ unaligned
+ 530 0204 D3F808E0 		ldr	lr, [r3, #8]	@ unaligned
+ 531 0208 D968     		ldr	r1, [r3, #12]	@ unaligned
+ 532 020a C2F800C0 		str	ip, [r2]	@ unaligned
+ 533 020e 5060     		str	r0, [r2, #4]	@ unaligned
+ 534 0210 C2F808E0 		str	lr, [r2, #8]	@ unaligned
+ 535 0214 D160     		str	r1, [r2, #12]	@ unaligned
+ 536 0216 1033     		adds	r3, r3, #16
+ 537 0218 1032     		adds	r2, r2, #16
+ 538 021a A342     		cmp	r3, r4
+ 539 021c EFD1     		bne	.L39
+ 540 021e 1968     		ldr	r1, [r3]	@ unaligned
+ 541 0220 5B68     		ldr	r3, [r3, #4]	@ unaligned
+ 542 0222 1160     		str	r1, [r2]	@ unaligned
+ 543 0224 5360     		str	r3, [r2, #4]	@ unaligned
+ 227:Library/Src/referee.c ****         case 0x020C:
+ 544              		.loc 1 227 13 is_stmt 1 view .LVU118
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 16
+
+
+ 545 0226 68E7     		b	.L13
+ 546              	.LVL61:
+ 547              	.L25:
+ 229:Library/Src/referee.c ****             break;
+ 548              		.loc 1 229 13 view .LVU119
+ 549 0228 BCF80720 		ldrh	r2, [ip, #7]	@ unaligned
+ 550 022c 094B     		ldr	r3, .L44
+ 551              	.LVL62:
+ 229:Library/Src/referee.c ****             break;
+ 552              		.loc 1 229 13 is_stmt 0 view .LVU120
+ 553 022e A3F8AF20 		strh	r2, [r3, #175]	@ unaligned
+ 554              	.LVL63:
+ 230:Library/Src/referee.c ****         case 0x020D:
+ 555              		.loc 1 230 13 is_stmt 1 view .LVU121
+ 556 0232 62E7     		b	.L13
+ 557              	.LVL64:
+ 558              	.L24:
+ 232:Library/Src/referee.c ****             break;
+ 559              		.loc 1 232 13 view .LVU122
+ 560 0234 074B     		ldr	r3, .L44
+ 561              	.LVL65:
+ 232:Library/Src/referee.c ****             break;
+ 562              		.loc 1 232 13 is_stmt 0 view .LVU123
+ 563 0236 DCF80720 		ldr	r2, [ip, #7]	@ unaligned
+ 564 023a C3F8B120 		str	r2, [r3, #177]	@ unaligned
+ 565              	.LVL66:
+ 232:Library/Src/referee.c ****             break;
+ 566              		.loc 1 232 13 view .LVU124
+ 567 023e BCF80B20 		ldrh	r2, [ip, #11]	@ unaligned
+ 568 0242 A3F8B520 		strh	r2, [r3, #181]	@ unaligned
+ 233:Library/Src/referee.c ****         case 0x020E:
+ 569              		.loc 1 233 13 is_stmt 1 view .LVU125
+ 570 0246 58E7     		b	.L13
+ 571              	.LVL67:
+ 572              	.L22:
+ 235:Library/Src/referee.c ****         case 0x0309:
+ 573              		.loc 1 235 13 view .LVU126
+ 574 0248 9CF80720 		ldrb	r2, [ip, #7]	@ zero_extendqisi2
+ 575 024c 014B     		ldr	r3, .L44
+ 576              	.LVL68:
+ 235:Library/Src/referee.c ****         case 0x0309:
+ 577              		.loc 1 235 13 is_stmt 0 view .LVU127
+ 578 024e 83F8B720 		strb	r2, [r3, #183]
+ 579              	.LVL69:
+ 235:Library/Src/referee.c ****         case 0x0309:
+ 580              		.loc 1 235 13 view .LVU128
+ 581 0252 4CE7     		b	.L38
+ 582              	.L45:
+ 583              		.align	2
+ 584              	.L44:
+ 585 0254 00000000 		.word	.LANCHOR0
+ 586 0258 B8000000 		.word	.LANCHOR0+184
+ 587 025c 3C000000 		.word	.LANCHOR0+60
+ 588 0260 74000000 		.word	.LANCHOR0+116
+ 589 0264 87000000 		.word	.LANCHOR0+135
+ 590              		.cfi_endproc
+ 591              	.LFE140:
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 17
+
+
+ 593              		.section	.text.referee_unpack_fifo_data,"ax",%progbits
+ 594              		.align	1
+ 595              		.global	referee_unpack_fifo_data
+ 596              		.syntax unified
+ 597              		.thumb
+ 598              		.thumb_func
+ 600              	referee_unpack_fifo_data:
+ 601              	.LFB139:
+  71:Library/Src/referee.c ****   uint8_t byte = 0;
+ 602              		.loc 1 71 1 is_stmt 1 view -0
+ 603              		.cfi_startproc
+ 604              		@ args = 0, pretend = 0, frame = 0
+ 605              		@ frame_needed = 0, uses_anonymous_args = 0
+ 606 0000 08B5     		push	{r3, lr}
+ 607              	.LCFI3:
+ 608              		.cfi_def_cfa_offset 8
+ 609              		.cfi_offset 3, -8
+ 610              		.cfi_offset 14, -4
+  72:Library/Src/referee.c ****   uint8_t sof = HEADER_SOF;
+ 611              		.loc 1 72 3 view .LVU130
+ 612              	.LVL70:
+  73:Library/Src/referee.c ****   referee_unpack_data_t *p_obj = &referee_unpack_obj;
+ 613              		.loc 1 73 3 view .LVU131
+  74:Library/Src/referee.c **** 
+ 614              		.loc 1 74 3 view .LVU132
+  76:Library/Src/referee.c ****   {
+ 615              		.loc 1 76 3 view .LVU133
+  76:Library/Src/referee.c ****   {
+ 616              		.loc 1 76 9 is_stmt 0 view .LVU134
+ 617 0002 20E0     		b	.L47
+ 618              	.LVL71:
+ 619              	.L55:
+  83:Library/Src/referee.c ****         {
+ 620              		.loc 1 83 9 is_stmt 1 view .LVU135
+  83:Library/Src/referee.c ****         {
+ 621              		.loc 1 83 11 is_stmt 0 view .LVU136
+ 622 0004 A528     		cmp	r0, #165
+ 623 0006 06D0     		beq	.L63
+  90:Library/Src/referee.c ****         }
+ 624              		.loc 1 90 11 is_stmt 1 view .LVU137
+  90:Library/Src/referee.c ****         }
+ 625              		.loc 1 90 24 is_stmt 0 view .LVU138
+ 626 0008 594B     		ldr	r3, .L65
+ 627 000a 0022     		movs	r2, #0
+ 628 000c 83F88720 		strb	r2, [r3, #135]
+ 629 0010 83F88820 		strb	r2, [r3, #136]
+ 630 0014 17E0     		b	.L47
+ 631              	.L63:
+  85:Library/Src/referee.c ****           p_obj->protocol_packet[p_obj->index++] = byte;
+ 632              		.loc 1 85 11 is_stmt 1 view .LVU139
+  85:Library/Src/referee.c ****           p_obj->protocol_packet[p_obj->index++] = byte;
+ 633              		.loc 1 85 30 is_stmt 0 view .LVU140
+ 634 0016 564B     		ldr	r3, .L65
+ 635 0018 0122     		movs	r2, #1
+ 636 001a 83F88620 		strb	r2, [r3, #134]
+  86:Library/Src/referee.c ****         }
+ 637              		.loc 1 86 11 is_stmt 1 view .LVU141
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 18
+
+
+  86:Library/Src/referee.c ****         }
+ 638              		.loc 1 86 39 is_stmt 0 view .LVU142
+ 639 001e B3F88720 		ldrh	r2, [r3, #135]	@ unaligned
+  86:Library/Src/referee.c ****         }
+ 640              		.loc 1 86 46 view .LVU143
+ 641 0022 511C     		adds	r1, r2, #1
+ 642 0024 A3F88710 		strh	r1, [r3, #135]	@ unaligned
+  86:Library/Src/referee.c ****         }
+ 643              		.loc 1 86 50 view .LVU144
+ 644 0028 1344     		add	r3, r3, r2
+ 645 002a 9871     		strb	r0, [r3, #6]
+ 646 002c 0BE0     		b	.L47
+ 647              	.L54:
+  96:Library/Src/referee.c ****         p_obj->protocol_packet[p_obj->index++] = byte;
+ 648              		.loc 1 96 9 is_stmt 1 view .LVU145
+  96:Library/Src/referee.c ****         p_obj->protocol_packet[p_obj->index++] = byte;
+ 649              		.loc 1 96 25 is_stmt 0 view .LVU146
+ 650 002e 504B     		ldr	r3, .L65
+ 651 0030 9880     		strh	r0, [r3, #4]	@ movhi
+  97:Library/Src/referee.c ****         p_obj->unpack_step = STEP_LENGTH_HIGH;
+ 652              		.loc 1 97 9 is_stmt 1 view .LVU147
+  97:Library/Src/referee.c ****         p_obj->unpack_step = STEP_LENGTH_HIGH;
+ 653              		.loc 1 97 37 is_stmt 0 view .LVU148
+ 654 0032 B3F88720 		ldrh	r2, [r3, #135]	@ unaligned
+  97:Library/Src/referee.c ****         p_obj->unpack_step = STEP_LENGTH_HIGH;
+ 655              		.loc 1 97 44 view .LVU149
+ 656 0036 511C     		adds	r1, r2, #1
+ 657 0038 A3F88710 		strh	r1, [r3, #135]	@ unaligned
+  97:Library/Src/referee.c ****         p_obj->unpack_step = STEP_LENGTH_HIGH;
+ 658              		.loc 1 97 48 view .LVU150
+ 659 003c 1A44     		add	r2, r2, r3
+ 660 003e 9071     		strb	r0, [r2, #6]
+  98:Library/Src/referee.c ****       }break;
+ 661              		.loc 1 98 9 is_stmt 1 view .LVU151
+  98:Library/Src/referee.c ****       }break;
+ 662              		.loc 1 98 28 is_stmt 0 view .LVU152
+ 663 0040 0222     		movs	r2, #2
+ 664 0042 83F88620 		strb	r2, [r3, #134]
+  99:Library/Src/referee.c ****       
+ 665              		.loc 1 99 8 is_stmt 1 view .LVU153
+ 666              	.LVL72:
+ 667              	.L47:
+  76:Library/Src/referee.c ****   {
+ 668              		.loc 1 76 9 view .LVU154
+  76:Library/Src/referee.c ****   {
+ 669              		.loc 1 76 11 is_stmt 0 view .LVU155
+ 670 0046 4B48     		ldr	r0, .L65+4
+ 671 0048 FFF7FEFF 		bl	fifo_s_used
+ 672              	.LVL73:
+  76:Library/Src/referee.c ****   {
+ 673              		.loc 1 76 9 view .LVU156
+ 674 004c 0028     		cmp	r0, #0
+ 675 004e 00F08E80 		beq	.L64
+  78:Library/Src/referee.c ****     switch(p_obj->unpack_step)
+ 676              		.loc 1 78 5 is_stmt 1 view .LVU157
+  78:Library/Src/referee.c ****     switch(p_obj->unpack_step)
+ 677              		.loc 1 78 12 is_stmt 0 view .LVU158
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 19
+
+
+ 678 0052 4848     		ldr	r0, .L65+4
+ 679 0054 FFF7FEFF 		bl	fifo_s_get
+ 680              	.LVL74:
+  79:Library/Src/referee.c ****     {
+ 681              		.loc 1 79 5 is_stmt 1 view .LVU159
+  79:Library/Src/referee.c ****     {
+ 682              		.loc 1 79 17 is_stmt 0 view .LVU160
+ 683 0058 454B     		ldr	r3, .L65
+ 684 005a 93F88630 		ldrb	r3, [r3, #134]	@ zero_extendqisi2
+  79:Library/Src/referee.c ****     {
+ 685              		.loc 1 79 5 view .LVU161
+ 686 005e 052B     		cmp	r3, #5
+ 687 0060 7CD8     		bhi	.L48
+ 688 0062 01A2     		adr	r2, .L50
+ 689 0064 52F823F0 		ldr	pc, [r2, r3, lsl #2]
+ 690              		.p2align 2
+ 691              	.L50:
+ 692 0068 05000000 		.word	.L55+1
+ 693 006c 2F000000 		.word	.L54+1
+ 694 0070 81000000 		.word	.L53+1
+ 695 0074 BD000000 		.word	.L52+1
+ 696 0078 D5000000 		.word	.L51+1
+ 697 007c 15010000 		.word	.L49+1
+ 698              		.p2align 1
+ 699              	.L53:
+ 103:Library/Src/referee.c ****         p_obj->protocol_packet[p_obj->index++] = byte;
+ 700              		.loc 1 103 9 is_stmt 1 view .LVU162
+ 103:Library/Src/referee.c ****         p_obj->protocol_packet[p_obj->index++] = byte;
+ 701              		.loc 1 103 25 is_stmt 0 view .LVU163
+ 702 0080 3B4B     		ldr	r3, .L65
+ 703 0082 9A88     		ldrh	r2, [r3, #4]
+ 704 0084 42EA0022 		orr	r2, r2, r0, lsl #8
+ 705 0088 92B2     		uxth	r2, r2
+ 706 008a 9A80     		strh	r2, [r3, #4]	@ movhi
+ 104:Library/Src/referee.c **** 
+ 707              		.loc 1 104 9 is_stmt 1 view .LVU164
+ 104:Library/Src/referee.c **** 
+ 708              		.loc 1 104 37 is_stmt 0 view .LVU165
+ 709 008c B3F88710 		ldrh	r1, [r3, #135]	@ unaligned
+ 104:Library/Src/referee.c **** 
+ 710              		.loc 1 104 44 view .LVU166
+ 711 0090 01F1010C 		add	ip, r1, #1
+ 712 0094 A3F887C0 		strh	ip, [r3, #135]	@ unaligned
+ 104:Library/Src/referee.c **** 
+ 713              		.loc 1 104 48 view .LVU167
+ 714 0098 0B44     		add	r3, r3, r1
+ 715 009a 9871     		strb	r0, [r3, #6]
+ 106:Library/Src/referee.c ****         {
+ 716              		.loc 1 106 9 is_stmt 1 view .LVU168
+ 106:Library/Src/referee.c ****         {
+ 717              		.loc 1 106 11 is_stmt 0 view .LVU169
+ 718 009c 762A     		cmp	r2, #118
+ 719 009e 04D8     		bhi	.L58
+ 108:Library/Src/referee.c ****         }
+ 720              		.loc 1 108 11 is_stmt 1 view .LVU170
+ 108:Library/Src/referee.c ****         }
+ 721              		.loc 1 108 30 is_stmt 0 view .LVU171
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 20
+
+
+ 722 00a0 334B     		ldr	r3, .L65
+ 723 00a2 0322     		movs	r2, #3
+ 724 00a4 83F88620 		strb	r2, [r3, #134]
+ 725 00a8 CDE7     		b	.L47
+ 726              	.L58:
+ 112:Library/Src/referee.c ****           p_obj->index = 0;
+ 727              		.loc 1 112 11 is_stmt 1 view .LVU172
+ 112:Library/Src/referee.c ****           p_obj->index = 0;
+ 728              		.loc 1 112 30 is_stmt 0 view .LVU173
+ 729 00aa 314B     		ldr	r3, .L65
+ 730 00ac 0022     		movs	r2, #0
+ 731 00ae 83F88620 		strb	r2, [r3, #134]
+ 113:Library/Src/referee.c ****         }
+ 732              		.loc 1 113 11 is_stmt 1 view .LVU174
+ 113:Library/Src/referee.c ****         }
+ 733              		.loc 1 113 24 is_stmt 0 view .LVU175
+ 734 00b2 83F88720 		strb	r2, [r3, #135]
+ 735 00b6 83F88820 		strb	r2, [r3, #136]
+ 736 00ba C4E7     		b	.L47
+ 737              	.L52:
+ 118:Library/Src/referee.c ****         p_obj->unpack_step = STEP_HEADER_CRC8;
+ 738              		.loc 1 118 9 is_stmt 1 view .LVU176
+ 118:Library/Src/referee.c ****         p_obj->unpack_step = STEP_HEADER_CRC8;
+ 739              		.loc 1 118 37 is_stmt 0 view .LVU177
+ 740 00bc 2C4B     		ldr	r3, .L65
+ 741 00be B3F88720 		ldrh	r2, [r3, #135]	@ unaligned
+ 118:Library/Src/referee.c ****         p_obj->unpack_step = STEP_HEADER_CRC8;
+ 742              		.loc 1 118 44 view .LVU178
+ 743 00c2 511C     		adds	r1, r2, #1
+ 744 00c4 A3F88710 		strh	r1, [r3, #135]	@ unaligned
+ 118:Library/Src/referee.c ****         p_obj->unpack_step = STEP_HEADER_CRC8;
+ 745              		.loc 1 118 48 view .LVU179
+ 746 00c8 1A44     		add	r2, r2, r3
+ 747 00ca 9071     		strb	r0, [r2, #6]
+ 119:Library/Src/referee.c ****       }break;
+ 748              		.loc 1 119 9 is_stmt 1 view .LVU180
+ 119:Library/Src/referee.c ****       }break;
+ 749              		.loc 1 119 28 is_stmt 0 view .LVU181
+ 750 00cc 0422     		movs	r2, #4
+ 751 00ce 83F88620 		strb	r2, [r3, #134]
+ 120:Library/Src/referee.c **** 
+ 752              		.loc 1 120 8 is_stmt 1 view .LVU182
+ 120:Library/Src/referee.c **** 
+ 753              		.loc 1 120 7 is_stmt 0 view .LVU183
+ 754 00d2 B8E7     		b	.L47
+ 755              	.L51:
+ 124:Library/Src/referee.c **** 
+ 756              		.loc 1 124 9 is_stmt 1 view .LVU184
+ 124:Library/Src/referee.c **** 
+ 757              		.loc 1 124 37 is_stmt 0 view .LVU185
+ 758 00d4 264B     		ldr	r3, .L65
+ 759 00d6 B3F88720 		ldrh	r2, [r3, #135]	@ unaligned
+ 124:Library/Src/referee.c **** 
+ 760              		.loc 1 124 44 view .LVU186
+ 761 00da 511C     		adds	r1, r2, #1
+ 762 00dc 1FFA81FC 		uxth	ip, r1
+ 763 00e0 A3F88710 		strh	r1, [r3, #135]	@ unaligned
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 21
+
+
+ 124:Library/Src/referee.c **** 
+ 764              		.loc 1 124 48 view .LVU187
+ 765 00e4 1344     		add	r3, r3, r2
+ 766 00e6 9871     		strb	r0, [r3, #6]
+ 126:Library/Src/referee.c ****         {
+ 767              		.loc 1 126 9 is_stmt 1 view .LVU188
+ 126:Library/Src/referee.c ****         {
+ 768              		.loc 1 126 12 is_stmt 0 view .LVU189
+ 769 00e8 BCF1050F 		cmp	ip, #5
+ 770 00ec ABD1     		bne	.L47
+ 128:Library/Src/referee.c ****           {
+ 771              		.loc 1 128 11 is_stmt 1 view .LVU190
+ 128:Library/Src/referee.c ****           {
+ 772              		.loc 1 128 16 is_stmt 0 view .LVU191
+ 773 00ee 0521     		movs	r1, #5
+ 774 00f0 2148     		ldr	r0, .L65+8
+ 775              	.LVL75:
+ 128:Library/Src/referee.c ****           {
+ 776              		.loc 1 128 16 view .LVU192
+ 777 00f2 FFF7FEFF 		bl	Verify_CRC8_Check_Sum
+ 778              	.LVL76:
+ 128:Library/Src/referee.c ****           {
+ 779              		.loc 1 128 14 view .LVU193
+ 780 00f6 20B1     		cbz	r0, .L59
+ 130:Library/Src/referee.c ****           }
+ 781              		.loc 1 130 13 is_stmt 1 view .LVU194
+ 130:Library/Src/referee.c ****           }
+ 782              		.loc 1 130 32 is_stmt 0 view .LVU195
+ 783 00f8 1D4B     		ldr	r3, .L65
+ 784 00fa 0522     		movs	r2, #5
+ 785 00fc 83F88620 		strb	r2, [r3, #134]
+ 786 0100 A1E7     		b	.L47
+ 787              	.L59:
+ 134:Library/Src/referee.c ****             p_obj->index = 0;
+ 788              		.loc 1 134 13 is_stmt 1 view .LVU196
+ 134:Library/Src/referee.c ****             p_obj->index = 0;
+ 789              		.loc 1 134 32 is_stmt 0 view .LVU197
+ 790 0102 1B4B     		ldr	r3, .L65
+ 791 0104 0022     		movs	r2, #0
+ 792 0106 83F88620 		strb	r2, [r3, #134]
+ 135:Library/Src/referee.c ****           }
+ 793              		.loc 1 135 13 is_stmt 1 view .LVU198
+ 135:Library/Src/referee.c ****           }
+ 794              		.loc 1 135 26 is_stmt 0 view .LVU199
+ 795 010a 83F88720 		strb	r2, [r3, #135]
+ 796 010e 83F88820 		strb	r2, [r3, #136]
+ 797 0112 98E7     		b	.L47
+ 798              	.LVL77:
+ 799              	.L49:
+ 142:Library/Src/referee.c ****         {
+ 800              		.loc 1 142 9 is_stmt 1 view .LVU200
+ 142:Library/Src/referee.c ****         {
+ 801              		.loc 1 142 18 is_stmt 0 view .LVU201
+ 802 0114 164A     		ldr	r2, .L65
+ 803 0116 B2F88730 		ldrh	r3, [r2, #135]	@ unaligned
+ 142:Library/Src/referee.c ****         {
+ 804              		.loc 1 142 61 view .LVU202
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 22
+
+
+ 805 011a 9188     		ldrh	r1, [r2, #4]
+ 142:Library/Src/referee.c ****         {
+ 806              		.loc 1 142 54 view .LVU203
+ 807 011c 01F10902 		add	r2, r1, #9
+ 142:Library/Src/referee.c ****         {
+ 808              		.loc 1 142 12 view .LVU204
+ 809 0120 9342     		cmp	r3, r2
+ 810 0122 06D2     		bcs	.L60
+ 144:Library/Src/referee.c ****         }
+ 811              		.loc 1 144 13 is_stmt 1 view .LVU205
+ 144:Library/Src/referee.c ****         }
+ 812              		.loc 1 144 48 is_stmt 0 view .LVU206
+ 813 0124 124A     		ldr	r2, .L65
+ 814 0126 591C     		adds	r1, r3, #1
+ 815 0128 A2F88710 		strh	r1, [r2, #135]	@ unaligned
+ 144:Library/Src/referee.c ****         }
+ 816              		.loc 1 144 52 view .LVU207
+ 817 012c 1344     		add	r3, r3, r2
+ 818 012e 9871     		strb	r0, [r3, #6]
+ 819 0130 89E7     		b	.L47
+ 820              	.L60:
+ 146:Library/Src/referee.c ****         {
+ 821              		.loc 1 146 14 is_stmt 1 view .LVU208
+ 146:Library/Src/referee.c ****         {
+ 822              		.loc 1 146 17 is_stmt 0 view .LVU209
+ 823 0132 9342     		cmp	r3, r2
+ 824 0134 87D3     		bcc	.L47
+ 148:Library/Src/referee.c ****             p_obj->index = 0;
+ 825              		.loc 1 148 13 is_stmt 1 view .LVU210
+ 148:Library/Src/referee.c ****             p_obj->index = 0;
+ 826              		.loc 1 148 32 is_stmt 0 view .LVU211
+ 827 0136 0E48     		ldr	r0, .L65
+ 828              	.LVL78:
+ 148:Library/Src/referee.c ****             p_obj->index = 0;
+ 829              		.loc 1 148 32 view .LVU212
+ 830 0138 0023     		movs	r3, #0
+ 831 013a 80F88630 		strb	r3, [r0, #134]
+ 149:Library/Src/referee.c ****             if ( Verify_CRC16_Check_Sum(p_obj->protocol_packet, 9 + p_obj->data_len) )
+ 832              		.loc 1 149 13 is_stmt 1 view .LVU213
+ 149:Library/Src/referee.c ****             if ( Verify_CRC16_Check_Sum(p_obj->protocol_packet, 9 + p_obj->data_len) )
+ 833              		.loc 1 149 26 is_stmt 0 view .LVU214
+ 834 013e 80F88730 		strb	r3, [r0, #135]
+ 835 0142 80F88830 		strb	r3, [r0, #136]
+ 150:Library/Src/referee.c ****             {
+ 836              		.loc 1 150 13 is_stmt 1 view .LVU215
+ 150:Library/Src/referee.c ****             {
+ 837              		.loc 1 150 18 is_stmt 0 view .LVU216
+ 838 0146 0931     		adds	r1, r1, #9
+ 839 0148 0630     		adds	r0, r0, #6
+ 840 014a FFF7FEFF 		bl	Verify_CRC16_Check_Sum
+ 841              	.LVL79:
+ 150:Library/Src/referee.c ****             {
+ 842              		.loc 1 150 16 view .LVU217
+ 843 014e 0028     		cmp	r0, #0
+ 844 0150 3FF479AF 		beq	.L47
+ 152:Library/Src/referee.c ****             }
+ 845              		.loc 1 152 17 is_stmt 1 view .LVU218
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 23
+
+
+ 846 0154 0848     		ldr	r0, .L65+8
+ 847 0156 FFF7FEFF 		bl	referee_read_data
+ 848              	.LVL80:
+ 849 015a 74E7     		b	.L47
+ 850              	.LVL81:
+ 851              	.L48:
+ 159:Library/Src/referee.c ****         p_obj->index = 0;
+ 852              		.loc 1 159 9 view .LVU219
+ 159:Library/Src/referee.c ****         p_obj->index = 0;
+ 853              		.loc 1 159 28 is_stmt 0 view .LVU220
+ 854 015c 044B     		ldr	r3, .L65
+ 855 015e 0022     		movs	r2, #0
+ 856 0160 83F88620 		strb	r2, [r3, #134]
+ 160:Library/Src/referee.c ****       }break;
+ 857              		.loc 1 160 9 is_stmt 1 view .LVU221
+ 160:Library/Src/referee.c ****       }break;
+ 858              		.loc 1 160 22 is_stmt 0 view .LVU222
+ 859 0164 83F88720 		strb	r2, [r3, #135]
+ 860 0168 83F88820 		strb	r2, [r3, #136]
+ 161:Library/Src/referee.c ****     }
+ 861              		.loc 1 161 8 is_stmt 1 view .LVU223
+ 161:Library/Src/referee.c ****     }
+ 862              		.loc 1 161 7 is_stmt 0 view .LVU224
+ 863 016c 6BE7     		b	.L47
+ 864              	.LVL82:
+ 865              	.L64:
+ 164:Library/Src/referee.c **** 
+ 866              		.loc 1 164 1 view .LVU225
+ 867 016e 08BD     		pop	{r3, pc}
+ 868              	.L66:
+ 869              		.align	2
+ 870              	.L65:
+ 871 0170 00000000 		.word	.LANCHOR2
+ 872 0174 00000000 		.word	.LANCHOR1
+ 873 0178 06000000 		.word	.LANCHOR2+6
+ 874              		.cfi_endproc
+ 875              	.LFE139:
+ 877              		.section	.text.USART6_IRQHandler,"ax",%progbits
+ 878              		.align	1
+ 879              		.global	USART6_IRQHandler
+ 880              		.syntax unified
+ 881              		.thumb
+ 882              		.thumb_func
+ 884              	USART6_IRQHandler:
+ 885              	.LFB141:
+ 243:Library/Src/referee.c **** 
+ 244:Library/Src/referee.c **** void USART6_IRQHandler(void)
+ 245:Library/Src/referee.c **** {
+ 886              		.loc 1 245 1 is_stmt 1 view -0
+ 887              		.cfi_startproc
+ 888              		@ args = 0, pretend = 0, frame = 8
+ 889              		@ frame_needed = 0, uses_anonymous_args = 0
+ 890 0000 00B5     		push	{lr}
+ 891              	.LCFI4:
+ 892              		.cfi_def_cfa_offset 4
+ 893              		.cfi_offset 14, -4
+ 894 0002 83B0     		sub	sp, sp, #12
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 24
+
+
+ 895              	.LCFI5:
+ 896              		.cfi_def_cfa_offset 16
+ 246:Library/Src/referee.c ****     static volatile uint8_t res;
+ 897              		.loc 1 246 5 view .LVU227
+ 247:Library/Src/referee.c ****     HAL_UART_IRQHandler(&huart6);
+ 898              		.loc 1 247 5 view .LVU228
+ 899 0004 2D48     		ldr	r0, .L71
+ 900 0006 FFF7FEFF 		bl	HAL_UART_IRQHandler
+ 901              	.LVL83:
+ 248:Library/Src/referee.c ****     if(USART6->SR & UART_FLAG_IDLE)
+ 902              		.loc 1 248 5 view .LVU229
+ 903              		.loc 1 248 14 is_stmt 0 view .LVU230
+ 904 000a 2D4B     		ldr	r3, .L71+4
+ 905 000c 1B68     		ldr	r3, [r3]
+ 906              		.loc 1 248 7 view .LVU231
+ 907 000e 13F0100F 		tst	r3, #16
+ 908 0012 2ED0     		beq	.L67
+ 909              	.LBB2:
+ 249:Library/Src/referee.c ****     {
+ 250:Library/Src/referee.c ****         __HAL_UART_CLEAR_PEFLAG(&huart6);
+ 910              		.loc 1 250 9 is_stmt 1 view .LVU232
+ 911              	.LBB3:
+ 912              		.loc 1 250 9 view .LVU233
+ 913 0014 0023     		movs	r3, #0
+ 914 0016 0193     		str	r3, [sp, #4]
+ 915              		.loc 1 250 9 view .LVU234
+ 916 0018 284B     		ldr	r3, .L71
+ 917 001a 1A68     		ldr	r2, [r3]
+ 918 001c 1168     		ldr	r1, [r2]
+ 919 001e 0191     		str	r1, [sp, #4]
+ 920              		.loc 1 250 9 view .LVU235
+ 921 0020 5268     		ldr	r2, [r2, #4]
+ 922 0022 0192     		str	r2, [sp, #4]
+ 923              		.loc 1 250 9 view .LVU236
+ 924 0024 019A     		ldr	r2, [sp, #4]
+ 925              	.LBE3:
+ 926              		.loc 1 250 9 view .LVU237
+ 251:Library/Src/referee.c **** 
+ 252:Library/Src/referee.c ****         static uint16_t this_time_rx_len = 0;
+ 927              		.loc 1 252 9 view .LVU238
+ 253:Library/Src/referee.c **** 
+ 254:Library/Src/referee.c ****         if ((huart6.hdmarx->Instance->CR & DMA_SxCR_CT) == RESET)
+ 928              		.loc 1 254 9 view .LVU239
+ 929              		.loc 1 254 20 is_stmt 0 view .LVU240
+ 930 0026 9B6B     		ldr	r3, [r3, #56]
+ 931              		.loc 1 254 27 view .LVU241
+ 932 0028 1B68     		ldr	r3, [r3]
+ 933              		.loc 1 254 37 view .LVU242
+ 934 002a 1A68     		ldr	r2, [r3]
+ 935              		.loc 1 254 12 view .LVU243
+ 936 002c 12F4002F 		tst	r2, #524288
+ 937 0030 22D1     		bne	.L69
+ 255:Library/Src/referee.c ****         {
+ 256:Library/Src/referee.c ****             __HAL_DMA_DISABLE(huart6.hdmarx);
+ 938              		.loc 1 256 13 is_stmt 1 view .LVU244
+ 939 0032 1A68     		ldr	r2, [r3]
+ 940 0034 22F00102 		bic	r2, r2, #1
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 25
+
+
+ 941 0038 1A60     		str	r2, [r3]
+ 257:Library/Src/referee.c ****             this_time_rx_len = USART_RX_BUF_LENGHT - __HAL_DMA_GET_COUNTER(huart6.hdmarx);
+ 942              		.loc 1 257 13 view .LVU245
+ 943              		.loc 1 257 54 is_stmt 0 view .LVU246
+ 944 003a 204B     		ldr	r3, .L71
+ 945 003c 9A6B     		ldr	r2, [r3, #56]
+ 946 003e 1168     		ldr	r1, [r2]
+ 947 0040 4A68     		ldr	r2, [r1, #4]
+ 948              		.loc 1 257 52 view .LVU247
+ 949 0042 C2F58072 		rsb	r2, r2, #256
+ 950 0046 92B2     		uxth	r2, r2
+ 951              		.loc 1 257 30 view .LVU248
+ 952 0048 1E48     		ldr	r0, .L71+8
+ 953 004a 0280     		strh	r2, [r0]	@ movhi
+ 258:Library/Src/referee.c ****             __HAL_DMA_SET_COUNTER(huart6.hdmarx, USART_RX_BUF_LENGHT);
+ 954              		.loc 1 258 13 is_stmt 1 view .LVU249
+ 955 004c 4FF48070 		mov	r0, #256
+ 956 0050 4860     		str	r0, [r1, #4]
+ 259:Library/Src/referee.c ****             huart6.hdmarx->Instance->CR |= DMA_SxCR_CT;
+ 957              		.loc 1 259 13 view .LVU250
+ 958              		.loc 1 259 19 is_stmt 0 view .LVU251
+ 959 0052 996B     		ldr	r1, [r3, #56]
+ 960              		.loc 1 259 26 view .LVU252
+ 961 0054 0868     		ldr	r0, [r1]
+ 962              		.loc 1 259 41 view .LVU253
+ 963 0056 0168     		ldr	r1, [r0]
+ 964 0058 41F40021 		orr	r1, r1, #524288
+ 965 005c 0160     		str	r1, [r0]
+ 260:Library/Src/referee.c ****             __HAL_DMA_ENABLE(huart6.hdmarx);
+ 966              		.loc 1 260 13 is_stmt 1 view .LVU254
+ 967 005e 9B6B     		ldr	r3, [r3, #56]
+ 968 0060 1968     		ldr	r1, [r3]
+ 969 0062 0B68     		ldr	r3, [r1]
+ 970 0064 43F00103 		orr	r3, r3, #1
+ 971 0068 0B60     		str	r3, [r1]
+ 261:Library/Src/referee.c ****             fifo_s_puts(&referee_fifo, (char*)usart6_buf[0], this_time_rx_len);
+ 972              		.loc 1 261 13 view .LVU255
+ 973 006a 1749     		ldr	r1, .L71+12
+ 974 006c 1748     		ldr	r0, .L71+16
+ 975 006e FFF7FEFF 		bl	fifo_s_puts
+ 976              	.LVL84:
+ 977              	.L67:
+ 978              	.LBE2:
+ 262:Library/Src/referee.c ****         }
+ 263:Library/Src/referee.c ****         else
+ 264:Library/Src/referee.c ****         {
+ 265:Library/Src/referee.c ****             __HAL_DMA_DISABLE(huart6.hdmarx);
+ 266:Library/Src/referee.c ****             this_time_rx_len = USART_RX_BUF_LENGHT - __HAL_DMA_GET_COUNTER(huart6.hdmarx);
+ 267:Library/Src/referee.c ****             __HAL_DMA_SET_COUNTER(huart6.hdmarx, USART_RX_BUF_LENGHT);
+ 268:Library/Src/referee.c ****             huart6.hdmarx->Instance->CR &= ~(DMA_SxCR_CT);
+ 269:Library/Src/referee.c ****             __HAL_DMA_ENABLE(huart6.hdmarx);
+ 270:Library/Src/referee.c ****             fifo_s_puts(&referee_fifo, (char*)usart6_buf[1], this_time_rx_len);
+ 271:Library/Src/referee.c ****         }
+ 272:Library/Src/referee.c ****     }
+ 273:Library/Src/referee.c **** }...
+ 979              		.loc 1 273 1 is_stmt 0 view .LVU256
+ 980 0072 03B0     		add	sp, sp, #12
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 26
+
+
+ 981              	.LCFI6:
+ 982              		.cfi_remember_state
+ 983              		.cfi_def_cfa_offset 4
+ 984              		@ sp needed
+ 985 0074 5DF804FB 		ldr	pc, [sp], #4
+ 986              	.L69:
+ 987              	.LCFI7:
+ 988              		.cfi_restore_state
+ 989              	.LBB4:
+ 265:Library/Src/referee.c ****             __HAL_DMA_DISABLE(huart6.hdmarx);
+ 990              		.loc 1 265 13 is_stmt 1 view .LVU257
+ 991 0078 1A68     		ldr	r2, [r3]
+ 992 007a 22F00102 		bic	r2, r2, #1
+ 993 007e 1A60     		str	r2, [r3]
+ 266:Library/Src/referee.c ****             this_time_rx_len = USART_RX_BUF_LENGHT - __HAL_DMA_GET_COUNTER(huart6.hdmarx);
+ 994              		.loc 1 266 13 view .LVU258
+ 266:Library/Src/referee.c ****             this_time_rx_len = USART_RX_BUF_LENGHT - __HAL_DMA_GET_COUNTER(huart6.hdmarx);
+ 995              		.loc 1 266 54 is_stmt 0 view .LVU259
+ 996 0080 0E4B     		ldr	r3, .L71
+ 997 0082 9A6B     		ldr	r2, [r3, #56]
+ 998 0084 1168     		ldr	r1, [r2]
+ 999 0086 4A68     		ldr	r2, [r1, #4]
+ 266:Library/Src/referee.c ****             this_time_rx_len = USART_RX_BUF_LENGHT - __HAL_DMA_GET_COUNTER(huart6.hdmarx);
+ 1000              		.loc 1 266 52 view .LVU260
+ 1001 0088 C2F58072 		rsb	r2, r2, #256
+ 1002 008c 92B2     		uxth	r2, r2
+ 266:Library/Src/referee.c ****             this_time_rx_len = USART_RX_BUF_LENGHT - __HAL_DMA_GET_COUNTER(huart6.hdmarx);
+ 1003              		.loc 1 266 30 view .LVU261
+ 1004 008e 0D48     		ldr	r0, .L71+8
+ 1005 0090 0280     		strh	r2, [r0]	@ movhi
+ 267:Library/Src/referee.c ****             __HAL_DMA_SET_COUNTER(huart6.hdmarx, USART_RX_BUF_LENGHT);
+ 1006              		.loc 1 267 13 is_stmt 1 view .LVU262
+ 1007 0092 4FF48070 		mov	r0, #256
+ 1008 0096 4860     		str	r0, [r1, #4]
+ 268:Library/Src/referee.c ****             huart6.hdmarx->Instance->CR &= ~(DMA_SxCR_CT);
+ 1009              		.loc 1 268 13 view .LVU263
+ 268:Library/Src/referee.c ****             huart6.hdmarx->Instance->CR &= ~(DMA_SxCR_CT);
+ 1010              		.loc 1 268 19 is_stmt 0 view .LVU264
+ 1011 0098 996B     		ldr	r1, [r3, #56]
+ 268:Library/Src/referee.c ****             huart6.hdmarx->Instance->CR &= ~(DMA_SxCR_CT);
+ 1012              		.loc 1 268 26 view .LVU265
+ 1013 009a 0868     		ldr	r0, [r1]
+ 268:Library/Src/referee.c ****             huart6.hdmarx->Instance->CR &= ~(DMA_SxCR_CT);
+ 1014              		.loc 1 268 41 view .LVU266
+ 1015 009c 0168     		ldr	r1, [r0]
+ 1016 009e 21F40021 		bic	r1, r1, #524288
+ 1017 00a2 0160     		str	r1, [r0]
+ 269:Library/Src/referee.c ****             __HAL_DMA_ENABLE(huart6.hdmarx);
+ 1018              		.loc 1 269 13 is_stmt 1 view .LVU267
+ 1019 00a4 9B6B     		ldr	r3, [r3, #56]
+ 1020 00a6 1968     		ldr	r1, [r3]
+ 1021 00a8 0B68     		ldr	r3, [r1]
+ 1022 00aa 43F00103 		orr	r3, r3, #1
+ 1023 00ae 0B60     		str	r3, [r1]
+ 270:Library/Src/referee.c ****             fifo_s_puts(&referee_fifo, (char*)usart6_buf[1], this_time_rx_len);
+ 1024              		.loc 1 270 13 view .LVU268
+ 1025 00b0 0749     		ldr	r1, .L71+20
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 27
+
+
+ 1026 00b2 0648     		ldr	r0, .L71+16
+ 1027 00b4 FFF7FEFF 		bl	fifo_s_puts
+ 1028              	.LVL85:
+ 1029              	.LBE4:
+ 1030              		.loc 1 273 1 is_stmt 0 view .LVU269
+ 1031 00b8 DBE7     		b	.L67
+ 1032              	.L72:
+ 1033 00ba 00BF     		.align	2
+ 1034              	.L71:
+ 1035 00bc 00000000 		.word	huart6
+ 1036 00c0 00140140 		.word	1073812480
+ 1037 00c4 00000000 		.word	.LANCHOR3
+ 1038 00c8 00000000 		.word	.LANCHOR4
+ 1039 00cc 00000000 		.word	.LANCHOR1
+ 1040 00d0 00010000 		.word	.LANCHOR4+256
+ 1041              		.cfi_endproc
+ 1042              	.LFE141:
+ 1044              		.global	referee_unpack_obj
+ 1045              		.global	referee_fifo_buf
+ 1046              		.global	referee_fifo
+ 1047              		.global	usart6_buf
+ 1048              		.global	data_referee
+ 1049              		.section	.bss.data_referee,"aw",%nobits
+ 1050              		.align	2
+ 1051              		.set	.LANCHOR0,. + 0
+ 1054              	data_referee:
+ 1055 0000 00000000 		.space	288
+ 1055      00000000 
+ 1055      00000000 
+ 1055      00000000 
+ 1055      00000000 
+ 1056              		.section	.bss.referee_fifo,"aw",%nobits
+ 1057              		.align	2
+ 1058              		.set	.LANCHOR1,. + 0
+ 1061              	referee_fifo:
+ 1062 0000 00000000 		.space	24
+ 1062      00000000 
+ 1062      00000000 
+ 1062      00000000 
+ 1062      00000000 
+ 1063              		.section	.bss.referee_fifo_buf,"aw",%nobits
+ 1064              		.align	2
+ 1067              	referee_fifo_buf:
+ 1068 0000 00000000 		.space	512
+ 1068      00000000 
+ 1068      00000000 
+ 1068      00000000 
+ 1068      00000000 
+ 1069              		.section	.bss.referee_unpack_obj,"aw",%nobits
+ 1070              		.align	2
+ 1071              		.set	.LANCHOR2,. + 0
+ 1074              	referee_unpack_obj:
+ 1075 0000 00000000 		.space	137
+ 1075      00000000 
+ 1075      00000000 
+ 1075      00000000 
+ 1075      00000000 
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 28
+
+
+ 1076              		.section	.bss.res.0,"aw",%nobits
+ 1079              	res.0:
+ 1080 0000 00       		.space	1
+ 1081              		.section	.bss.this_time_rx_len.1,"aw",%nobits
+ 1082              		.align	1
+ 1083              		.set	.LANCHOR3,. + 0
+ 1086              	this_time_rx_len.1:
+ 1087 0000 0000     		.space	2
+ 1088              		.section	.bss.usart6_buf,"aw",%nobits
+ 1089              		.align	2
+ 1090              		.set	.LANCHOR4,. + 0
+ 1093              	usart6_buf:
+ 1094 0000 00000000 		.space	512
+ 1094      00000000 
+ 1094      00000000 
+ 1094      00000000 
+ 1094      00000000 
+ 1095              		.text
+ 1096              	.Letext0:
+ 1097              		.file 2 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 1098              		.file 3 "c:\\program files (x86)\\gnu arm embedded toolchain\\10 2021.10\\arm-none-eabi\\include\\
+ 1099              		.file 4 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f407xx.h"
+ 1100              		.file 5 "Drivers/CMSIS/Device/ST/STM32F4xx/Include/stm32f4xx.h"
+ 1101              		.file 6 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_def.h"
+ 1102              		.file 7 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_dma.h"
+ 1103              		.file 8 "Drivers/STM32F4xx_HAL_Driver/Inc/stm32f4xx_hal_uart.h"
+ 1104              		.file 9 "Library/Inc/fifo.h"
+ 1105              		.file 10 "Library/Inc/referee.h"
+ 1106              		.file 11 "Library/Inc/crc_ref.h"
+ 1107              		.file 12 "<built-in>"
+ARM GAS  C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s 			page 29
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 referee.c
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:20     .text.referee_Init:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:26     .text.referee_Init:00000000 referee_Init
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:178    .text.referee_Init:000000c4 $d
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:190    .text.referee_read_data:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:196    .text.referee_read_data:00000000 referee_read_data
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:240    .text.referee_read_data:0000002e $d
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:255    .text.referee_read_data:0000004a $t
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:585    .text.referee_read_data:00000254 $d
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:594    .text.referee_unpack_fifo_data:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:600    .text.referee_unpack_fifo_data:00000000 referee_unpack_fifo_data
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:692    .text.referee_unpack_fifo_data:00000068 $d
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:698    .text.referee_unpack_fifo_data:00000080 $t
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:871    .text.referee_unpack_fifo_data:00000170 $d
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:878    .text.USART6_IRQHandler:00000000 $t
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:884    .text.USART6_IRQHandler:00000000 USART6_IRQHandler
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:1035   .text.USART6_IRQHandler:000000bc $d
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:1074   .bss.referee_unpack_obj:00000000 referee_unpack_obj
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:1067   .bss.referee_fifo_buf:00000000 referee_fifo_buf
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:1061   .bss.referee_fifo:00000000 referee_fifo
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:1093   .bss.usart6_buf:00000000 usart6_buf
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:1054   .bss.data_referee:00000000 data_referee
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:1050   .bss.data_referee:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:1057   .bss.referee_fifo:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:1064   .bss.referee_fifo_buf:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:1070   .bss.referee_unpack_obj:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:1079   .bss.res.0:00000000 res.0
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:1080   .bss.res.0:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:1082   .bss.this_time_rx_len.1:00000000 $d
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:1086   .bss.this_time_rx_len.1:00000000 this_time_rx_len.1
+C:\Users\cyz19\AppData\Local\Temp\cc6LYFXw.s:1089   .bss.usart6_buf:00000000 $d
+
+UNDEFINED SYMBOLS
+huart6
+hdma_usart6_rx
+hdma_usart6_tx
+memcpy
+fifo_s_used
+fifo_s_get
+Verify_CRC8_Check_Sum
+Verify_CRC16_Check_Sum
+HAL_UART_IRQHandler
+fifo_s_puts
