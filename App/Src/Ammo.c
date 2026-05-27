@@ -224,49 +224,28 @@ void Ammo_Task()
 
             case STEP_AMMO_FIRE_PUSH:
             {
-                //DJ_124_ctrl_vel(&hcan2, 0x200, PID_chassis_vel, data_motor.Chassis_motor_measure, 0, 7200, 0, 0);
-                //data_motor.Chassis_motor_measure[1].circle = Circle_STOP(1, ammo_circle);
-                //ammo_circle = Circle_STOP(1, ammo_circle);
-                //last_circle = ammo_circle;
-                //total_ecd = ammo_circle * 8192 + data_motor.Chassis_motor_measure[1].ecd;
-                //now_ecd = total_ecd / 8192.0f *2.0 * 3.14f;
+                int16_t push_vel = 7200;
+                if (ammo_circle >= 619 && ammo_circle <= 1443)
+                {
+                    push_vel = 720;
+                }
+                DJ_124_ctrl_vel(&hcan2, 0x200, PID_chassis_vel, data_motor.Chassis_motor_measure, 0, push_vel, 0, 0);
 
-                DJ_124_ctrl_vel(&hcan2, 0x200, PID_chassis_vel, data_motor.Chassis_motor_measure, 0, 7200, 0, 0);
-                //if (data_motor.Chassis_motor_measure[1].ecd - data_motor.Chassis_motor_measure[1].last_ecd > 4096)
-                //{
-                //    ammo_circle--;
-                //}
-                //else if (data_motor.Chassis_motor_measure[1].ecd - data_motor.Chassis_motor_measure[1].last_ecd < -4096)
-                //{
-                //    ammo_circle++;
-                //}
-                //total_ecd = ammo_circle * 8192 + data_motor.Chassis_motor_measure[1].ecd;
-                //now_ecd = total_ecd / 8192.0f *2.0 * 3.14f;
-
-                //circle_vel = PID_Calc(&PID_chassis_pos[1], now_ecd, set_ecd);
-                //DJ_124_ctrl_vel(&hcan2, 0x200, PID_chassis_vel, data_motor.Chassis_motor_measure, 0, (int16_t)circle_vel, 0, 0);
                 if(data_rc.status_ammo == 0)
-                {
-                    ammo_step = STEP_AMMO_STOP;
-                }
-                else if (data_rc.status_ammo == 1 || data_rc.status_ammo == 2)
-                {
-                    //if (data_motor.Chassis_motor_measure[1].given_current > 4000)
-                    //{
-                    //    ammo_step = STEP_AMMO_FIRE_BACK;
-                    //}
-                    
-                    if (ammo_circle >= 2062)
                     {
-                        ammo_step = STEP_AMMO_FIRE_BACK;
-                        //ammo_circle = 0;
+                        ammo_step = STEP_AMMO_STOP;
                     }
-                    else
+                    else if (data_rc.status_ammo == 1 || data_rc.status_ammo == 2)
                     {
-                        ammo_step = STEP_AMMO_FIRE_PUSH;
+                        if (ammo_circle >= 2062)
+                        {
+                            ammo_step = STEP_AMMO_FIRE_BACK;
+                        }
+                        else
+                        {
+                            ammo_step = STEP_AMMO_FIRE_PUSH;
+                        }
                     }
-                    //ammo_step = STEP_AMMO_FIRE_PUSH;
-                }
                 break;
             }
             case STEP_AMMO_FIRE_BACK:
