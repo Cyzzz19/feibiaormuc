@@ -119,4 +119,6 @@ typedef enum
 
 int Circle_STOP(int i, int n);
 
+extern float ballistic_height;
+
 #endif

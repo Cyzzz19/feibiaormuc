@@ -1,6 +1,8 @@
 #include "remote_control.h"
 #include "Data.h"
 
+extern float ballistic_height;
+
 
 RC_ctrl_t rc_ctrl = {0};
 data_rc_t data_rc = {0};
@@ -145,6 +147,22 @@ void rc_read_data(data_rc_t *data_rc)
        data_rc->reset = 0; 
     }
 
+    {
+        static uint8_t last_s0 = 2;
+        static uint8_t last_s1 = 2;
+
+        if (data_rc->RC_ctrl->rc.s[0] == 1 && last_s0 != 1)
+        {
+            ballistic_height += 0.1f;
+        }
+        last_s0 = data_rc->RC_ctrl->rc.s[0];
+
+        if (data_rc->RC_ctrl->rc.s[1] == 1 && last_s1 != 1)
+        {
+            ballistic_height -= 0.1f;
+        }
+        last_s1 = data_rc->RC_ctrl->rc.s[1];
+    }
 }
 
 

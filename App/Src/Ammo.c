@@ -11,10 +11,11 @@
 
 #define BALLISTIC_ANGLE_DEG      26.6f
 #define BALLISTIC_HORIZ_DIST     16.05f
-#define BALLISTIC_HEIGHT_DIFF    1.5f
 #define BALLISTIC_GRAVITY        9.81f
 #define BALLISTIC_WHEEL_RADIUS   0.044f
 #define BALLISTIC_PAIR1_RPM      5000
+
+float ballistic_height = 1.5f;
 
 //ammo_step_e ammo_step =STEP_AMMO_CLOSE;
 ammo_step_e ammo_step =STEP_AMMO_STOP;
@@ -48,7 +49,7 @@ static int ballistic_calc_rpm(void)
     float cos_a = cosf(angle_rad);
     float tan_a = tanf(angle_rad);
     float v0 = BALLISTIC_HORIZ_DIST / cos_a
-               * sqrtf(BALLISTIC_GRAVITY / (2.0f * (BALLISTIC_HORIZ_DIST * tan_a - BALLISTIC_HEIGHT_DIFF)));
+               * sqrtf(BALLISTIC_GRAVITY / (2.0f * (BALLISTIC_HORIZ_DIST * tan_a - ballistic_height)));
     return (int)(v0 * 60.0f / (2.0f * 3.141592654f * BALLISTIC_WHEEL_RADIUS));
 }
 
@@ -102,6 +103,8 @@ int Circle_STOP(int i, int n)
 
 void Ammo_Task()
 {
+    float last_ballistic_height;
+
     PID_init(&PID_shoot_vel[0] , PID_trigger_vel_Kp , PID_trigger_vel_Ki , PID_trigger_vel_Kd , PID_trigger_vel_imax , PID_trigger_vel_outmax);
     PID_init(&PID_ammo1_vel[0] , PID_ammo1_vel_Kp , PID_ammo1_vel_Ki , PID_ammo1_vel_Kd , PID_ammo1_vel_imax , PID_ammo1_vel_outmax);
     PID_init(&PID_ammo1_vel[1] , PID_ammo2_vel_Kp , PID_ammo2_vel_Ki , PID_ammo2_vel_Kd , PID_ammo2_vel_imax , PID_ammo2_vel_outmax);
@@ -137,11 +140,17 @@ void Ammo_Task()
     PID_init(&PID_chassis_pos[3] , PID_chassis_pos_Kp , PID_chassis_pos_Ki , PID_chassis_pos_Kd , PID_chassis_pos_imax , PID_chassis_pos_outmax);
 
     ballistic_set_vel_before(ballistic_calc_rpm());
+    last_ballistic_height = ballistic_height;
 
 
     while(1)
     {
-        
+        if (ballistic_height != last_ballistic_height)
+        {
+            ballistic_set_vel_before(ballistic_calc_rpm());
+            last_ballistic_height = ballistic_height;
+        }
+
         switch (ammo_step)
         {
             //case STEP_AMMO_CLOSE:
