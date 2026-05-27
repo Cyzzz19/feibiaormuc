@@ -75,10 +75,6 @@ float now_ecd = 0.0;
 float set_ecd = 3500;
 float back_ecd = 20;
 float circle_vel = 0;
-static uint8_t ammo_push_stage = 0;
-static int16_t ammo_push_target = 0;
-static uint8_t hold_released = 0;
-static uint16_t hold_timeout = 0;
 
 void usart_printf( const char*fmt,...)
 {
@@ -187,8 +183,6 @@ void Ammo_Task()
                     }
                     else if(data_rc.status_ammo==1||data_rc.status_ammo==2)
                     {
-                        ammo_push_stage = 0;
-                        ammo_push_target = ammo_circle + 1031;
                         ammo_step = STEP_AMMO_FIRE;
                     }
                 //}
@@ -252,62 +246,26 @@ void Ammo_Task()
                 //circle_vel = PID_Calc(&PID_chassis_pos[1], now_ecd, set_ecd);
                 //DJ_124_ctrl_vel(&hcan2, 0x200, PID_chassis_vel, data_motor.Chassis_motor_measure, 0, (int16_t)circle_vel, 0, 0);
                 if(data_rc.status_ammo == 0)
-                    {
-                        ammo_step = STEP_AMMO_STOP;
-                    }
-                    else if (data_rc.status_ammo == 1 || data_rc.status_ammo == 2)
-                    {
-                        if (ammo_circle >= ammo_push_target)
-                        {
-                            if (ammo_push_stage == 0)
-                            {
-                                hold_released = 0;
-                                hold_timeout = 0;
-                                ammo_step = STEP_AMMO_HOLD;
-                            }
-                            else
-                            {
-                                ammo_step = STEP_AMMO_FIRE_BACK;
-                            }
-                        }
-                        else
-                        {
-                            ammo_step = STEP_AMMO_FIRE_PUSH;
-                        }
-                    }
-                break;
-            }
-            case STEP_AMMO_HOLD:
-            {
-                DJ_124_ctrl(&hcan2, 0x200, 0, 0, 0, 0);
-
-                if(data_rc.status_ammo == 0)
                 {
-                    hold_released = 1;
-                    hold_timeout++;
-                    if(hold_timeout > 300)
+                    ammo_step = STEP_AMMO_STOP;
+                }
+                else if (data_rc.status_ammo == 1 || data_rc.status_ammo == 2)
+                {
+                    //if (data_motor.Chassis_motor_measure[1].given_current > 4000)
+                    //{
+                    //    ammo_step = STEP_AMMO_FIRE_BACK;
+                    //}
+                    
+                    if (ammo_circle >= 2062)
                     {
-                        hold_released = 0;
-                        hold_timeout = 0;
-                        ammo_step = STEP_AMMO_STOP;
+                        ammo_step = STEP_AMMO_FIRE_BACK;
+                        //ammo_circle = 0;
                     }
                     else
                     {
-                        ammo_step = STEP_AMMO_HOLD;
+                        ammo_step = STEP_AMMO_FIRE_PUSH;
                     }
-                }
-                else if (hold_released == 1 && data_rc.status_ammo == 2)
-                {
-                    hold_released = 0;
-                    hold_timeout = 0;
-                    ammo_push_stage = 1;
-                    ammo_push_target = ammo_circle + 1031;
-                    ammo_transtime = 0;
-                    ammo_step = STEP_AMMO_FIRE;
-                }
-                else
-                {
-                    ammo_step = STEP_AMMO_HOLD;
+                    //ammo_step = STEP_AMMO_FIRE_PUSH;
                 }
                 break;
             }

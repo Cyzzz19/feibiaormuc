@@ -16,7 +16,6 @@ typedef enum
    STEP_AMMO_FIRE_BACK = 22,
    STEP_AMMO_CHANGE = 23,
    STEP_AMMO_COOL = 24,
-   STEP_AMMO_HOLD = 25,
    STEP_AMMO_CLOSE = 101,
 }ammo_step_e;
 
