@@ -1,4 +1,6 @@
 {
+    "cortex-debug.gdbPath": "F:/astra/10 2021.10/bin/arm-none-eabi-gdb",
+    "cortex-debug.openocdPath.windows": "F:/astra/OpenOCD-20240916-0.12.0/bin/openocd",
     "files.associations": {
         "*.m": "matlab",
         "can_receive.h": "c",
@@ -11,12 +13,56 @@
         "motor.h": "c",
         "pid.h": "c",
         "uart_minipc.h": "c",
+        "usart.h": "c",
+        "fifo.h": "c",
         "remote_control.h": "c",
+        "bmi088.h": "c",
         "gimbal.h": "c",
         "ammo.h": "c",
-        "string.h": "c",
-        "usart.h": "c",
-        "referee.h": "c",
-        "stdarg.h": "c"
-    }
+        "referee.h": "c"
+    },
+    //系统配置
+    "debug.onTaskErrors": "debugAnyway",          
+    //调试时忽略异常                            
+    "diffEditor.wordWrap": "on",
+    //视距折行                                               
+    "editor.cursorBlinking": "smooth", 
+    //光标闪烁
+    "editor.cursorSmoothCaretAnimation": "on", 
+    //光标动画
+    "editor.fontSize": 20, 
+    //字体大小
+    "editor.guides.bracketPairs": true, 
+    //匹配括号
+    "editor.mouseWheelZoom": true, 
+    //缩放
+    "editor.smoothScrolling": true,
+    //平滑滚动
+    "editor.suggestSelection": "first",
+    //建议选择
+    "editor.wordWrap": "on",
+    //视距折行
+    "editor.rulers":[120],
+    //设置标尺
+    "editor.tabSize": 4,
+    //设置tab缩进
+    "explorer.confirmDelete": false,
+    //删除文件时不询问
+    "files.autoGuessEncoding": true,
+    //自动猜测编码
+    "files.autoSave": "afterDelay",
+    //自动保存
+    "security.workspace.trust.untrustedFiles": "open",
+    //信任打开的文件
+    "terminal.integrated.enableMultiLinePasteWarning": "never",
+    //禁止多行粘贴警告
+    "terminal.integrated.smoothScrolling": true,
+    //平滑滚动
+    "window.dialogStyle": "custom",
+    //自定义对话框样式
+    "workbench.colorTheme": "Dark Modern",
+    //主题
+    "workbench.list.smoothScrolling": true,
+    "git.ignoreLimitWarning": true,
+    //平滑滚动
 }

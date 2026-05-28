@@ -40,7 +40,7 @@ static int shoot_G_time = 0;
 int ammo_time = 0;
 int len=10;
 int vel_trans[6]={2500,-2500,3000,-3000,3000,-3000};
-int vel_before[6]={0};
+int vel_before[6]={5252,-5252,3484,-3484,3484,-3484};
 int vel_last[6]={0};
 
 static int ballistic_calc_rpm(void)
@@ -139,7 +139,7 @@ void Ammo_Task()
     PID_init(&PID_chassis_pos[2] , PID_chassis_pos_Kp , PID_chassis_pos_Ki , PID_chassis_pos_Kd , PID_chassis_pos_imax , PID_chassis_pos_outmax);
     PID_init(&PID_chassis_pos[3] , PID_chassis_pos_Kp , PID_chassis_pos_Ki , PID_chassis_pos_Kd , PID_chassis_pos_imax , PID_chassis_pos_outmax);
 
-    ballistic_set_vel_before(ballistic_calc_rpm());
+   // ballistic_set_vel_before(ballistic_calc_rpm());
     last_ballistic_height = ballistic_height;
 
 
@@ -147,7 +147,7 @@ void Ammo_Task()
     {
         if (ballistic_height != last_ballistic_height)
         {
-            ballistic_set_vel_before(ballistic_calc_rpm());
+            //ballistic_set_vel_before(ballistic_calc_rpm());
             last_ballistic_height = ballistic_height;
         }
 

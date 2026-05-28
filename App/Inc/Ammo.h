@@ -31,37 +31,37 @@ typedef enum
 /*飞镖摩擦轮参数*/
 #define PID_ammo1_vel_Kp       4.5
 #define PID_ammo1_vel_Ki       0.02
-#define PID_ammo1_vel_Kd       0.7
+#define PID_ammo1_vel_Kd       0.05
 #define PID_ammo1_vel_imax     16000
 #define PID_ammo1_vel_outmax   7500
 
 #define PID_ammo2_vel_Kp       4.5
 #define PID_ammo2_vel_Ki       0.02
-#define PID_ammo2_vel_Kd       0.7
+#define PID_ammo2_vel_Kd       0.05
 #define PID_ammo2_vel_imax     16000
 #define PID_ammo2_vel_outmax   7500
 
-#define PID_ammo3_vel_Kp       3.2//5
+#define PID_ammo3_vel_Kp       7.6//5
 #define PID_ammo3_vel_Ki       0//0.0092
-#define PID_ammo3_vel_Kd       0.06//2.7
+#define PID_ammo3_vel_Kd       0.15//2.7
 #define PID_ammo3_vel_imax     16000
 #define PID_ammo3_vel_outmax   7500
 
-#define PID_ammo4_vel_Kp       3.2//5//4.2
+#define PID_ammo4_vel_Kp       7.6//5//4.2
 #define PID_ammo4_vel_Ki       0//0.0092//0.01
-#define PID_ammo4_vel_Kd       0.06//2.7//0.7
+#define PID_ammo4_vel_Kd       0.15//2.7//0.7
 #define PID_ammo4_vel_imax     16000
 #define PID_ammo4_vel_outmax   7500
 
-#define PID_ammo5_vel_Kp       3.2//2.1
+#define PID_ammo5_vel_Kp       7.6//2.1
 #define PID_ammo5_vel_Ki       0
-#define PID_ammo5_vel_Kd       0.06 
+#define PID_ammo5_vel_Kd       0.15 
 #define PID_ammo5_vel_imax     16000
 #define PID_ammo5_vel_outmax   7500
 
-#define PID_ammo6_vel_Kp       3.2//5
+#define PID_ammo6_vel_Kp       7.6//5
 #define PID_ammo6_vel_Ki       0//0.002
-#define PID_ammo6_vel_Kd       0.06//0.7
+#define PID_ammo6_vel_Kd       0.15//0.7
 #define PID_ammo6_vel_imax     16000
 #define PID_ammo6_vel_outmax   7500
 /*飞镖摩擦轮参数*/

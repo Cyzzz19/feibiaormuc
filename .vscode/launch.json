@@ -1,6 +1,5 @@
 {
     "configurations": [
-        
     
 
         {
@@ -13,12 +12,12 @@
             "servertype": "openocd",
             "device": "stm32f407",
             "configFiles": [
-                "interface/stlink-v2.cfg",
+                "interface/stlink.cfg",
                 "target/stm32f4x.cfg"
             ],
             "liveWatch": {
-            "enabled": true,
-            "samplesPerSecond": 20
+                "enabled": true,
+                "samplesPerSecond": 20
             }
         }
     ]
