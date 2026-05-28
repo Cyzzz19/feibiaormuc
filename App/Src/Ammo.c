@@ -193,7 +193,19 @@ void Ammo_Task()
 
             case STEP_AMMO_MANUAL:
             {
-                DJ_124_ctrl_vel(&hcan2, 0x200, PID_chassis_vel, data_motor.Chassis_motor_measure, 0, data_rc.speed_y, data_rc.speed_x, 0);
+                int16_t speed_y = data_rc.speed_y;
+                int16_t speed_x = data_rc.speed_x;
+
+                if (data_rc.RC_ctrl->rc.ch[1] > -10 && data_rc.RC_ctrl->rc.ch[1] < 10)
+                {
+                    speed_y = 0;
+                }
+                if (data_rc.RC_ctrl->rc.ch[0] > -10 && data_rc.RC_ctrl->rc.ch[0] < 10)
+                {
+                    speed_x = 0;
+                }
+
+                DJ_124_ctrl_vel(&hcan2, 0x200, PID_chassis_vel, data_motor.Chassis_motor_measure, 0, speed_y, speed_x, 0);
 
                 if(data_rc.status_ammo==1||data_rc.status_ammo==2)
                 {
