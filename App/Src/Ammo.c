@@ -200,12 +200,21 @@ void Ammo_Task()
                 {
                     speed_y = 0;
                 }
+                else
+                {
+                    DJ_124_ctrl_vel(&hcan2, 0x200, PID_chassis_vel, data_motor.Chassis_motor_measure, 0, speed_y, speed_x, 0);
+
+                }
                 if (data_rc.RC_ctrl->rc.ch[0] > -10 && data_rc.RC_ctrl->rc.ch[0] < 10)
                 {
                     speed_x = 0;
                 }
+                else
+                {
+                    DJ_124_ctrl_vel(&hcan2, 0x200, PID_chassis_vel, data_motor.Chassis_motor_measure, 0, speed_y, speed_x, 0);
 
-                DJ_124_ctrl_vel(&hcan2, 0x200, PID_chassis_vel, data_motor.Chassis_motor_measure, 0, speed_y, speed_x, 0);
+                }
+
 
                 if(data_rc.status_ammo==1||data_rc.status_ammo==2)
                 {
