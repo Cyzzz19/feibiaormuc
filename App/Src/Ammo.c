@@ -225,7 +225,7 @@ void Ammo_Task()
             case STEP_AMMO_FIRE_PUSH:
             {
                 int16_t push_vel = 7200;
-                if (ammo_circle >= 1031 && ammo_circle <= 1443)
+                if (ammo_circle >= 1130 && ammo_circle <= 1443)
                 {
                     push_vel = 720;
                 }
