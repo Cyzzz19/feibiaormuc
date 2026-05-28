@@ -96,11 +96,11 @@ typedef enum
 #define PID_chassis1_vel_maxout 8500
 
 /*推杆*/
-#define PID_chassis2_vel_Kp     1
-#define PID_chassis2_vel_Ki     0
-#define PID_chassis2_vel_Kd     0
-#define PID_chassis2_vel_imax   1000
-#define PID_chassis2_vel_maxout 8500
+#define PID_chassis2_vel_Kp     25//8
+#define PID_chassis2_vel_Ki     0.001//0.625 
+#define PID_chassis2_vel_Kd     0//1
+#define PID_chassis2_vel_imax   5000
+#define PID_chassis2_vel_maxout 12000
 
 /*pitch轴*/
 #define PID_chassis3_vel_Kp     1
