@@ -193,127 +193,31 @@ void Ammo_Task()
 
             case STEP_AMMO_FIRE:
             {
-                DJ_124_ctrl(&hcan2, 0x200, 0, 0, 0, 0);
-                
-                //if ((data_referee.GameRobotState.power_management_ammo_output == 0))
-                //{
-                //    ammo_step = STEP_AMMO_CLOSE;
-                //}
-                //else if(data_referee.GameRobotState.power_management_ammo_output == 1)
-                //{
-                    if(data_rc.status_ammo==0)
-                    {
-                        ammo_step = STEP_AMMO_STOP;
-                    }
-                    else if(data_rc.status_ammo==1 || data_rc.status_ammo==2)
-                    {
-                        if(ammo_transtime >= 200)
-                        {
-                            ammo_step = STEP_AMMO_FIRE_PUSH;
-                            ammo_transtime = 0;
-                        }
-                        else
-                        {
-                            ammo_step = STEP_AMMO_FIRE;
-                            ammo_transtime++;
-                        }
-                    }
+                DJ_124_ctrl_vel(&hcan2, 0x200, PID_chassis_vel, data_motor.Chassis_motor_measure, 0, data_rc.speed_y, data_rc.speed_x, 0);
 
-                    break;
+                if(data_rc.status_ammo==0)
+                {
+                    ammo_step = STEP_AMMO_STOP;
+                }
+                else if(data_rc.status_ammo==1||data_rc.status_ammo==2)
+                {
+                    ammo_step = STEP_AMMO_FIRE;
+                }
+
+                break;
             }
 
             case STEP_AMMO_FIRE_PUSH:
             {
-                int16_t push_vel = 7200;
-                if (ammo_circle >= 1130 && ammo_circle <= 1443)
-                {
-                    push_vel = 720;
-                }
-                DJ_124_ctrl_vel(&hcan2, 0x200, PID_chassis_vel, data_motor.Chassis_motor_measure, 0, push_vel, 0, 0);
-
-                if(data_rc.status_ammo == 0)
-                    {
-                        ammo_step = STEP_AMMO_STOP;
-                    }
-                    else if (data_rc.status_ammo == 1 || data_rc.status_ammo == 2)
-                    {
-                        if (ammo_circle >= 2062)
-                        {
-                            ammo_step = STEP_AMMO_FIRE_BACK;
-                        }
-                        else
-                        {
-                            ammo_step = STEP_AMMO_FIRE_PUSH;
-                        }
-                    }
+                ammo_step = STEP_AMMO_STOP;
                 break;
             }
             case STEP_AMMO_FIRE_BACK:
-            {
-                DJ_124_ctrl_vel(&hcan2, 0x200, PID_chassis_vel, data_motor.Chassis_motor_measure, 0, -7200, 0, 0);
-                //data_motor.Chassis_motor_measure[1].circle = Circle_STOP(1, ammo_circle);
-                //ammo_circle = Circle_STOP(1, ammo_circle);
-                //    data_motor.Chassis_motor_measure[1].circle = ammo_circle;
-
-                if (data_motor.Chassis_motor_measure[1].ecd - data_motor.Chassis_motor_measure[1].last_ecd > 4096)
-                {
-                    ammo_circle--;
-                }
-                else if (data_motor.Chassis_motor_measure[1].ecd - data_motor.Chassis_motor_measure[1].last_ecd < -4096)
-                {
-                    ammo_circle++;
-                }
-                
-                if(data_rc.status_ammo == 0)
-                {
-                    ammo_step = STEP_AMMO_STOP;
-                }
-                else if (data_rc.status_ammo == 1 || data_rc.status_ammo == 2)
-                {
-                    if (ammo_circle  <= -50)
-                    {
-                        ammo_step = STEP_AMMO_CHANGE;
-                        ammo_circle = 0;
-                    }
-                    else
-                    {
-                        ammo_step = STEP_AMMO_FIRE_BACK;
-                    }
-                }
-                break;
-            }
             case STEP_AMMO_CHANGE:
-            {
-                DJ_124_ctrl_vel(&hcan2, 0x200, PID_chassis_vel, data_motor.Chassis_motor_measure, 0, 0, 7500, 0);
-                if(data_rc.status_ammo == 0)
-                {
-                    ammo_step = STEP_AMMO_STOP;
-                }
-                else if (data_rc.status_ammo == 1 || data_rc.status_ammo == 2)
-                {
-                    if (data_motor.Chassis_motor_measure[2].given_current > 4600)
-                    {
-                        ammo_step = STEP_AMMO_COOL;
-                    }
-                    else 
-                    {
-                        ammo_step = STEP_AMMO_CHANGE;
-                    }
-                }
-                break;
-            }
-
             case STEP_AMMO_COOL:
+            case STEP_AMMO_CLOSE:
             {
-                DJ_124_ctrl_vel(&hcan2, 0x200, PID_chassis_vel, data_motor.Chassis_motor_measure, 0, 0, 0, 0);
-                if(data_rc.status_ammo == 0)
-                {
-                    ammo_step = STEP_AMMO_STOP;
-                }
-                else if (data_rc.status_ammo == 1 || data_rc.status_ammo == 2)
-                {
-                    ammo_step = STEP_AMMO_COOL;
-                }
+                ammo_step = STEP_AMMO_STOP;
                 break;
             }
                     
