@@ -11,6 +11,7 @@
 typedef enum 
 {
    STEP_AMMO_STOP  = 1,
+   STEP_AMMO_MANUAL = 19,
    STEP_AMMO_FIRE  = 20,
    STEP_AMMO_FIRE_PUSH = 21,
    STEP_AMMO_FIRE_BACK = 22,

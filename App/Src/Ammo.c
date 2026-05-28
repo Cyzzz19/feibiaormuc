@@ -179,7 +179,7 @@ void Ammo_Task()
                 //{
                     if(data_rc.status_ammo==0)
                     {
-                        ammo_step = STEP_AMMO_STOP;
+                        ammo_step = STEP_AMMO_MANUAL;
                     }
                     else if(data_rc.status_ammo==1||data_rc.status_ammo==2)
                     {
@@ -189,6 +189,22 @@ void Ammo_Task()
 
                 break;
 
+            }
+
+            case STEP_AMMO_MANUAL:
+            {
+                DJ_124_ctrl_vel(&hcan2, 0x200, PID_chassis_vel, data_motor.Chassis_motor_measure, 0, data_rc.speed_y, data_rc.speed_x, 0);
+
+                if(data_rc.status_ammo==1||data_rc.status_ammo==2)
+                {
+                    ammo_step = STEP_AMMO_STOP;
+                }
+                else
+                {
+                    ammo_step = STEP_AMMO_MANUAL;
+                }
+
+                break;
             }
 
             case STEP_AMMO_FIRE:
