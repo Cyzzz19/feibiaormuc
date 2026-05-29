@@ -270,7 +270,7 @@ void Ammo_Task()
                 }
                 else if (data_rc.status_ammo == 1 || data_rc.status_ammo == 2)
                 {
-                    if (ammo_circle  <= -50)
+                    if (ammo_circle  <= -40)
                     {
                         ammo_step = STEP_AMMO_CHANGE;
                         ammo_circle = 0;
