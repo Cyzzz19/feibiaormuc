@@ -55,8 +55,14 @@ static int ballistic_calc_rpm(void)
 
 static void ballistic_set_vel_before(int rpm_base)
 {
-    int pair3 = rpm_base;
-    int pair2 = rpm_base + 300;
+    float m_eq = WHEEL_INERTIA_ONE / (WHEEL_EQ_RADIUS * WHEEL_EQ_RADIUS);
+    float dart_v_target = (float)rpm_base * 2.0f * 3.141592654f * WHEEL_OUTER_RADIUS / 60.0f;
+
+    float w2 = ((DART_MASS + 2.0f * m_eq) * DART_V2_INTERMEDIATE - DART_MASS * DART_V1_AFTER_PAIR1) / (2.0f * m_eq);
+    int pair2 = (int)(w2 * 60.0f / (2.0f * 3.141592654f * WHEEL_OUTER_RADIUS));
+
+    float w3 = ((DART_MASS + 2.0f * m_eq) * dart_v_target - DART_MASS * DART_V2_INTERMEDIATE) / (2.0f * m_eq);
+    int pair3 = (int)(w3 * 60.0f / (2.0f * 3.141592654f * WHEEL_OUTER_RADIUS));
 
     vel_before[0] =  BALLISTIC_PAIR1_RPM;  vel_before[1] = -BALLISTIC_PAIR1_RPM;
     vel_before[2] =  pair2;               vel_before[3] = -pair2;

@@ -29,6 +29,15 @@ typedef enum
 /*拨盘电机PID参数*/
 
 /*飞镖摩擦轮参数*/
+/*摩擦轮分配物理常量 (来自feibiao3.xlsx)*/
+#define DART_MASS               0.2086f
+#define WHEEL_INERTIA_ONE       0.000225296f
+#define WHEEL_EQ_RADIUS         0.045f
+#define WHEEL_OUTER_RADIUS      0.044f
+#define DART_V1_AFTER_PAIR1     11.2f
+#define DART_V2_INTERMEDIATE    14.0f
+/*摩擦轮分配物理常量*/
+
 #define PID_ammo1_vel_Kp       4.5
 #define PID_ammo1_vel_Ki       0.02
 #define PID_ammo1_vel_Kd       0.05
