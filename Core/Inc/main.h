@@ -75,6 +75,8 @@ void Error_Handler(void);
 #define BMI088_Accel_GPIO_Port GPIOA
 #define BMI088_Gyro_Pin GPIO_PIN_0
 #define BMI088_Gyro_GPIO_Port GPIOB
+#define PG14_IN_Pin GPIO_PIN_14
+#define PG14_IN_GPIO_Port GPIOG
 
 /* USER CODE BEGIN Private defines */
 

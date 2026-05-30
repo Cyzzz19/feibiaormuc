@@ -8,14 +8,14 @@ referee_unpack_data_t referee_unpack_obj;
 
 extern UART_HandleTypeDef huart6;
 extern DMA_HandleTypeDef hdma_usart6_rx;
-extern DMA_HandleTypeDef hdma_usart6_tx;
 
 void referee_Init(uint8_t *rx1_buf, uint8_t *rx2_buf, uint16_t dma_buf_num)
 {
     //enable the DMA transfer for the receiver and tramsmit request
     //使能DMA串口接收和发送
     SET_BIT(huart6.Instance->CR3, USART_CR3_DMAR);
-    SET_BIT(huart6.Instance->CR3, USART_CR3_DMAT);
+
+
 
     //enalbe idle interrupt
     //使能空闲中断
@@ -54,16 +54,6 @@ void referee_Init(uint8_t *rx1_buf, uint8_t *rx2_buf, uint16_t dma_buf_num)
     __HAL_DMA_ENABLE(&hdma_usart6_rx);
 
 
-    //disable DMA
-    //失效DMA
-    __HAL_DMA_DISABLE(&hdma_usart6_tx);
-
-    while(hdma_usart6_tx.Instance->CR & DMA_SxCR_EN)
-    {
-        __HAL_DMA_DISABLE(&hdma_usart6_tx);
-    }
-
-    hdma_usart6_tx.Instance->PAR = (uint32_t) & (USART6->DR);
 }
 
 
