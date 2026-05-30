@@ -135,13 +135,9 @@ void Gimbal_Task()
                     {
                         if(trans_time >= 270)
                         {
-                            if (data_rc.status_gimbal == 1)
+                            if (data_rc.status_gimbal == 1 || data_rc.status_gimbal == 2)
                             {
                                 gimbal_step = STEP_GIMBAL_FIRE;
-                            }
-                            else if(data_rc.status_gimbal == 2)
-                            {
-                                gimbal_step = STEP_GIMBAL_FIRE_LAST;
                             }
 
                             trans_time = 0;
@@ -163,32 +159,32 @@ void Gimbal_Task()
                 DJ_124_ctrl_vel(&hcan1, AMMO2_ALL_ID, PID_ammo2_vel, data_motor.Ammo2_motor_measure, 0, vel_before[5], 0, 0);
                 DJ_124_ctrl_vel(&hcan2 , AMMO2_ALL_ID , PID_ammo2_vel, data_motor.Ammo2_motor_measure ,vel_before[4], 0, 0 , 0);
 
-                if(data_motor.Ammo1_motor_measure[0].given_current >= 5450)
-                {
-                    m++;
-                }
-
-                if(m > 0 && data_motor.Ammo1_motor_measure[0].given_current <= 700)
-                {
-                    n = 1;
-                    m =0;
-                }
-
-                if(n == 1)
-                {
-                    for(int i = 0; i < 6; i++)
-                    {
-                        if(vel_before[i] > 0)
-                        {
-                            vel_before[i] = vel_before[i] - 1;
-                        }
-                        else if(vel_before[i] < 0)
-                        {
-                            vel_before[i] = vel_before[i] + 1;
-                        }
-                    }
-                    n = 0;
-                }
+                //if(data_motor.Ammo1_motor_measure[0].given_current >= 5450)
+                //{
+                //    m++;
+                //}
+//
+                //if(m > 0 && data_motor.Ammo1_motor_measure[0].given_current <= 700)
+                //{
+                //    n = 1;
+                //    m =0;
+                //}
+//
+                //if(n == 1)
+                //{
+                //    for(int i = 0; i < 6; i++)
+                //    {
+                //        if(vel_before[i] > 0)
+                //        {
+                //            vel_before[i] = vel_before[i] - 1;
+                //        }
+                //        else if(vel_before[i] < 0)
+                //        {
+                //            vel_before[i] = vel_before[i] + 1;
+                //        }
+                //    }
+                //    n = 0;
+                //}
 
 
                 //if(data_referee.GameRobotState.power_management_gimbal_output == 0)
@@ -201,13 +197,9 @@ void Gimbal_Task()
                     {
                         gimbal_step = STEP_GIMBAL_STOP;
                     }
-                    else if (data_rc.status_gimbal == 1)
+                    if (data_rc.status_gimbal == 1 || data_rc.status_gimbal == 2)
                     {
                         gimbal_step = STEP_GIMBAL_FIRE;
-                    }
-                    else if(data_rc.status_gimbal == 2)
-                    {
-                        gimbal_step = STEP_GIMBAL_FIRE_LAST;
                     }
                 //}
 
@@ -232,13 +224,9 @@ void Gimbal_Task()
                     {
                         gimbal_step = STEP_GIMBAL_STOP;
                     }
-                    else if (data_rc.status_gimbal == 1)
+                    if (data_rc.status_gimbal == 1 || data_rc.status_gimbal == 2)
                     {
                         gimbal_step = STEP_GIMBAL_FIRE;
-                    }
-                    else if(data_rc.status_gimbal == 2)
-                    {
-                        gimbal_step = STEP_GIMBAL_FIRE_LAST;
                     }
                 //}
                 break;
